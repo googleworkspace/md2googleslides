@@ -1,0 +1,139 @@
+{
+  "presentationId": "12345",
+  "pageSize": {
+    "width": {
+      "magnitude": 9144000,
+      "unit": "EMU"
+    },
+    "height": {
+      "magnitude": 5143500,
+      "unit": "EMU"
+    }
+  },
+  "slides": [
+    {
+      "objectId": "title-slide",
+      "pageElements": [
+        {
+          "objectId": "centered-title-element",
+          "shape": {
+            "placeholder": {
+              "type": "CENTERED_TITLE"
+            }
+          }
+        },
+        {
+          "objectId": "subtitle-element",
+          "shape": {
+            "placeholder": {
+              "type": "SUBTITLE"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "objectId": "body-slide",
+      "pageElements": [
+        {
+          "objectId": "title-element",
+          "shape": {
+            "placeholder": {
+              "type": "TITLE"
+            }
+          }
+        },
+        {
+          "objectId": "body-element",
+          "size": {
+            "width": {
+              "magnitude": 3000000,
+              "unit": "EMU"
+            },
+            "height": {
+              "magnitude": 3000000,
+              "unit": "EMU"
+            }
+          },
+          "transform": {
+            "scaleX": 2.7894,
+            "scaleY": 1.0263,
+            "translateX": 387900,
+            "translateY": 1489824.0225,
+            "unit": "EMU"
+          },
+          "shape": {
+            "placeholder": {
+              "type": "BODY"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "objectId": "two-column-slide",
+      "pageElements": [
+        {
+          "objectId": "title-element",
+          "shape": {
+            "placeholder": {
+              "type": "TITLE"
+            }
+          }
+        },
+        {
+          "objectId": "body-element",
+          "size": {
+            "width": {
+              "magnitude": 3000000,
+              "unit": "EMU"
+            },
+            "height": {
+              "magnitude": 3000000,
+              "unit": "EMU"
+            }
+          },
+          "transform": {
+            "scaleX": 1.3333,
+            "scaleY": 1.0263,
+            "translateX": 387900,
+            "translateY": 1489825,
+            "unit": "EMU"
+          },
+          "shape": {
+            "placeholder": {
+              "type": "BODY"
+            }
+          }
+        },
+        {
+          "objectId": "body-element-2",
+          "size": {
+            "width": {
+              "magnitude": 3000000,
+              "unit": "EMU"
+            },
+            "height": {
+              "magnitude": 3000000,
+              "unit": "EMU"
+            }
+          },
+          "transform": {
+            "scaleX": 1.3333,
+            "scaleY": 1.0263,
+            "translateX": 4756200,
+            "translateY": 1489825,
+            "unit": "EMU"
+          },
+          "shape": {
+            "placeholder": {
+              "type": "BODY"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "locale": "en",
+  "revisionId": "1"
+}
