@@ -1,13 +1,12 @@
 {
   "name": "md2gslides",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Convert Markdown to Google Slides",
   "main": "index.js",
   "files": [
     "index.js",
     "bin/",
     "lib/",
-    "config",
     "LICENSE",
     "README.md",
     "CONTRIBUTING.md"

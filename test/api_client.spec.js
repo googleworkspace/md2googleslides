@@ -38,7 +38,7 @@ describe('ApiClient', function() {
             reqheaders: {
                 'Authorization': 'Bearer abc'
             }})
-            .get('/v1beta1/presentations/123')
+            .get('/v1/presentations/123')
             .reply(200, {});
         const oauth2Client = buildCredentials();
         const apiClient = new ApiClient(oauth2Client);
@@ -48,7 +48,7 @@ describe('ApiClient', function() {
 
     it('should reject promises for failed requests', function() {
         nock('https://slides.googleapis.com')
-            .get('/v1beta1/presentations/123')
+            .get('/v1/presentations/123')
             .reply(400, { error: 'invalid request.' });
         const oauth2Client = buildCredentials();
         const apiClient = new ApiClient(oauth2Client);

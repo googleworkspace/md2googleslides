@@ -47,13 +47,13 @@ describe('SlideGenerator', function() {
                 reqheaders: {
                     'Authorization': 'Bearer abc'
                 }})
-                .post('/v1beta1/presentations')
+                .post('/v1/presentations')
                 .reply(200, presentation);
             nock('https://slides.googleapis.com', {
                 reqheaders: {
                     'Authorization': 'Bearer abc'
                 }})
-                .post('/v1beta1/presentations/1tuAQc1AVbJcAZWWikCW4najLJo7KtvE0AGohHZ24_M4')
+                .post('/v1/presentations/1tuAQc1AVbJcAZWWikCW4najLJo7KtvE0AGohHZ24_M4')
                 .reply(200, {});
         });
 
@@ -77,7 +77,7 @@ describe('SlideGenerator', function() {
                 reqheaders: {
                     'Authorization': 'Bearer abc'
                 }})
-                .get('/v1beta1/presentations/12345')
+                .get('/v1/presentations/12345')
                 .reply(200, { "presentationId": "12345" });
         });
 
