@@ -52,7 +52,7 @@ The following examples show how to create slides of various layouts:
     ## Your name here
 </pre>
 
-![Title slide](examples/title_slide.png)
+![Title slide](https://github.com/googlesamples/md2googleslides/raw/master/examples/title_slide.png)
 
 #### Section title slides
 
@@ -62,7 +62,7 @@ The following examples show how to create slides of various layouts:
     # This is a section title
 </pre>
 
-![Section title slide](examples/section_title_slide.png)
+![Section title slide](https://github.com/googlesamples/md2googleslides/raw/master/examples/section_title_slide.png)
 
 #### Section title & body slides
 
@@ -76,7 +76,7 @@ The following examples show how to create slides of various layouts:
     This is the body
 </pre>
 
-![Section title & body slide](examples/section_title_body_slide.png)
+![Section title & body slide](https://github.com/googlesamples/md2googleslides/raw/master/examples/section_title_body_slide.png)
 
 #### Title & body slides
 
@@ -88,7 +88,7 @@ The following examples show how to create slides of various layouts:
     This is the slide body.
 </pre>
 
-![Title & body slide](examples/title_body_slide.png)
+![Title & body slide](https://github.com/googlesamples/md2googleslides/raw/master/examples/title_body_slide.png)
 
 #### Main point slide
 
@@ -100,7 +100,7 @@ Add `{.big}` to the title to make a slide with one big point
     # This is the main point {.big}
 </pre>
 
-![Main point slide](examples/main_point_slide.png)
+![Main point slide](https://github.com/googlesamples/md2googleslides/raw/master/examples/main_point_slide.png)
 
 #### Big number slide
 
@@ -134,7 +134,7 @@ on its own line with a blank both before and after.
     This is the right column
 </pre>
 
-![Two column slide](examples/two_column_slide.png)
+![Two column slide](https://github.com/googlesamples/md2googleslides/raw/master/examples/two_column_slide.png)
 
 
 ### Images
@@ -156,7 +156,7 @@ slide template.
     ![](https://placekitten.com/900/900)
 </pre>
 
-![Slide with image](examples/image_slide.png)
+![Slide with image](https://github.com/googlesamples/md2googleslides/raw/master/examples/image_slide.png)
 
 #### Background images
 
@@ -171,7 +171,7 @@ the end of an image URL.
     ![](https://placekitten.com/1600/900){.background}
 </pre>
 
-![Slide with background image](examples/background_image_slide.png)
+![Slide with background image](https://github.com/googlesamples/md2googleslides/raw/master/examples/background_image_slide.png)
 
 ### Videos
 
@@ -185,7 +185,7 @@ Includes YouTUbe videos with a modified image tag.
     @[youtube](MG8KADiRbOU)
 </pre>
 
-![Slide with video](examples/video_slide.png)
+![Slide with video](https://github.com/googlesamples/md2googleslides/raw/master/examples/video_slide.png)
 
 
 ### Formatting
