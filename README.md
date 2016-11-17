@@ -175,7 +175,7 @@ the end of an image URL.
 
 ### Videos
 
-Includes YouTUbe videos with a modified image tag.
+Includes YouTube videos with a modified image tag.
 
 <pre>
     ---
