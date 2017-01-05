@@ -208,12 +208,12 @@ describe('extractSlides', function() {
 
     describe('with text formats', function() {
         const markdown =
-            '*italic* and **bold**\n';
+            '*italic*, **bold**, ~~strikethrough~~\n';
 
         const slides = extractSlides(markdown);
 
-        it('should have list markers', function() {
-            return expect(slides).to.have.deep.property('[0].bodies[0].textRuns').length(2);
+        it('should have text runs', function() {
+            return expect(slides).to.have.deep.property('[0].bodies[0].textRuns').length(3);
         });
 
         it('should have the correct italic start', function() {
@@ -229,15 +229,27 @@ describe('extractSlides', function() {
         });
 
         it('should have the correct bold start', function() {
-            return expect(slides).to.have.deep.property('[0].bodies[0].textRuns[1].start', 11);
+            return expect(slides).to.have.deep.property('[0].bodies[0].textRuns[1].start', 8);
         });
 
         it('should have the correct bold end', function() {
-            return expect(slides).to.have.deep.property('[0].bodies[0].textRuns[1].end', 15);
+            return expect(slides).to.have.deep.property('[0].bodies[0].textRuns[1].end', 12);
         });
 
         it('should have the correct bold style', function() {
             return expect(slides).to.have.deep.property('[0].bodies[0].textRuns[1].bold', true);
+        });
+
+        it('should have the correct strikethrough start', function() {
+            return expect(slides).to.have.deep.property('[0].bodies[0].textRuns[2].start', 14);
+        });
+
+        it('should have the correct strikethrough end', function() {
+            return expect(slides).to.have.deep.property('[0].bodies[0].textRuns[2].end', 27);
+        });
+
+        it('should have the correct strikethrough style', function() {
+            return expect(slides).to.have.deep.property('[0].bodies[0].textRuns[2].strikethrough', true);
         });
     });
 
@@ -254,5 +266,72 @@ describe('extractSlides', function() {
 
     });
 
+    describe('with inline HTML span', function() {
+        const markdown =
+            '<span style="color: #EFEFEF">hello</span>\n';
 
+        const slides = extractSlides(markdown);
+
+        it('should have text runs', function() {
+            return expect(slides).to.have.deep.property('[0].bodies[0].textRuns').length(1);
+        });
+
+        it('should have the correct start', function() {
+            return expect(slides).to.have.deep.property('[0].bodies[0].textRuns[0].start', 0);
+        });
+
+        it('should have the correct end', function() {
+            return expect(slides).to.have.deep.property('[0].bodies[0].textRuns[0].end', 5);
+        });
+
+        it('should have the correct  style', function() {
+            return expect(slides).to.have.deep.property('[0].bodies[0].textRuns[0].foregroundColor');
+        });
+    });
+
+    describe('with inline HTML subscript', function() {
+        const markdown =
+            'H<sub>2</sub>O\n';
+
+        const slides = extractSlides(markdown);
+
+        it('should have text runs', function() {
+            return expect(slides).to.have.deep.property('[0].bodies[0].textRuns').length(1);
+        });
+
+        it('should have the correct start', function() {
+            return expect(slides).to.have.deep.property('[0].bodies[0].textRuns[0].start', 1);
+        });
+
+        it('should have the correct end', function() {
+            return expect(slides).to.have.deep.property('[0].bodies[0].textRuns[0].end', 2);
+        });
+
+        it('should have the correct style', function() {
+            return expect(slides).to.have.deep.property('[0].bodies[0].textRuns[0].baselineOffset', 'SUBSCRIPT');
+        });
+    });
+
+    describe('with inline HTML superscript', function() {
+        const markdown =
+            'Hello<sup>1</sup>\n';
+
+        const slides = extractSlides(markdown);
+
+        it('should have text runs', function() {
+            return expect(slides).to.have.deep.property('[0].bodies[0].textRuns').length(1);
+        });
+
+        it('should have the correct start', function() {
+            return expect(slides).to.have.deep.property('[0].bodies[0].textRuns[0].start', 5);
+        });
+
+        it('should have the correct end', function() {
+            return expect(slides).to.have.deep.property('[0].bodies[0].textRuns[0].end', 6);
+        });
+
+        it('should have the correct style', function() {
+            return expect(slides).to.have.deep.property('[0].bodies[0].textRuns[0].baselineOffset', 'SUPERSCRIPT');
+        });
+    });
 });

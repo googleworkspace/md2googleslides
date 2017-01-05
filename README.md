@@ -195,6 +195,7 @@ Basic formatting rules are allowed, including:
 * Bold
 * Italics
 * Code
+* Strikethrough
 * Hyperlinks
 * Ordered lists
 * Unordered lists
@@ -202,7 +203,7 @@ Basic formatting rules are allowed, including:
 The following markdown illustrates a few common styles.
 
 <pre>
-**Bold** and *italics* may be used.
+**Bold**, *italics*, and ~~strikethrough~` may be used.
 
 Ordered lists:
 1. Item 1
@@ -214,6 +215,27 @@ Unordered lists:
 * Item 2
   * Item 2.1
 </pre>
+
+Additionally, a subset of inline HTML tags are supported for styling.
+
+* `<span>`
+* `<sup>`
+* `<sub>`
+* `<em>`
+* `<i>`
+* `<strong>`
+* `<b>`
+
+Supported CSS styles for use with `<span>` elements:
+
+* `color`
+* `background-color`
+* `font-weight: bold`
+* `font-style: italic`
+* `text-decoration: underline`
+* `text-decoration: line-through`
+* `font-family`
+* `font-variant: small-caps`
 
 ### Emoji
 

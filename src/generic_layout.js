@@ -116,8 +116,13 @@ class GenericLayout {
                         bold: textRun.bold,
                         italic: textRun.italic,
                         foregroundColor: textRun.foregroundColor,
+                        backgroundColor: textRun.backgroundColor,
+                        strikethrough: textRun.strikethrough,
+                        underline: textRun.underline,
+                        smallCaps: textRun.smallCaps,
                         fontFamily: textRun.fontFamily,
                         link: textRun.link,
+                        baselineOffset: textRun.baselineOffset
                     }
                 }, locationProps)
             };

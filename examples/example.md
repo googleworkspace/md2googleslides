@@ -19,6 +19,7 @@ Text can be styled for:
 
 * *emphasis*
 * **strong emphasis**
+* ~~strikethrough~~
 * `fixed width code fonts`
 
 Slides :heart: [links](https://developers.google.com/slides) too!
@@ -99,3 +100,11 @@ Fish   | 142 million
 Cats   | 88 million
 Dogs   | 75 million
 Birds  | 16 million
+
+---
+# Some inline HTML and CSS is supported
+
+Use <span style="color:red">span</span> to color text.
+
+Use <sup>superscript</sup> and <sub>subscript</sub>, <span style="text-decoration: line-through">strikethrough</span>
+or <span style="text-decoration: underline">underline</span>, even <span style="font-variant: small-caps">small caps.</span>

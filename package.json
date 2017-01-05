@@ -1,6 +1,6 @@
 {
   "name": "md2gslides",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Convert Markdown to Google Slides",
   "main": "index.js",
   "files": [
@@ -37,6 +37,7 @@
     "google-auth-library": "^0.9.8",
     "googleapis": "^14.2.0",
     "highlight.js": "^9.7.0",
+    "inline-styles-parse": "^1.2.0",
     "jsonfile": "^2.4.0",
     "layout": "^2.2.0",
     "lodash": "^4.16.4",
@@ -53,6 +54,7 @@
     "native-css": "^1.2.5",
     "opener": "^1.4.2",
     "parse-color": "^1.0.0",
+    "parse5": "^3.0",
     "probe-image-size": "^2.1.1",
     "promise": "^7.1.1",
     "promise-retry": "^1.1.1",

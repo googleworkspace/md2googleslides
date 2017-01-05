@@ -24,7 +24,8 @@ const extend = require('extend');
 const nativeCSS = require('native-css');
 const low = require('lowlight');
 const parseColor = require('parse-color');
-
+const parse5 = require('parse5');
+const inlineStylesParse = require('inline-styles-parse');
 const markdownTokenRules = {};
 const htmlTokenRules = {};
 
@@ -52,10 +53,16 @@ function extractSlides(markdown, stylesheet) {
             italic: undefined,
             fontFamily: undefined,
             foregroundColor: undefined,
-            link: undefined
+            link: undefined,
+            backgroundColor: undefined,
+            underline: undefined,
+            strikethrough: undefined,
+            smallCaps: undefined,
+            baselineOffset: undefined
         }],
         listDepth: 0,
-        css: css
+        css: css,
+        inlineHtmlContext: undefined
     };
 
     startSlide(env);
@@ -76,7 +83,8 @@ function parseMarkdown(markdown) {
     const mdOptions = {
         html: true,
         langPrefix: 'highlight ',
-        linkify: false
+        linkify: false,
+        breaks: false
     };
     const parser = markdownIt(mdOptions)
         .use(attrs)
@@ -186,6 +194,49 @@ markdownTokenRules['inline'] = function(token, env) {
     }
 };
 
+markdownTokenRules['html_inline'] = function(token, env) {
+    const fragment = parse5.parseFragment(token.content, env.inlineHtmlContext);
+    if(fragment.childNodes.length) {
+        const style = {}
+        env.inlineHtmlContext = fragment.childNodes[0];
+        const node = fragment.childNodes[0];
+        switch (node.nodeName) {
+            case 'strong':
+            case 'b':
+                style.bold = true;
+                break;
+            case 'em':
+            case 'i':
+                style.italic = true;
+                break;
+            case 'code':
+                style.fontFamily = 'Courier New';
+                break;
+            case 'sub':
+                style.baselineOffset = 'SUBSCRIPT';
+                break;
+            case 'sup':
+                style.baselineOffset = 'SUPERSCRIPT';
+                break;
+            case 'span':
+                break;
+            default:
+                throw new Error('Unsupported inline HTML element: ' + node.nodeName);
+        }
+        for(let attr of node.attrs) {
+            if (attr.name == 'style') {
+                const dummyRule = inlineStylesParse.declarationsToRule(attr.value);
+                const css = nativeCSS.convert(dummyRule);
+                convertCssRule(css['dummy'], style);
+                break;
+            }
+        }
+        startStyle(style, env)
+    } else {
+        endStyle(env);
+    }
+};
+
 markdownTokenRules['text'] = function(token, env) {
     env.text.rawText += token.content;
 };
@@ -270,6 +321,14 @@ markdownTokenRules['em_close'] = function(token, env) {
     endStyle(env);
 };
 
+markdownTokenRules['s_open'] = function(token, env) {
+    startStyle({strikethrough: true}, env);
+};
+
+markdownTokenRules['s_close'] = function(token, env) {
+    endStyle(env);
+};
+
 markdownTokenRules['strong_open'] = function(token, env) {
     startStyle({bold: true}, env);
 };
@@ -296,8 +355,12 @@ markdownTokenRules['code_inline'] = function(token, env) {
     endStyle(env);
 };
 
-markdownTokenRules['softbreak'] = function(token, env) {
+markdownTokenRules['hardbreak'] = function(token, env) {
     env.text.rawText += '\u000b';
+};
+
+markdownTokenRules['softbreak'] = function(token, env) {
+    env.text.rawText += ' ';
 };
 
 markdownTokenRules['blockquote_open'] = function(token, env) {
@@ -448,23 +511,39 @@ function parseColorString(hexString) {
 
 function getCssStyle(token, env) {
     const classNames = token.properties['className'];
-    const style = {};
+    let style = {};
     for(let cls of (classNames || [])) {
-        const classStyle = env.css[cls.replace(/-/g, '_')];
-        if (classStyle) {
-            if (classStyle['color']) {
-                style.foregroundColor = parseColorString(classStyle['color']);
-            }
-            if (classStyle['font-weight'] == 'bold') {
-                style.bold = true;
-            }
-            if (classStyle['font-style'] == 'italic') {
-                style.italic = true;
-            }
-            if (classStyle['font-family']) {
-                style.fontFamily = classStyle['font-family'];
-            }
+        const rule = env.css[cls.replace(/-/g, '_')];
+        if (rule) {
+            convertCssRule(rule, style);
         }
+    }
+    return style;
+}
+
+function convertCssRule(rule, style = {}) {
+    if (rule['color']) {
+        style.foregroundColor = parseColorString(rule['color']);
+    }
+    if (rule['background-color']) {
+        style.backgroundColor = parseColorString(rule['background-color']);
+    }    if (rule['font-weight'] == 'bold') {
+        style.bold = true;
+    }
+    if (rule['font-style'] == 'italic') {
+        style.italic = true;
+    }
+    if (rule['text-decoration'] == 'underline') {
+        style.underline = true;
+    }
+    if (rule['text-decoration'] == 'line-through') {
+        style.strikethrough = true;
+    }
+    if (rule['font-family']) {
+        style.fontFamily = rule['font-family'];
+    }
+    if (rule['font-variant'] == 'small-caps') {
+        style.smallCaps = true;
     }
     return style;
 }
