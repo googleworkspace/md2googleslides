@@ -19,7 +19,6 @@
 require('babel-polyfill');
 
 const Promise = require('promise');
-const jsonfile = require('jsonfile');
 const fs = require('fs');
 const path = require('path');
 const ArgumentParser = require('argparse').ArgumentParser;
@@ -159,7 +158,7 @@ function buildSlideGenerator(oauth2Client) {
 
 function eraseIfNeeded(slideGenerator) {
     if (args.erase || !args.id) {
-        return slideGenerator.erase().then(function() { return slideGenerator });
+        return slideGenerator.erase().then(function() { return slideGenerator; });
     } else {
         return Promise.resolve(slideGenerator);
     }

@@ -108,17 +108,17 @@ class SlideGenerator {
             randomize: true,
         };
         const probe = function(image) {
-            return promiseRetry((retry, number) => {
+            return promiseRetry((retry) => {
                 return probeImageSize({ url: image.url, timeout: 5000 })
                     .then(size => {
                         image.width = size.width;
                         image.height = size.height;
                     }).catch(err => {
-                        if (err.code == ECONNRESET || err.code == ETIMEDOUT) {
+                        if (err.code == 'ECONNRESET' || err.code == 'ETIMEDOUT') {
                             retry(err);
                         }
                         throw err;
-                    })
+                    });
             }, retryOptions);
         };
         const promises = [];

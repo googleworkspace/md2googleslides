@@ -197,31 +197,31 @@ markdownTokenRules['inline'] = function(token, env) {
 markdownTokenRules['html_inline'] = function(token, env) {
     const fragment = parse5.parseFragment(token.content, env.inlineHtmlContext);
     if(fragment.childNodes.length) {
-        const style = {}
+        const style = {};
         env.inlineHtmlContext = fragment.childNodes[0];
         const node = fragment.childNodes[0];
         switch (node.nodeName) {
-            case 'strong':
-            case 'b':
-                style.bold = true;
-                break;
-            case 'em':
-            case 'i':
-                style.italic = true;
-                break;
-            case 'code':
-                style.fontFamily = 'Courier New';
-                break;
-            case 'sub':
-                style.baselineOffset = 'SUBSCRIPT';
-                break;
-            case 'sup':
-                style.baselineOffset = 'SUPERSCRIPT';
-                break;
-            case 'span':
-                break;
-            default:
-                throw new Error('Unsupported inline HTML element: ' + node.nodeName);
+        case 'strong':
+        case 'b':
+            style.bold = true;
+            break;
+        case 'em':
+        case 'i':
+            style.italic = true;
+            break;
+        case 'code':
+            style.fontFamily = 'Courier New';
+            break;
+        case 'sub':
+            style.baselineOffset = 'SUBSCRIPT';
+            break;
+        case 'sup':
+            style.baselineOffset = 'SUPERSCRIPT';
+            break;
+        case 'span':
+            break;
+        default:
+            throw new Error('Unsupported inline HTML element: ' + node.nodeName);
         }
         for(let attr of node.attrs) {
             if (attr.name == 'style') {
@@ -231,7 +231,7 @@ markdownTokenRules['html_inline'] = function(token, env) {
                 break;
             }
         }
-        startStyle(style, env)
+        startStyle(style, env);
     } else {
         endStyle(env);
     }
