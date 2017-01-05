@@ -9,7 +9,8 @@
     "lib/",
     "LICENSE",
     "README.md",
-    "CONTRIBUTING.md"
+    "CONTRIBUTING.md",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "clean": "rm -rf lib",
