@@ -203,7 +203,7 @@ Basic formatting rules are allowed, including:
 The following markdown illustrates a few common styles.
 
 <pre>
-**Bold**, *italics*, and ~~strikethrough~` may be used.
+**Bold**, *italics*, and ~~strikethrough~~ may be used.
 
 Ordered lists:
 1. Item 1
