@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+* Allow blank slides
+
 ## 0.2
 
 * Add support for additional text styles including strikethrough,
