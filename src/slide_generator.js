@@ -207,6 +207,9 @@ class SlideGenerator {
      */
     updatePresentation(batch) {
         debug(JSON.stringify(batch, null, 2));
+        if (batch.requests.length == 0) {
+            return Promise.resolve(null);
+        }
         return this.apiClient.batchUpdate({
             presentationId: this.presentation.data.presentationId,
             resource: batch});
