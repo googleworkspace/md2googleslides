@@ -46,6 +46,25 @@ describe('extractSlides', function() {
         });
     });
 
+    describe('with an empty slide', function() {
+        const markdown =
+            '---\n' +
+            '\n'
+            '---\n';
+        const slides = extractSlides(markdown);
+
+        it('should return a slide', function() {
+            return expect(slides).to.have.length(1);
+        });
+
+        it('should have no title', function() {
+            return expect(slides).to.have.deep.property('[0].title', null);
+        });
+
+        it('should have empty bodies', function() {
+            return expect(slides).to.have.deep.property('[0].bodies').empty;
+        });
+    });
     describe('with a title & body slide', function() {
         const markdown =
             '# Title\n' +
@@ -130,6 +149,7 @@ describe('extractSlides', function() {
             return expect(slides).to.have.deep.property('[0].videos[0].id', '12345');
         });
     });
+
     describe('with tables', function() {
         const markdown =
             '# Title\n' +

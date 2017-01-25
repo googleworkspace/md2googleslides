@@ -79,7 +79,31 @@ describe('matchLayout', function() {
             tables: [],
             images: [],
             videos: []
-        }]
+        }],
+        ['TITLE_AND_BODY', {
+            title: { rawText: 'title'},
+            subtitle: null,
+            bodies: [],
+            tables: [],
+            images: [ { url :"https://source.unsplash.com/78A265wPiO4/1600x900", padding :0} ],
+            videos: []
+        }],
+        ['BLANK', {
+            title: null,
+            subtitle: null,
+            bodies: [],
+            tables: [],
+            images: [],
+            videos: []
+        }],
+        ['BLANK', {
+            title: null,
+            subtitle: null,
+            bodies: [],
+            tables: [],
+            images: [ { url :"https://source.unsplash.com/78A265wPiO4/1600x900", padding :0} ],
+            videos: []
+        }],
     ];
 
     for(let test of tests) {

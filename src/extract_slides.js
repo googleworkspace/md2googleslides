@@ -114,7 +114,7 @@ function startTextBlock(env) {
 
 function endSlide(env) {
     if(env.currentSlide) {
-        if (env.text && env.text.rawText.length) {
+        if (env.text && env.text.rawText.trim().length) {
             env.currentSlide.bodies.push(env.text);
         }
 

@@ -39,12 +39,14 @@ function hasTextContent(slide) {
     return slide.bodies.length;
 }
 
+// Anything which takes up the main body space
 function hasContent(slide) {
     return slide.bodies.length ||
            slide.tables.length ||
            slide.videos.length ||
            slide.images.length;
 }
+
 
 // Define rules for picking slide layouts based on the default
 // layouts in Slides.
@@ -59,7 +61,7 @@ defineLayout('MAIN_POINT', function(slide) {
 });
 
 defineLayout('SECTION_HEADER', function(slide) {
-    return slide.title  && !slide.subtitle && !hasContent(slide);
+    return slide.title && !slide.subtitle && !hasContent(slide);
 });
 
 defineLayout('SECTION_TITLE_AND_DESCRIPTION', function(slide) {
@@ -75,7 +77,7 @@ defineLayout('TITLE_AND_TWO_COLUMNS', function(slide) {
 });
 
 defineLayout('TITLE_AND_BODY', function(slide) {
-    return hasContent(slide);
+    return slide.title || slide.bodies.length;
 });
 
 defineLayout('BLANK', function() {
