@@ -354,4 +354,19 @@ describe('extractSlides', function() {
             return expect(slides).to.have.deep.property('[0].bodies[0].textRuns[0].baselineOffset', 'SUPERSCRIPT');
         });
     });
+
+    describe('with speaker notes', function() {
+        const markdown =
+            '# Title\n' +
+            '<!-- Hello **world** -->\n';
+        const slides = extractSlides(markdown);
+
+        it('should have speaker notes', function() {
+            return expect(slides).to.have.deep.property('[0].notes.rawText', 'Hello world\n');
+        });
+
+        it('should have text runs', function() {
+            return expect(slides).to.have.deep.property('[0].notes.textRuns').length(1);
+        });
+    });
 });

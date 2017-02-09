@@ -51,7 +51,13 @@ describe('GenericLayout', function() {
                 "bodies": [],
                 "tables": [],
                 "videos": [],
-                "images": []
+                "images": [],
+                "notes": {
+                    "rawText": "Speaker notes here.",
+                    "textRuns": [],
+                    "listMarkers": []
+                },
+
             };
             const layout = new GenericLayout('', presentation, input);
             layout.appendContentRequests(requests);
@@ -71,6 +77,15 @@ describe('GenericLayout', function() {
                 "insertText": {
                     "text": "Your name here",
                     "objectId": "subtitle-element"
+                }
+            });
+        });
+
+        it(`should insert speaker notes`, function() {
+            expect(requests).to.include({
+                "insertText": {
+                    "text": "Speaker notes here.",
+                    "objectId": "speaker-notes-element"
                 }
             });
         });

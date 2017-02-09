@@ -27,9 +27,22 @@ const parseColor = require('parse-color');
 const parse5 = require('parse5');
 const inlineStylesParse = require('inline-styles-parse');
 const markdownTokenRules = {};
+const inlineTokenRules = {};
 const htmlTokenRules = {};
 
 const NO_OP = function() {};
+const mdOptions = {
+    html: true,
+    langPrefix: 'highlight ',
+    linkify: false,
+    breaks: false
+};
+const parser = markdownIt(mdOptions)
+    .use(attrs)
+    .use(lazyHeaders)
+    .use(emoji, {shortcuts: {}})
+    .use(expandTabs, {tabWidth: 4})
+    .use(video, { youtube: { width: 640, height: 390 }});
 
 /**
  * Parse the markdown and converts it into a form more suitable
@@ -45,7 +58,40 @@ const NO_OP = function() {};
 function extractSlides(markdown, stylesheet) {
     let tokens = parseMarkdown(markdown);
     let css = nativeCSS.convert(stylesheet);
-    let env = {
+    let env = newEnv(markdownTokenRules, css);
+    startSlide(env);
+    processTokens(tokens, env);
+    endSlide(env);
+    debug(JSON.stringify(env.slides, null, 2));
+    return env.slides;
+}
+
+function processTokens(tokens, env) {
+    for(let index in tokens) {
+        let token = tokens[index];
+        if (token.type == 'hr' && index == 0) {
+            continue; // Skip leading HR since no previous slide
+        }
+        processMarkdownToken(token, env);
+    }
+}
+
+function parseMarkdown(markdown) {
+    return parser.parse(markdown);
+}
+
+function processMarkdownToken(token, env) {
+    let rule = env.rules[token.type];
+    if (rule) {
+        rule(token, env);
+    } else {
+        debug(`Ignoring token ${token.type}`);
+    }
+}
+
+function newEnv(rules, css) {
+    return {
+        rules: rules,
         slides: [],
         currentSlide: null,
         styles: [{
@@ -62,48 +108,10 @@ function extractSlides(markdown, stylesheet) {
         }],
         listDepth: 0,
         css: css,
-        inlineHtmlContext: undefined
+        inlineHtmlContext: undefined,
+        restrictToInline: false
     };
-
-    startSlide(env);
-
-    for(let index in tokens) {
-        let token = tokens[index];
-        if (token.type == 'hr' && index == 0) {
-            continue; // Skip leading HR since no previous slide
-        }
-        processMarkdownToken(token, env);
-    }
-    endSlide(env);
-    debug(JSON.stringify(env.slides, null, 2));
-    return env.slides;
 }
-
-function parseMarkdown(markdown) {
-    const mdOptions = {
-        html: true,
-        langPrefix: 'highlight ',
-        linkify: false,
-        breaks: false
-    };
-    const parser = markdownIt(mdOptions)
-        .use(attrs)
-        .use(lazyHeaders)
-        .use(emoji, {shortcuts: {}})
-        .use(expandTabs, {tabWidth: 4})
-        .use(video, { youtube: { width: 640, height: 390 }});
-    return parser.parse(markdown);
-}
-
-function processMarkdownToken(token, env) {
-    let rule = markdownTokenRules[token.type];
-    if (rule) {
-        rule(token, env);
-    } else {
-        debug(`Ignoring token ${token.type}`);
-    }
-}
-
 function startTextBlock(env) {
     env.text = {
         rawText: '',
@@ -131,7 +139,12 @@ function startSlide(env) {
         bodies: [],
         tables: [],
         videos: [],
-        images: []
+        images: [],
+        notes: {
+            rawText: '',
+            textRuns: [],
+            listMarkers: []
+        }
     };
 }
 
@@ -193,6 +206,22 @@ markdownTokenRules['inline'] = function(token, env) {
         processMarkdownToken(child, env);
     }
 };
+
+markdownTokenRules['html_block'] = function(token, env) {
+    var re = /<!--([\s\S]*)-->/m;
+    var match = re.exec(token.content);
+    if (match == null) {
+        throw new Error('Unsupported HTML block: ' + token.content);
+    }
+    // Since the notes can contain unparsed markdown, create a new environment
+    // to process it so we don't inadvertently lose state. Just carry
+    // forward the notes from the current slide to append to
+    var subEnv = newEnv(inlineTokenRules, env.css);
+    subEnv.text = env.currentSlide.notes;
+    var tokens = parseMarkdown(match[1]);
+    processTokens(tokens, subEnv);
+};
+
 
 markdownTokenRules['html_inline'] = function(token, env) {
     const fragment = parse5.parseFragment(token.content, env.inlineHtmlContext);
@@ -472,6 +501,39 @@ markdownTokenRules['list_item_open'] = function(token, env) {
 };
 
 markdownTokenRules['list_item_close'] = NO_OP;
+
+// These rules are specific to parsing markdown in an inline context.
+
+inlineTokenRules['heading_open'] = function(token, env) {
+    startStyle({bold: true}, env); // TODO - Better style for inline headers
+};
+inlineTokenRules['heading_close'] = function(token, env) {
+    endStyle(env);
+};
+inlineTokenRules['inline'] = markdownTokenRules['inline'];
+inlineTokenRules['html_inline'] = markdownTokenRules['html_inline'];
+inlineTokenRules['text'] = markdownTokenRules['text'];
+inlineTokenRules['paragraph_open'] = markdownTokenRules['paragraph_open'];
+inlineTokenRules['paragraph_close'] = markdownTokenRules['paragraph_close'];
+inlineTokenRules['fence'] = markdownTokenRules['fence'];
+inlineTokenRules['em_open'] = markdownTokenRules['em_open'];
+inlineTokenRules['em_close'] = markdownTokenRules['em_close'];
+inlineTokenRules['s_open'] = markdownTokenRules['s_open'];
+inlineTokenRules['s_close'] = markdownTokenRules['s_close'];
+inlineTokenRules['strong_open'] = markdownTokenRules['strong_open'];
+inlineTokenRules['strong_close'] = markdownTokenRules['strong_close'];
+inlineTokenRules['link_open'] = markdownTokenRules['link_open'];
+inlineTokenRules['link_close'] = markdownTokenRules['link_close'];
+inlineTokenRules['code_inline'] = markdownTokenRules['code_inline'];
+inlineTokenRules['hardbreak'] = markdownTokenRules['hardbreak'];
+inlineTokenRules['softbreak'] = markdownTokenRules['softbreak'];
+inlineTokenRules['blockquote_open'] = markdownTokenRules['blockquote_open'];
+inlineTokenRules['blockquote_close'] = markdownTokenRules['blockquote_close'];
+inlineTokenRules['emoji'] = markdownTokenRules['emoji'];
+inlineTokenRules['bullet_list_open'] = markdownTokenRules['bullet_list_open'];
+inlineTokenRules['bullet_list_close'] = markdownTokenRules['bullet_list_close'];
+inlineTokenRules['blockquote_open'] = markdownTokenRules['blockquote_open'];
+
 
 // These rules are specific to parsing syntax-highlighted code
 // Currently these are a very small subset of HTML, limited to

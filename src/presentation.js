@@ -120,6 +120,14 @@ class Presentation {
         }
         return null;
     }
+
+    findSpeakerNotesObjectId(pageId) {
+        let page = this.findPage(pageId);
+        if (page) {
+            return page.slideProperties.notesPage.notesProperties.speakerNotesObjectId;
+        }
+        return null;
+    }
 }
 
 module.exports = Presentation;
