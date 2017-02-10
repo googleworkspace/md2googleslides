@@ -4,6 +4,9 @@
 
 ## Your name here
 
+<!--
+This only appears as a speaker note.
+-->
 
 ---
 
