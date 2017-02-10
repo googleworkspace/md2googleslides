@@ -70,7 +70,7 @@ class GenericLayout {
             this.appendCreateVideoRequests(this.slide.videos, requests);
         }
 
-        if (this.slide.notes && this.slide.notes.rawText.length) {
+        if (this.slide.notes) {
             const objectId = this.presentation.findSpeakerNotesObjectId(this.slide.objectId);
             this.appendInsertTextRequests(this.slide.notes, { objectId: objectId }, requests);
         }

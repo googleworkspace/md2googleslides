@@ -358,15 +358,24 @@ describe('extractSlides', function() {
     describe('with speaker notes', function() {
         const markdown =
             '# Title\n' +
-            '<!-- Hello **world** -->\n';
+            '<!-- \n' +
+            'Hello **world**\n' +
+            '\n' +
+            '* one\n' +
+            '* two\n' +
+            '-->\n';
         const slides = extractSlides(markdown);
 
         it('should have speaker notes', function() {
-            return expect(slides).to.have.deep.property('[0].notes.rawText', 'Hello world\n');
+            return expect(slides).to.have.deep.property('[0].notes.rawText', 'Hello world\none\ntwo\n');
         });
 
         it('should have text runs', function() {
             return expect(slides).to.have.deep.property('[0].notes.textRuns').length(1);
+        });
+
+        it('should have list markers', function() {
+            return expect(slides).to.have.deep.property('[0].notes.listMarkers').length(1);
         });
     });
 });
