@@ -30,7 +30,14 @@
             }
           }
         }
-      ]
+      ],
+      "slideProperties": {
+        "notesPage": {
+          "notesProperties": {
+            "speakerNotesObjectId": "speaker-notes-element"
+          }
+        }
+      }
     },
     {
       "objectId": "body-slide",

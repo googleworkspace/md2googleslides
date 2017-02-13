@@ -36,7 +36,7 @@
     "debug": "^2.2.0",
     "extend": "^3.0.0",
     "google-auth-library": "^0.9.8",
-    "googleapis": "^14.2.0",
+    "googleapis": "~16.1",
     "highlight.js": "^9.7.0",
     "inline-styles-parse": "^1.2.0",
     "jsonfile": "^2.4.0",

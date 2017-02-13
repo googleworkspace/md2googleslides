@@ -175,7 +175,7 @@ the end of an image URL.
 
 ### Videos
 
-Includes YouTube videos with a modified image tag.
+Include YouTube videos with a modified image tag.
 
 <pre>
     ---
@@ -187,6 +187,24 @@ Includes YouTube videos with a modified image tag.
 
 ![Slide with video](https://github.com/googlesamples/md2googleslides/raw/master/examples/video_slide.png)
 
+### Speaker notes
+
+Include speaker notes for a slide using HTML comments. Text inside
+the comments may include markdown for formatting, though only text
+formatting is allowed. Videos, images, and tables are ignored inside
+speaker notes.
+
+<pre>
+    ---
+
+    # Slide title
+
+    ![](https://placekitten.com/1600/900){.background}
+
+    &lt;!--
+    These are speaker notes.
+    --&gt;
+</pre>
 
 ### Formatting
 
