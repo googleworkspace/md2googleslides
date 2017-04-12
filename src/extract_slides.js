@@ -266,6 +266,7 @@ inlineTokenRules['paragraph_close'] = function(token, env) {
 
 
 inlineTokenRules['fence'] = function(token, env) {
+    startStyle({fontFamily: 'Courier New, monospace'}, env);
     if(token.info) {
         const htmlTokens = low.highlight(token.info, token.content);
         for(let token of htmlTokens.value) {
@@ -279,6 +280,7 @@ inlineTokenRules['fence'] = function(token, env) {
         env.text.rawText += token.content.replace(/\n/g, '\u000b');
     }
     env.text.rawText += '\n';
+    endStyle(env);
 };
 
 inlineTokenRules['em_open'] = function(token, env) {
