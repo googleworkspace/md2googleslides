@@ -77,7 +77,7 @@ function processTokens(tokens, env) {
 }
 
 function parseMarkdown(markdown) {
-    return parser.parse(markdown);
+    return parser.parse(markdown, {});
 }
 
 function processMarkdownToken(token, env) {
