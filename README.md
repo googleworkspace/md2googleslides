@@ -286,8 +286,8 @@ To change the syntax highlight theme specify the `--style <theme>` option on the
 command line. All [highlight.js themes](https://github.com/isagalaev/highlight.js/tree/master/src/styles)
 are supported. For example, to use the github theme
 
-```
-$ md2gslides slides.md --style github
+```sh
+md2gslides slides.md --style github
 ```
 
 ### Tables
