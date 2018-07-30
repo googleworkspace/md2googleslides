@@ -15,14 +15,14 @@ Contributions are welcome.
 
 For command line use, install md2gslides globally:
 
-```
-$ npm install -g md2gslides
+```sh
+npm install -g md2gslides
 ```
 
 After installing, import your slides by running:
 
-```
-$ md2gslides slides.md
+```sh
+md2gslides slides.md
 ```
 
 The first time the command is run you will be prompted for authorization. Credentials
@@ -286,8 +286,8 @@ To change the syntax highlight theme specify the `--style <theme>` option on the
 command line. All [highlight.js themes](https://github.com/isagalaev/highlight.js/tree/master/src/styles)
 are supported. For example, to use the github theme
 
-```
-$ md2gslides slides.md --style github
+```sh
+md2gslides slides.md --style github
 ```
 
 ### Tables
@@ -319,14 +319,14 @@ are used for testing.
 
 To compile:
 
-```
-$ npm run compile
+```sh
+npm run compile
 ```
 
 To run unit tests:
 
-```
-$ npm run test
+```sh
+npm run test
 ```
 
 See [CONTRIBUTING](CONTRIBUTING.md) for additional terms.
