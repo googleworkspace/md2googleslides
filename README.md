@@ -1,4 +1,4 @@
-# md2googleslides -- Markdown to Google Slides
+# md2googleslides – Markdown to Google Slides <a href="https://travis-ci.org/gsuitedevs/md2googleslides"><img src="https://travis-ci.org/gsuitedevs/md2googleslides.svg?branch=master" alt="Build Status"></a><a href="https://www.npmjs.com/package/md2gslides"><img src="https://img.shields.io/npm/v/md2gslides.svg" alt="npm Version"></a>
 
 Generate Google Slides from markdown & HTML. Run from the command line or embed in another
 application.
