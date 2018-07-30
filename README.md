@@ -15,14 +15,14 @@ Contributions are welcome.
 
 For command line use, install md2gslides globally:
 
-```
-$ npm install -g md2gslides
+```sh
+npm install -g md2gslides
 ```
 
 After installing, import your slides by running:
 
-```
-$ md2gslides slides.md
+```sh
+md2gslides slides.md
 ```
 
 The first time the command is run you will be prompted for authorization. Credentials
@@ -319,14 +319,14 @@ are used for testing.
 
 To compile:
 
-```
-$ npm run compile
+```sh
+npm run compile
 ```
 
 To run unit tests:
 
-```
-$ npm run test
+```sh
+npm run test
 ```
 
 See [CONTRIBUTING](CONTRIBUTING.md) for additional terms.
