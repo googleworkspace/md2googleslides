@@ -17,7 +17,7 @@
 const assert = require('assert');
 const debug = require('debug')('md2gslides');
 const Promise = require('promise');
-const GoogleAuth = require('google-auth-library');
+const {OAuth2Client} = require('google-auth-library');
 const path = require('path');
 const mkdirp = require('mkdirp');
 const lowdb = require('lowdb');
@@ -76,8 +76,7 @@ class UserAuthorizer {
      * @returns {Promise.<google.auth.OAuth2>}
      */
     getUserCredentials(user, scopes) {
-        const auth = new GoogleAuth();
-        const oauth2Client = new auth.OAuth2(this.clientId, this.clientSecret, this.redirectUrl);
+        const oauth2Client = new OAuth2Client(this.clientId, this.clientSecret, this.redirectUrl);
         let previousToken = this.db.get(user).value();
         let saveToken = () => this.db.set(user, oauth2Client.credentials).value();
         let emitCredentials = () => oauth2Client;
