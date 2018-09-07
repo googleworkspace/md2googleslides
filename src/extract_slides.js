@@ -266,13 +266,13 @@ inlineTokenRules['paragraph_close'] = function(token, env) {
 
 
 inlineTokenRules['fence'] = function(token, env) {
-    startStyle({fontFamily: 'Courier New, monospace'}, env);
-    if(token.info) {
-        const htmlTokens = low.highlight(token.info, token.content);
+    startStyle({fontFamily: 'Courier New'}, env);
+    const language = token.info ? token.info.trim() : undefined;
+    if(language) {
+        const htmlTokens = low.highlight(language, token.content);
         for(let token of htmlTokens.value) {
             processHtmlToken(token, env);
         }
-
     } else {
         // For code blocks, replace line feeds with vertical tabs to keep
         // the block as a single paragraph. This avoid the extra vertical
