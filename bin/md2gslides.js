@@ -43,7 +43,8 @@ function parseArguments() {
     parser.addArgument(
         'file',
         {
-            help: 'Path to markdown file to convert'
+            help: 'Path to markdown file to convert',
+            required: false
         }
     );
     parser.addArgument(
@@ -171,7 +172,8 @@ function loadCss(theme) {
 }
 
 function generateSlides(slideGenerator) {
-    const input = fs.readFileSync(args.file, { encoding: 'UTF-8'});
+    const file = args.file == 'STDIN' ? 0 : args.file;
+    const input = fs.readFileSync(file, { encoding: 'UTF-8'});
     const css = loadCss(args.style);
 
     return slideGenerator.generateFromMarkdown(input, css);

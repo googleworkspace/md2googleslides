@@ -59,13 +59,13 @@ This is the *right* column
 
 # Slides can have background images
 
-![](https://source.unsplash.com/78A265wPiO4/1600x900){.background}
+![](https://picsum.photos/g/1600/900){.background}
 
 ---
 
 # Slides can have an inline image
 
-![](https://source.unsplash.com/WLUHO9A_xik/1600x900)
+![](https://picsum.photos/1600/900)
 
 ---
 
@@ -91,6 +91,26 @@ This is the *right* column
 // Print hello
 function hello() {
   console.log('Hello world');
+}
+```
+
+---
+# Code can be big...
+
+```javascript {style="font-size: 36pt"}
+// Print hello
+function hello() {
+  console.log('Hello big world');
+}
+```
+
+---
+# ... or small
+
+```javascript {style="font-size: 8p"}
+// Print hello
+function hello() {
+  console.log('Hello little world');
 }
 ```
 

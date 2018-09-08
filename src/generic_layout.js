@@ -113,7 +113,7 @@ class GenericLayout {
             request = {
                 updateTextStyle: extend({
                     textRange: {
-                        type: 'FIXED_RANGE', // rangeType in prod
+                        type: 'FIXED_RANGE',
                         startIndex: textRun.start,
                         endIndex: textRun.end
                     },
@@ -126,6 +126,7 @@ class GenericLayout {
                         underline: textRun.underline,
                         smallCaps: textRun.smallCaps,
                         fontFamily: textRun.fontFamily,
+                        fontSize: textRun.fontSize,
                         link: textRun.link,
                         baselineOffset: textRun.baselineOffset
                     }

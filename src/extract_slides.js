@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+const _ = require('lodash');
 const debug = require('debug')('md2gslides');
 const markdownIt = require('markdown-it');
 const attrs = require('markdown-it-attrs');
@@ -149,7 +150,8 @@ function currentStyle(env) {
 }
 
 function startStyle(newStyle, env) {
-    const style = extend({}, newStyle, currentStyle(env));
+    const previousStyle = currentStyle(env);
+    const style = extend({}, newStyle, previousStyle);
     style.start = env.text.rawText.length;
     env.styles.push(style);
 }
@@ -159,6 +161,12 @@ function endStyle(env) {
     style.end = env.text.rawText.length;
     if (style.start == style.end) {
         return; // Ignore empty ranges
+    }
+    if (_.isEmpty(_.keys(_.omit(style, "start", "end")))) {
+      return; // Ignore ranges with no style
+    }
+    if (_.find(env.text.textRuns, _.matches(style))) {
+      return; // Ignore duplicate ranges
     }
     env.text.textRuns.push(style);
 }
@@ -184,7 +192,8 @@ function hasClass(token, cls) {
 // These rules are specific to parsing markdown in an inline context.
 
 inlineTokenRules['heading_open'] = function(token, env) {
-    startStyle({bold: true}, env); // TODO - Better style for inline headers
+    const style = getStyle(token, {bold: true});
+    startStyle(style, env); // TODO - Better style for inline headers
 };
 
 inlineTokenRules['heading_close'] = function(token, env) {
@@ -200,9 +209,9 @@ inlineTokenRules['inline'] = function(token, env) {
 inlineTokenRules['html_inline'] = function(token, env) {
     const fragment = parse5.parseFragment(token.content, env.inlineHtmlContext);
     if(fragment.childNodes.length) {
-        const style = {};
         env.inlineHtmlContext = fragment.childNodes[0];
         const node = fragment.childNodes[0];
+        const style = getStyle(node, {});
         switch (node.nodeName) {
             case 'strong':
             case 'b':
@@ -226,14 +235,6 @@ inlineTokenRules['html_inline'] = function(token, env) {
             default:
                 throw new Error('Unsupported inline HTML element: ' + node.nodeName);
         }
-        for(let attr of node.attrs) {
-            if (attr.name == 'style') {
-                const dummyRule = inlineStylesParse.declarationsToRule(attr.value);
-                const css = nativeCSS.convert(dummyRule);
-                convertCssRule(css['dummy'], style);
-                break;
-            }
-        }
         startStyle(style, env);
     } else {
         endStyle(env);
@@ -242,7 +243,10 @@ inlineTokenRules['html_inline'] = function(token, env) {
 
 
 inlineTokenRules['text'] = function(token, env) {
+    const style = getStyle(token, {});
+    startStyle(style, env)
     env.text.rawText += token.content;
+    endStyle(env);
 };
 
 inlineTokenRules['paragraph_open'] = function(token, env) {
@@ -266,13 +270,14 @@ inlineTokenRules['paragraph_close'] = function(token, env) {
 
 
 inlineTokenRules['fence'] = function(token, env) {
-    startStyle({fontFamily: 'Courier New, monospace'}, env);
-    if(token.info) {
-        const htmlTokens = low.highlight(token.info, token.content);
+    const style = getStyle(token, {fontFamily: 'Courier New'});
+    startStyle(style, env);
+    const language = token.info ? token.info.trim() : undefined;
+    if(language) {
+        const htmlTokens = low.highlight(language, token.content);
         for(let token of htmlTokens.value) {
             processHtmlToken(token, env);
         }
-
     } else {
         // For code blocks, replace line feeds with vertical tabs to keep
         // the block as a single paragraph. This avoid the extra vertical
@@ -284,7 +289,8 @@ inlineTokenRules['fence'] = function(token, env) {
 };
 
 inlineTokenRules['em_open'] = function(token, env) {
-    startStyle({italic: true}, env);
+    const style = getStyle(token, {italic: true});
+    startStyle(style, env);
 };
 
 inlineTokenRules['em_close'] = function(token, env) {
@@ -292,7 +298,8 @@ inlineTokenRules['em_close'] = function(token, env) {
 };
 
 inlineTokenRules['s_open'] = function(token, env) {
-    startStyle({strikethrough: true}, env);
+    const style = getStyle(token, {strikethrough: true});
+    startStyle(style, env);
 };
 
 inlineTokenRules['s_close'] = function(token, env) {
@@ -300,7 +307,8 @@ inlineTokenRules['s_close'] = function(token, env) {
 };
 
 inlineTokenRules['strong_open'] = function(token, env) {
-    startStyle({bold: true}, env);
+    const style = getStyle(token, {bold: true});
+    startStyle(style, env);
 };
 
 inlineTokenRules['strong_close'] = function(token, env) {
@@ -308,11 +316,12 @@ inlineTokenRules['strong_close'] = function(token, env) {
 };
 
 inlineTokenRules['link_open'] = function(token, env) {
-    startStyle({
+    const style = getStyle(token, {
         link: {
             url: attr(token, 'href')
         }
-    }, env);
+    });
+    startStyle(style, env);
 };
 
 inlineTokenRules['link_close'] = function(token, env) {
@@ -320,7 +329,8 @@ inlineTokenRules['link_close'] = function(token, env) {
 };
 
 inlineTokenRules['code_inline'] = function(token, env) {
-    startStyle({fontFamily: 'Courier New'}, env);
+    const style = getStyle(token, {fontFamily: 'Courier New'});
+    startStyle(style, env);
     env.text.rawText += token.content;
     endStyle(env);
 };
@@ -334,7 +344,10 @@ inlineTokenRules['softbreak'] = function(token, env) {
 };
 
 inlineTokenRules['blockquote_open'] = function(token, env) {
-    startStyle({italic: true}, env); // TODO - More interesting styling for block quotes
+    // TODO - More interesting styling for block quotes
+    const style = getStyle(token, {italic: true});
+    applyCssStyle(token, style);
+    startStyle(style, env);
 };
 
 inlineTokenRules['blockquote_close'] = function(token, env) {
@@ -346,6 +359,8 @@ inlineTokenRules['emoji'] = function(token, env) {
 };
 
 inlineTokenRules['bullet_list_open'] = inlineTokenRules['ordered_list_open'] = function(token, env) {
+    const style = getStyle(token, {});
+    startStyle(style, env);
     if (env.list) {
         if (env.list.tag != token.tag) {
             throw new Error('Nested lists must match parent style');
@@ -373,13 +388,18 @@ inlineTokenRules['bullet_list_close'] = inlineTokenRules['ordered_list_close'] =
     } else {
         env.list.depth -= 1;
     }
+    endStyle(env);
 };
 
 inlineTokenRules['list_item_open'] = function(token, env) {
+    const style = getStyle(token, {});
+    startStyle(style, env);
     env.text.rawText += new Array(env.list.depth + 1).join('\t');
 };
 
-inlineTokenRules['list_item_close'] = NO_OP;
+inlineTokenRules['list_item_close'] = function(token, env) {
+    endStyle(env);
+};
 
 
 // Additional rules for processing the entire document
@@ -389,7 +409,9 @@ inlineTokenRules['list_item_close'] = NO_OP;
 extend(fullTokenRules, inlineTokenRules);
 
 fullTokenRules['heading_open'] = function(token, env) {
+    const style = getStyle(token, {});
     startTextBlock(env);
+    startStyle(style, env);
     env.text.big = hasClass(token, 'big');
 };
 
@@ -401,6 +423,7 @@ fullTokenRules['heading_close'] = function(token, env) {
     } else {
         debug(`Ignoring header element ${token.tag}`);
     }
+    endStyle(env);
     startTextBlock(env);
 };
 
@@ -465,6 +488,8 @@ fullTokenRules['video'] = function(token, env) {
 };
 
 fullTokenRules['table_open'] = function(token, env) {
+    const style = getStyle(token, {});
+    startStyle(style, env);
     env.table = {
         rows: 0,
         columns: 0,
@@ -474,6 +499,7 @@ fullTokenRules['table_open'] = function(token, env) {
 
 fullTokenRules['table_close'] = function(token, env) {
     env.currentSlide.tables.push(env.table);
+    endStyle(env);
 };
 
 fullTokenRules['thead_open'] = NO_OP;
@@ -484,6 +510,8 @@ fullTokenRules['tbody_close'] = NO_OP;
 
 
 fullTokenRules['tr_open'] = function(token, env) {
+    const style = getStyle(token, {});
+    startStyle(style, env);
     env.row = [];
 };
 
@@ -492,21 +520,23 @@ fullTokenRules['tr_close'] = function(token, env) {
     env.table.cells.push(row);
     env.table.columns = Math.max(env.table.columns, row.length);
     env.table.rows = env.table.cells.length;
+    endStyle(env);
 };
 
 fullTokenRules['td_open'] = function(token, env) {
-    startStyle({
+    const style = getStyle(token, {
         foregroundColor: {
             opaqueColor: {
                 themeColor: 'TEXT1'
             }
         }
-    }, env);
+    });
+    startStyle(style, env);
     startTextBlock(env);
 };
 
 fullTokenRules['th_open'] = function(token, env) {
-    startStyle({
+    const style = getStyle(token, {
         bold: true,
         // Note: Non-placeholder elements aren't aware of the slide theme.
         // Set the foreground color to match the primary text color of the
@@ -516,7 +546,8 @@ fullTokenRules['th_open'] = function(token, env) {
                 themeColor: 'TEXT1'
             }
         }
-    }, env);
+    });
+    startStyle(style, env);
     startTextBlock(env);
 };
 
@@ -599,6 +630,18 @@ function convertCssRule(rule, style = {}) {
     if (rule['font-variant'] == 'small-caps') {
         style.smallCaps = true;
     }
+    if (rule['font-size']) {
+      // Font size must be expressed in points
+      const match = rule['font-size'].match(/(\d+)(?:pt)?/);
+      if (!match) {
+        console.error("Invalid font-size value:", rule['font-size']);
+      } else {
+        style.fontSize = {
+          magnitude: match[1],
+          unit: "PT"
+        }
+      }
+    }
     return style;
 }
 
@@ -612,6 +655,27 @@ function processHtmlToken(token, env) {
     if (rule) {
         rule(token, env);
     }
+}
+
+function getStyle(token, style = {}) {
+  applyCssStyle(token, style);
+  return style;
+}
+
+function applyCssStyle(token, style) {
+  if (!token.attrs) {
+    return;
+  }
+  for(let attr of token.attrs) {
+      let name = attr.name || attr[0];
+      let value = attr.value || attr[1];
+      if (name == 'style') {
+          const dummyRule = inlineStylesParse.declarationsToRule(value);
+          const css = nativeCSS.convert(dummyRule);
+          convertCssRule(css['dummy'], style);
+          break;
+      }
+  }
 }
 
 

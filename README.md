@@ -254,6 +254,11 @@ Supported CSS styles for use with `<span>` elements:
 * `text-decoration: line-through`
 * `font-family`
 * `font-variant: small-caps`
+* `font-size` (must use points for units)
+
+You may also use `{style="..."}` [attributes](https://www.npmjs.com/package/markdown-it-attrs)
+after markdown elements to apply styles. This can be used on headers, inline
+elements, code blocks, etc.
 
 ### Emoji
 
@@ -310,6 +315,10 @@ Cats   | 88 million
 Dogs   | 75 million
 Birds  | 16 million
 </pre>
+
+## Reading from standard input
+
+You can also pipe markdown into the tool by using `STDIN` as the file name.
 
 ## Contributing
 
