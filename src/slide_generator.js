@@ -63,7 +63,7 @@ class SlideGenerator {
             resource: {
                 title: title
             }
-        }).then(presentation => new SlideGenerator(apiClient, presentation));
+        }).then(response => new SlideGenerator(apiClient, response.data));
     }
 
     /**
@@ -75,7 +75,7 @@ class SlideGenerator {
     static forPresentation(oauth2Client, presentationId) {
         let apiClient = new ApiClient(oauth2Client);
         return apiClient.getPresentation({presentationId: presentationId})
-            .then(presentation => new SlideGenerator(apiClient, presentation));
+            .then(response => new SlideGenerator(apiClient, response.data));
     }
 
     /**
@@ -154,7 +154,8 @@ class SlideGenerator {
         }
         return this.apiClient.batchUpdate({
             presentationId: this.presentation.data.presentationId,
-            resource: batch});
+            resource: batch})
+            .then((response) => response.data);
     }
 
     /**
@@ -212,7 +213,8 @@ class SlideGenerator {
         }
         return this.apiClient.batchUpdate({
             presentationId: this.presentation.data.presentationId,
-            resource: batch});
+            resource: batch})
+            .then((response) => response.data);
     }
 
     /**
@@ -222,12 +224,11 @@ class SlideGenerator {
      */
     reloadPresentation() {
         return this.apiClient.getPresentation({presentationId: this.presentation.data.presentationId})
-            .then(presentation => {
-                this.presentation.data = presentation;
+            .then(response => {
+                this.presentation.data = response.data;
                 return this.presentation;
             });
     }
 }
 
 module.exports = SlideGenerator;
-

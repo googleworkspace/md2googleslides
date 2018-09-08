@@ -14,6 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+const {OAuth2Client} = require('google-auth-library');
 const nock = require('nock');
 const chai = require('chai');
 chai.use(require('chai-as-promised'));
@@ -21,8 +22,13 @@ const expect = chai.expect;
 const google = require('googleapis');
 const ApiClient = require('../src/api_client');
 
+const axios = require('axios');
+const httpAdapter = require('axios/lib/adapters/http');
+
+axios.defaults.adapter = httpAdapter;
+
 function buildCredentials() {
-    const oauth2Client = new google.auth.OAuth2('test', 'test', null);
+    const oauth2Client = new OAuth2Client('test', 'test', null);
     oauth2Client.setCredentials({
         'access_token':'abc',
         'expires_in':3920,

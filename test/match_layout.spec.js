@@ -18,7 +18,6 @@
 const chai = require('chai');
 chai.use(require('chai-as-promised'));
 const expect = chai.expect;
-const nock = require('nock');
 const matchLayout = require('../src/match_layout');
 
 describe('matchLayout', function() {

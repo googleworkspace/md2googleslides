@@ -14,7 +14,7 @@
 
 const debug = require('debug')('md2gslides');
 const Promise = require('promise');
-const google = require('googleapis');
+const {google} = require('googleapis');
 
 /**
  * Small helper class to wrap some of the Drive & Slides API methods
