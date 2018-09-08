@@ -286,9 +286,9 @@ describe('extractSlides', function() {
 
     });
 
-    describe('with inline HTML span', function() {
+    describe('with markdown attributes', function() {
         const markdown =
-            '<span style="color: #EFEFEF">hello</span>\n';
+            '*hello*{style="color: #EFEFEF; font-size: 5pt">}\n';
 
         const slides = extractSlides(markdown);
 
@@ -304,8 +304,39 @@ describe('extractSlides', function() {
             return expect(slides).to.have.deep.property('[0].bodies[0].textRuns[0].end', 5);
         });
 
-        it('should have the correct  style', function() {
+        it('should have the color style', function() {
             return expect(slides).to.have.deep.property('[0].bodies[0].textRuns[0].foregroundColor');
+        });
+
+        it('should have the font size style', function() {
+            return expect(slides).to.have.deep.property('[0].bodies[0].textRuns[0].fontSize');
+        });
+    });
+
+    describe('with inline HTML span', function() {
+        const markdown =
+            '<span style="color: #EFEFEF; font-size: 5pt">hello</span>\n';
+
+        const slides = extractSlides(markdown);
+
+        it('should have text runs', function() {
+            return expect(slides).to.have.deep.property('[0].bodies[0].textRuns').length(1);
+        });
+
+        it('should have the correct start', function() {
+            return expect(slides).to.have.deep.property('[0].bodies[0].textRuns[0].start', 0);
+        });
+
+        it('should have the correct end', function() {
+            return expect(slides).to.have.deep.property('[0].bodies[0].textRuns[0].end', 5);
+        });
+
+        it('should have the color style', function() {
+            return expect(slides).to.have.deep.property('[0].bodies[0].textRuns[0].foregroundColor');
+        });
+
+        it('should have the font size style', function() {
+            return expect(slides).to.have.deep.property('[0].bodies[0].textRuns[0].fontSize');
         });
     });
 
