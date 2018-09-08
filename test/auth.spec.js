@@ -16,7 +16,7 @@
 
 
 const mockfs = require('mock-fs');
-const nock = require('nock');
+const moxios = require('moxios');
 const fs = require('fs');
 const Promise = require('promise');
 const chai = require('chai');
@@ -26,26 +26,29 @@ const UserAuthorizer = require('../src/auth');
 
 
 function stubTokenRequest() {
-    nock('https://accounts.google.com')
-        .post('/o/oauth2/token')
-        .reply(200, {
-            'access_token':'new_token',
-            'expires_in':3920,
-            'token_type':'Bearer'
-        });
+    moxios.stubRequest(/.*token/, {
+      status: 200,
+      response: {
+          'access_token':'new_token',
+          'expires_in':3920,
+          'token_type':'Bearer'
+      }
+    });
 }
 
 function stubTokenRequestError() {
-    nock('https://accounts.google.com')
-        .post('/o/oauth2/token')
-        .reply(400, {
+    moxios.stubRequest(/.*token/, {
+        status: 400,
+        response:{
             'error_description': 'Bad Request',
             'error': 'invalid_grant'
-        });
+        }
+      });
 }
 
 describe('UserAuthorizer', function() {
     beforeEach(function() {
+        moxios.install();
         mockfs({'/tmp/tokens.json': JSON.stringify({
             'expired': {
                 'access_token': 'ya29.123',
@@ -63,7 +66,10 @@ describe('UserAuthorizer', function() {
         })});
     });
 
-    afterEach(mockfs.restore);
+    afterEach(function() {
+      mockfs.restore();
+      moxios.uninstall();
+    });
 
     it('should require client id', function() {
         let options = {};
