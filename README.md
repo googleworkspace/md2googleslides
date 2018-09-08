@@ -316,6 +316,10 @@ Dogs   | 75 million
 Birds  | 16 million
 </pre>
 
+## Reading from standard input
+
+You can also pipe markdown into the tool by using `STDIN` as the file name.
+
 ## Contributing
 
 With the exception of `/bin/md2gslides.js`, ES6 is used throughout and compiled
