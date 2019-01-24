@@ -134,6 +134,7 @@ function endSlide(env) {
 function startSlide(env) {
     env.currentSlide = {
         objectId: uuid.v1(),
+        customLayout: null,
         title: null,
         subtitle: null,
         backgroundImage: null,
@@ -256,6 +257,13 @@ inlineTokenRules['paragraph_open'] = function(token, env) {
         startTextBlock(env);
     } else if (!env.text) {
         startTextBlock(env);
+    }
+
+    const style = getStyle(token,{});
+    // If we have a layout style set this on the slide so we can select the 
+    // right master template when building the deck
+    if (style.layout != undefined && style.layout != "") {
+        env.currentSlide.customLayout = style.layout;
     }
 };
 
@@ -641,6 +649,9 @@ function convertCssRule(rule, style = {}) {
           unit: "PT"
         }
       }
+    }
+    if (rule['layout']) {
+        style.layout = rule['layout'];
     }
     return style;
 }

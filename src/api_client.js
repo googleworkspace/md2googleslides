@@ -29,12 +29,17 @@ class ApiClient {
     constructor(oauth2Client) {
         debug('Creating API client');
         let slides = google.slides({ version: 'v1', auth: oauth2Client});
+        let drive = google.drive({ version: 'v3', auth: oauth2Client});
 
         // Map some of the underlying API client methods to this object, converting
         this.denodifyAndBindMethods(slides.presentations, {
             getPresentation: 'get',
             createPresentation: 'create',
             batchUpdate: 'batchUpdate'
+        });
+
+        this.denodifyAndBindMethods(drive.files, {
+            copyPresentation: 'copy'
         });
     }
 

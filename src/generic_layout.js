@@ -91,9 +91,11 @@ class GenericLayout {
         }
 
         for(let i in pageElements) {
-            debug(`Slide #${this.slide.index}: setting ${placeholderName}[${i}] to ${values[i].rawText}`);
-            let id = pageElements[i].objectId;
-            this.appendInsertTextRequests(values[i], { objectId: id}, requests);
+            if (values[i] != undefined) {
+                debug(`Slide #${this.slide.index}: setting ${placeholderName}[${i}] to ${values[i].rawText}`);
+                let id = pageElements[i].objectId;
+                this.appendInsertTextRequests(values[i], { objectId: id}, requests);
+            }
         }
     }
 

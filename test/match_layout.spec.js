@@ -114,3 +114,32 @@ describe('matchLayout', function() {
     }
 
 });
+
+describe('matchCustomLayout', function() {
+    it(`should use a custom layout`, function() {
+        const slide = {
+            title: null,
+            subtitle: null,
+            bodies: [],
+            tables: [],
+            images: [],
+            videos: [],
+            customLayout: 'mylayout'
+        }
+
+        const presentation = {
+            data: {
+                layouts: [
+                    { 
+                        layoutProperties: {
+                            displayName: 'mylayout', 
+                            name: 'MYLAYOUT'
+                        }
+                    }
+                ]
+            }
+        };
+        const layout = matchLayout(presentation, slide);
+        expect(layout.name).to.eql('MYLAYOUT');
+    });
+});

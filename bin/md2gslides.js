@@ -28,7 +28,11 @@ const opener = require('opener');
 const readline = require('readline');
 
 const SCOPES = [
-    'https://www.googleapis.com/auth/presentations'
+    'https://www.googleapis.com/auth/presentations',
+    'https://www.googleapis.com/auth/drive',
+    'https://www.googleapis.com/auth/drive.appdata',
+    'https://www.googleapis.com/auth/drive.metadata',
+    'https://www.googleapis.com/auth/drive.file',
 ];
 const USER_HOME = process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
 const STORED_CREDENTIALS_PATH = path.join(USER_HOME, '.credentials', 'md2gslides.json');
@@ -98,6 +102,14 @@ function parseArguments() {
             required: false
         }
     );
+    parser.addArgument(
+        ['-c', '--copy'],
+        {
+            help: 'Id of the presentation to copy and use as a base',
+            dest: 'copy',
+            required: false
+        }
+    );
     return parser.parseArgs();
 }
 
@@ -148,11 +160,15 @@ function authorizeUser() {
 }
 
 function buildSlideGenerator(oauth2Client) {
+    const title = args.title || args.file;
     const presentationId = args.id;
+    const copyId = args.copy;
+
     if (presentationId) {
         return SlideGenerator.forPresentation(oauth2Client, presentationId);
-    } else {
-        const title = args.title || args.file;
+    } else if(copyId != undefined) {
+        return SlideGenerator.copyPresentation(oauth2Client, title, copyId);
+    }else {
         return SlideGenerator.newPresentation(oauth2Client, title);
     }
 }
