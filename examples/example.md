@@ -68,6 +68,11 @@ This is the *right* column
 ![](https://picsum.photos/1600/900)
 
 ---
+# Slides can have inline images with custom parameters
+
+![](https://picsum.photos/1600/900){pad=30 offset-y=30 offset-x=30}
+
+---
 
 # Slides can have many images
 

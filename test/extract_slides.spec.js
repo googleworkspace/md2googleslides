@@ -127,13 +127,23 @@ describe('extractSlides', function() {
         const markdown =
             '# Title\n' +
             '\n' +
-            '![](https://example.com/image.jpg)\n' +
+            '![](https://example.com/image.jpg){offset-x=100 offset-y=200}\n' +
             'hello world\n';
         const slides = extractSlides(markdown);
 
         it('should have a background image', function() {
             return expect(slides).to.have.deep.property('[0].images[0].url',
                 'https://example.com/image.jpg');
+        });
+
+        it('should have an image x offset', function() {
+            return expect(slides).to.have.deep.property('[0].images[0].offsetX',
+                100);
+        });
+        
+        it('should have an image y offset', function() {
+            return expect(slides).to.have.deep.property('[0].images[0].offsetY',
+                200);
         });
     });
 
