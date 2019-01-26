@@ -133,11 +133,11 @@ Use <sup>superscript</sup> and <sub>subscript</sub>, <span style="text-decoratio
 or <span style="text-decoration: underline">underline</span>, even <span style="font-variant: small-caps">small caps.</span>
 
 ---
-{style="layout: Title and body"}
+{layout="Title and body"}
 
 # Slides can use custom master slides
 
-Custom master slides can be selected by adding the style `{style="layout: Title and body"}`, rather than autodetect the layout 
+Custom master slides can be selected by adding the attribute `{layout="Title and body"}`, rather than auto detect the layout 
 the slide layout will be chosen from the available master slides by the name.
 
 This can be used with the flag `--copy=[presentation id]` to copy and use an existing presentation as the source rather than a blank slide.

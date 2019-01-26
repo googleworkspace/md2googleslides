@@ -259,11 +259,11 @@ inlineTokenRules['paragraph_open'] = function(token, env) {
         startTextBlock(env);
     }
 
-    const style = getStyle(token,{});
-    // If we have a layout style set this on the slide so we can select the 
+    var layout = attr(token, 'layout');
+    // If we have a layout attribute set this on the slide so we can select the 
     // right master template when building the deck
-    if (style.layout != undefined && style.layout != "") {
-        env.currentSlide.customLayout = style.layout;
+    if (layout != undefined && layout != "") {
+        env.currentSlide.customLayout = layout;
     }
 };
 
@@ -649,9 +649,6 @@ function convertCssRule(rule, style = {}) {
           unit: "PT"
         }
       }
-    }
-    if (rule['layout']) {
-        style.layout = rule['layout'];
     }
     return style;
 }

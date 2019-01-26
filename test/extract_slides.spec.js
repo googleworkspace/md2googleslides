@@ -412,7 +412,7 @@ describe('extractSlides', function() {
 
     describe('with a custom layout', function() {
         const markdown =
-            '{style="layout: my custom layout"}\n' +
+            '{layout="my custom layout"}\n' +
             '# Title\n';
         const slides = extractSlides(markdown);
 
