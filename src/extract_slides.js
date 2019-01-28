@@ -126,7 +126,6 @@ function endSlide(env) {
         if (env.text && env.text.rawText.trim().length) {
             env.currentSlide.bodies.push(env.text);
         }
-
         env.slides.push(env.currentSlide);
     }
 }
@@ -456,16 +455,32 @@ fullTokenRules['hr'] = function(token, env) {
 };
 
 fullTokenRules['image'] = function(token, env) {
+    const style = getStyle(token, {});
+
     const image = {
         url: attr(token, 'src'),
         width: undefined,
         height: undefined,
-        padding: 0
+        padding: 0,
+        offsetX: 0,
+        offsetY: 0,
     };
+    
     const padding = attr(token, 'pad');
     if (padding) {
         image.padding = parseInt(padding);
     }
+
+    const offsetX = attr(token, 'offset-x');
+    if (offsetX) {
+        image.offsetX = parseInt(offsetX);
+    }
+    
+    const offsetY = attr(token, 'offset-y');
+    if (offsetY) {
+        image.offsetY = parseInt(offsetY);
+    }
+    
     if (hasClass(token, 'background')) {
         env.currentSlide.backgroundImage = image;
     } else {
