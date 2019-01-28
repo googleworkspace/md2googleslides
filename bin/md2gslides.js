@@ -30,9 +30,6 @@ const readline = require('readline');
 const SCOPES = [
     'https://www.googleapis.com/auth/presentations',
     'https://www.googleapis.com/auth/drive',
-    'https://www.googleapis.com/auth/drive.appdata',
-    'https://www.googleapis.com/auth/drive.metadata',
-    'https://www.googleapis.com/auth/drive.file',
 ];
 const USER_HOME = process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
 const STORED_CREDENTIALS_PATH = path.join(USER_HOME, '.credentials', 'md2gslides.json');
@@ -168,7 +165,7 @@ function buildSlideGenerator(oauth2Client) {
         return SlideGenerator.forPresentation(oauth2Client, presentationId);
     } else if(copyId != undefined) {
         return SlideGenerator.copyPresentation(oauth2Client, title, copyId);
-    }else {
+    } else {
         return SlideGenerator.newPresentation(oauth2Client, title);
     }
 }
