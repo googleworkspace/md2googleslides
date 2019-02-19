@@ -419,4 +419,15 @@ describe('extractSlides', function() {
             return expect(slides).to.have.deep.property('[0].notes.listMarkers').length(1);
         });
     });
+
+    describe('with a custom layout', function() {
+        const markdown =
+            '{layout="my custom layout"}\n' +
+            '# Title\n';
+        const slides = extractSlides(markdown);
+
+        it('should have a customLayout', function() {
+            return expect(slides).to.have.deep.property('[0].customLayout', 'my custom layout');
+        });
+    });
 });

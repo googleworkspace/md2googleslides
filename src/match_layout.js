@@ -17,9 +17,18 @@ const GenericLayout = require('./generic_layout');
 const layouts = [];
 
 function matchLayout(presentation, slide) {
-    for(let layout of layouts) {
-        if (layout.match(slide)) {
-            return new GenericLayout(layout.name, presentation, slide);
+    // if we have manually set the slide layout get the master from the presentation
+    if (slide.customLayout != undefined) {
+        for(let layout of presentation.data.layouts) {
+            if (layout.layoutProperties.displayName == slide.customLayout) {
+                return new GenericLayout(layout.layoutProperties.name, presentation, slide);
+            }
+        }
+    }else {
+        for(let layout of layouts) {
+            if (layout.match(slide)) {
+                return new GenericLayout(layout.name, presentation, slide);
+            }
         }
     }
 }

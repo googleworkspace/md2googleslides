@@ -133,6 +133,7 @@ function endSlide(env) {
 function startSlide(env) {
     env.currentSlide = {
         objectId: uuid.v1(),
+        customLayout: null,
         title: null,
         subtitle: null,
         backgroundImage: null,
@@ -255,6 +256,13 @@ inlineTokenRules['paragraph_open'] = function(token, env) {
         startTextBlock(env);
     } else if (!env.text) {
         startTextBlock(env);
+    }
+
+    var layout = attr(token, 'layout');
+    // If we have a layout attribute set this on the slide so we can select the 
+    // right master template when building the deck
+    if (layout != undefined && layout != "") {
+        env.currentSlide.customLayout = layout;
     }
 };
 
