@@ -73,7 +73,6 @@ This is the *right* column
 ![](https://picsum.photos/1600/900){pad=30 offset-y=30 offset-x=30}
 
 ---
-
 # Slides can have many images
 
 ![](https://www.gstatic.com/images/branding/product/2x/drive_36dp.png){pad=10}
@@ -83,10 +82,9 @@ This is the *right* column
 ![](https://www.gstatic.com/images/branding/product/2x/forms_36dp.png){pad=10}
 
 ---
-
 # Slides can have local images 
 
-![](file://image_slide.png)
+![](image_slide.png)
 
 ---
 

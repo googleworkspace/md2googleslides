@@ -15,7 +15,9 @@
 const debug = require('debug')('md2gslides');
 const mathJax = require('mathjax-node');
 const sharp = require('sharp');
-var tmp = require('tmp-promise');
+const tmp = require('tmp-promise');
+
+tmp.setGracefulCleanup();
 
 mathJax.config({
     MathJax: {
@@ -26,6 +28,11 @@ mathJax.config({
 });
 mathJax.start();
 
+/**
+ * Checks to see if the image requires rasterization (e.g. SVG, MathJAX, etc)
+ * @param {Image} image to generate if needed 
+ * @return {Promise<Image>} Promise resolved with image URL
+ */
 async function maybeGenerateImage(image) {
     if (image.url) {
         return image;
@@ -70,8 +77,8 @@ async function renderMathJax(image, format = 'TeX') {
 }
 
 async function renderSVG(image) {
-    debug('Generating SVG');
-    let path = await tmp.tmpName({ postfix: 'png' });
+    debug('Generating SVG', image);
+    let path = await tmp.tmpName({ postfix: '.png' });
     let buffer = Buffer.from(image.source);
     try {
         let result = await sharp(buffer, { density: 2400 } ).png().toFile(path);

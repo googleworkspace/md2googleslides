@@ -36,6 +36,7 @@
     "babel-polyfill": "^6.26.0",
     "debug": "^4.1.1",
     "extend": "^3.0.0",
+    "file-url": "^2.0.2",
     "google-auth-library": "^2.0.2",
     "googleapis": "^36.0.0",
     "highlight.js": "^9.15.6",

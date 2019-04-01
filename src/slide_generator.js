@@ -168,7 +168,6 @@ class SlideGenerator {
         const probe = function(image) {
             let promise;
             let parsedUrl = new URL(image.url);
-
             if (parsedUrl.protocol == 'file:') {
                 let stream = fs.createReadStream(parsedUrl.pathname);
                 promise = probeImageSize(stream).finally(() => stream.destroy());

@@ -28,6 +28,7 @@ const low = require('lowlight');
 const parseColor = require('parse-color');
 const parse5 = require('parse5');
 const inlineStylesParse = require('inline-styles-parse');
+const fileUrl = require('file-url')
 const inlineTokenRules = {};
 const fullTokenRules = {};
 const htmlTokenRules = {};
@@ -473,9 +474,12 @@ fullTokenRules['hr'] = function(token, env) {
 
 fullTokenRules['image'] = function(token, env) {
     const style = getStyle(token, {});
-
+    let url = attr(token, 'src');
+    if (!url.match(/(file|https?):/)) {
+        url = fileUrl(url);
+    }
     const image = {
-        url: attr(token, 'src'),
+        url: url,
         width: undefined,
         height: undefined,
         padding: 0,
