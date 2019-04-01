@@ -136,7 +136,6 @@ function endSlide(env) {
         if (env.text && env.text.rawText.trim().length) {
             env.currentSlide.bodies.push(env.text);
         }
-
         env.slides.push(env.currentSlide);
     }
 }
@@ -144,6 +143,7 @@ function endSlide(env) {
 function startSlide(env) {
     env.currentSlide = {
         objectId: uuid.v1(),
+        customLayout: null,
         title: null,
         subtitle: null,
         backgroundImage: null,
@@ -266,6 +266,13 @@ inlineTokenRules['paragraph_open'] = function(token, env) {
         startTextBlock(env);
     } else if (!env.text) {
         startTextBlock(env);
+    }
+
+    var layout = attr(token, 'layout');
+    // If we have a layout attribute set this on the slide so we can select the 
+    // right master template when building the deck
+    if (layout != undefined && layout != "") {
+        env.currentSlide.customLayout = layout;
     }
 };
 
@@ -465,16 +472,32 @@ fullTokenRules['hr'] = function(token, env) {
 };
 
 fullTokenRules['image'] = function(token, env) {
+    const style = getStyle(token, {});
+
     const image = {
         url: attr(token, 'src'),
         width: undefined,
         height: undefined,
-        padding: 0
+        padding: 0,
+        offsetX: 0,
+        offsetY: 0,
     };
+    
     const padding = attr(token, 'pad');
     if (padding) {
         image.padding = parseInt(padding);
     }
+
+    const offsetX = attr(token, 'offset-x');
+    if (offsetX) {
+        image.offsetX = parseInt(offsetX);
+    }
+    
+    const offsetY = attr(token, 'offset-y');
+    if (offsetY) {
+        image.offsetY = parseInt(offsetY);
+    }
+    
     if (hasClass(token, 'background')) {
         env.currentSlide.backgroundImage = image;
     } else {

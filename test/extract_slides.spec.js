@@ -128,13 +128,23 @@ describe('extractSlides', function() {
         const markdown =
             '# Title\n' +
             '\n' +
-            '![](https://example.com/image.jpg)\n' +
+            '![](https://example.com/image.jpg){offset-x=100 offset-y=200}\n' +
             'hello world\n';
         const slides = extractSlides(markdown);
 
         it('should have a background image', function() {
             return expect(slides).to.have.nested.property('[0].images[0].url',
                 'https://example.com/image.jpg');
+        });
+
+        it('should have an image x offset', function() {
+            return expect(slides).to.have.nested.property('[0].images[0].offsetX',
+                100);
+        });
+        
+        it('should have an image y offset', function() {
+            return expect(slides).to.have.nested.property('[0].images[0].offsetY',
+                200);
         });
     });
 
@@ -408,6 +418,17 @@ describe('extractSlides', function() {
 
         it('should have list markers', function() {
             return expect(slides).to.have.nested.property('[0].notes.listMarkers').length(1);
+        });
+    });
+
+    describe('with a custom layout', function() {
+        const markdown =
+            '{layout="my custom layout"}\n' +
+            '# Title\n';
+        const slides = extractSlides(markdown);
+
+        it('should have a customLayout', function() {
+            return expect(slides).to.have.nested.property('[0].customLayout', 'my custom layout');
         });
     });
 });

@@ -73,9 +73,29 @@ class SlideGenerator {
     }
 
     /**
+     * Returns a generator that copies an existing presentation.
+     *
+     * @param {google.auth.OAuth2} oauth2Client User credentials
+     * @param {string} title Title of presentation
+     * @param {string} presentationId ID of presentation to copy
+     * @returns {Promise.<SlideGenerator>}
+     */
+    static async copyPresentation(oauth2Client, title, presentationId) {
+        let drive = google.drive({ version: 'v3', auth: oauth2Client});
+        let res = await drive.files.copy({
+            fileId: presentationId,
+            resource: {
+                name: title
+            }
+        });
+        return SlideGenerator.forPresentation(oauth2Client, res.id);
+    }
+
+    /**
      * Returns a generator that writes to an existing presentation.
      *
      * @param {google.auth.OAuth2} oauth2Client User credentials
+     * @param {string} presentationId ID of presentation to use
      * @returns {Promise.<SlideGenerator>}
      */
     static async forPresentation(oauth2Client, presentationId) {
@@ -207,7 +227,8 @@ class SlideGenerator {
         }
         return await this.api.presentations.batchUpdate({
             presentationId: this.presentation.data.presentationId,
-            resource: batch});
+            resource: batch})
+            .then((response) => response.data);
     }
 
     /**
@@ -247,6 +268,7 @@ class SlideGenerator {
             requests: []
         };
         for(let slide of this.slides) {
+            debug('appendContent', slide.layout);
             slide.layout.appendContentRequests(batch.requests);
         }
         return batch;
@@ -265,7 +287,8 @@ class SlideGenerator {
         }
         return await this.api.presentations.batchUpdate({
             presentationId: this.presentation.data.presentationId,
-            resource: batch});
+            resource: batch})
+            .then((response) => response.data);
     }
 
     /**
@@ -281,4 +304,3 @@ class SlideGenerator {
 }
 
 module.exports = SlideGenerator;
-

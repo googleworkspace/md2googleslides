@@ -29,7 +29,7 @@ const readline = require('readline');
 
 const SCOPES = [
     'https://www.googleapis.com/auth/presentations',
-    'https://www.googleapis.com/auth/drive.file'
+    'https://www.googleapis.com/auth/drive',
 ];
 
 const USER_HOME = process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
@@ -100,6 +100,14 @@ function parseArguments() {
             required: false
         }
     );
+    parser.addArgument(
+        ['-c', '--copy'],
+        {
+            help: 'Id of the presentation to copy and use as a base',
+            dest: 'copy',
+            required: false
+        }
+    );
     return parser.parseArgs();
 }
 
@@ -150,11 +158,15 @@ function authorizeUser() {
 }
 
 function buildSlideGenerator(oauth2Client) {
+    const title = args.title || args.file;
     const presentationId = args.id;
+    const copyId = args.copy;
+
     if (presentationId) {
         return SlideGenerator.forPresentation(oauth2Client, presentationId);
+    } else if(copyId != undefined) {
+        return SlideGenerator.copyPresentation(oauth2Client, title, copyId);
     } else {
-        const title = args.title || args.file;
         return SlideGenerator.newPresentation(oauth2Client, title);
     }
     

@@ -24,6 +24,9 @@ chai.use(require('chai-as-promised'));
 const expect = chai.expect;
 const UserAuthorizer = require('../src/auth');
 
+const axios = require('axios');
+const httpAdapter = require('axios/lib/adapters/http');
+axios.defaults.adapter = httpAdapter;
 
 function stubTokenRequest() {
     nock('https://oauth2.googleapis.com')
@@ -155,6 +158,4 @@ describe('UserAuthorizer', function() {
             });
         });
     });
-
-
 });

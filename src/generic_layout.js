@@ -91,9 +91,11 @@ class GenericLayout {
         }
 
         for(let i in pageElements) {
-            debug(`Slide #${this.slide.index}: setting ${placeholderName}[${i}] to ${values[i].rawText}`);
-            let id = pageElements[i].objectId;
-            this.appendInsertTextRequests(values[i], { objectId: id}, requests);
+            if (values[i] != undefined) {
+                debug(`Slide #${this.slide.index}: setting ${placeholderName}[${i}] to ${values[i].rawText}`);
+                let id = pageElements[i].objectId;
+                this.appendInsertTextRequests(values[i], { objectId: id}, requests);
+            }
         }
     }
 
@@ -223,8 +225,8 @@ class GenericLayout {
                         transform: {
                             scaleX: 1,
                             scaleY: 1,
-                            translateX: translateX + (item.x + item.meta.padding) * scaleRatio,
-                            translateY: translateY + (item.y + item.meta.padding) * scaleRatio,
+                            translateX: translateX + (item.x + item.meta.padding + item.meta.offsetX) * scaleRatio,
+                            translateY: translateY + (item.y + item.meta.padding + item.meta.offsetY) * scaleRatio,
                             shearX: 0,
                             shearY: 0,
                             unit: 'EMU'
