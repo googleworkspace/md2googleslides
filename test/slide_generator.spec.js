@@ -22,10 +22,11 @@ const chai = require('chai');
 chai.use(require('chai-as-promised'));
 const expect = chai.expect;
 const google = require('googleapis');
+const { OAuth2Client } = require('google-auth-library');
 const SlideGenerator = require('../src/slide_generator');
 
 function buildCredentials() {
-    const oauth2Client = new google.auth.OAuth2('test', 'test', null);
+    const oauth2Client = new OAuth2Client('test', 'test', null);
     oauth2Client.setCredentials({
         'access_token':'abc',
         'expires_in':3920,
@@ -40,39 +41,23 @@ describe('SlideGenerator', function() {
     const fixturePath = path.join(path.dirname(__dirname), 'test', 'fixtures');
 
     describe('with new presentation', function() {
-        before(function() {
+        beforeEach(function() {
             const presentation = jsonfile.readFileSync(
                 path.join(fixturePath, 'blank_presentation.json'));
-            nock('https://slides.googleapis.com', {
-                reqheaders: {
-                    'Authorization': 'Bearer abc'
-                }})
+            nock('https://slides.googleapis.com')
+                .log(console.log)
                 .post('/v1/presentations')
                 .reply(200, presentation);
-            nock('https://slides.googleapis.com', {
-                reqheaders: {
-                    'Authorization': 'Bearer abc'
-                }})
-                .post('/v1/presentations/1tuAQc1AVbJcAZWWikCW4najLJo7KtvE0AGohHZ24_M4')
-                .reply(200, {});
         });
 
         it('should create a presentation', function() {
             const generator = SlideGenerator.newPresentation(buildCredentials(), 'title');
             return expect(generator).to.eventually.be.instanceof(SlideGenerator);
         });
-
-        it('should generate slides', function() {
-            const result = SlideGenerator.forPresentation(buildCredentials(),
-                '1tuAQc1AVbJcAZWWikCW4najLJo7KtvE0AGohHZ24_M4')
-                .then(generator => generator.generateFromMarkdown(markdown));
-            return expect(result).to.eventually.be.resolved;
-        });
-
     });
 
     describe('with existing presentation', function() {
-        before(function() {
+        beforeEach(function() {
             nock('https://slides.googleapis.com', {
                 reqheaders: {
                     'Authorization': 'Bearer abc'

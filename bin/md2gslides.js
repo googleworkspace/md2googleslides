@@ -28,10 +28,12 @@ const opener = require('opener');
 const readline = require('readline');
 
 const SCOPES = [
-    'https://www.googleapis.com/auth/presentations'
+    'https://www.googleapis.com/auth/presentations',
+    'https://www.googleapis.com/auth/drive.file'
 ];
+
 const USER_HOME = process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
-const STORED_CREDENTIALS_PATH = path.join(USER_HOME, '.credentials', 'md2gslides.json');
+const STORED_CREDENTIALS_PATH = path.join(USER_HOME, '.md2googleslides', 'credentials.json');
 
 function parseArguments() {
     var parser = new ArgumentParser({
@@ -155,6 +157,7 @@ function buildSlideGenerator(oauth2Client) {
         const title = args.title || args.file;
         return SlideGenerator.newPresentation(oauth2Client, title);
     }
+    
 }
 
 function eraseIfNeeded(slideGenerator) {
@@ -172,7 +175,11 @@ function loadCss(theme) {
 }
 
 function generateSlides(slideGenerator) {
-    const file = args.file == 'STDIN' ? 0 : args.file;
+    const file = args.file == 'STDIN' ? 0 : path.resolve(args.file);
+    if (file != 0) {
+        // Set working directory relative to markdown file
+        process.chdir(path.dirname(file));
+    }
     const input = fs.readFileSync(file, { encoding: 'UTF-8'});
     const css = loadCss(args.style);
 

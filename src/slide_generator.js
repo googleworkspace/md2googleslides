@@ -14,12 +14,16 @@
 
 const debug = require('debug')('md2gslides');
 const Promise = require('promise');
-const ApiClient = require('./api_client');
 const extractSlides = require('./extract_slides');
 const Presentation = require('./presentation');
 const matchLayout = require('./match_layout');
 const probeImageSize = require('probe-image-size');
+const { maybeGenerateImage } = require('./generate_image');
 const promiseRetry = require('promise-retry');
+const URL = require('url').URL;
+const fs = require('fs');
+const { google } = require('googleapis');
+const { uploadLocalImage } = require('./upload_image');
 
 /**
  * Generates slides from Markdown or HTML. Requires an authorized
@@ -41,13 +45,13 @@ const promiseRetry = require('promise-retry');
  */
 class SlideGenerator {
     /**
-     * @param {APIClient] apiClient Authorized API client instance
+     * @param {Object} api Authorized API client instance
      * @param {Object} presentation Initial presentation data
      * @private
      */
-    constructor(apiClient, presentation) {
+    constructor(api, presentation) {
         this.presentation = new Presentation(presentation);
-        this.apiClient = apiClient;
+        this.api = api;
     }
 
     /**
@@ -57,13 +61,15 @@ class SlideGenerator {
      * @param {string} title Title of presentation
      * @returns {Promise.<SlideGenerator>}
      */
-    static newPresentation(oauth2Client, title) {
-        let apiClient = new ApiClient(oauth2Client);
-        return apiClient.createPresentation({
+    static async newPresentation(oauth2Client, title) {
+        let api = google.slides({ version: 'v1', auth: oauth2Client});
+        let res = await api.presentations.create({
             resource: {
                 title: title
             }
-        }).then(presentation => new SlideGenerator(apiClient, presentation));
+        });
+        let presentation = res.data;
+        return new SlideGenerator(api, presentation);
     }
 
     /**
@@ -72,10 +78,11 @@ class SlideGenerator {
      * @param {google.auth.OAuth2} oauth2Client User credentials
      * @returns {Promise.<SlideGenerator>}
      */
-    static forPresentation(oauth2Client, presentationId) {
-        let apiClient = new ApiClient(oauth2Client);
-        return apiClient.getPresentation({presentationId: presentationId})
-            .then(presentation => new SlideGenerator(apiClient, presentation));
+    static async forPresentation(oauth2Client, presentationId) {
+        let api = google.slides({ version: 'v1', auth: oauth2Client});
+        let res = await api.presentations.get({presentationId: presentationId});
+        let presentation = res.data;
+        return new SlideGenerator(api, presentation);
     }
 
     /**
@@ -84,15 +91,50 @@ class SlideGenerator {
      * @param {String} markdown Markdown to import
      * @returns {Promise.<String>} ID of generated slide
      */
-    generateFromMarkdown(markdown, css = null) {
+    async generateFromMarkdown(markdown, css = null) {
         this.slides = extractSlides(markdown, css);
-        return this.probeImageSizes()
-            .then(() => this.updatePresentation(this.createSlides()))
-            .then(() => this.reloadPresentation())
-            .then(() => this.updatePresentation(this.populateSlides()))
-            .then(() => this.presentation.data.presentationId);
+        await this.generateImages();
+        await this.probeImageSizes();
+        await this.uploadLocalImages();
+        await this.updatePresentation(this.createSlides());
+        await this.reloadPresentation();
+        await this.updatePresentation(this.populateSlides());
+        return this.presentation.data.presentationId;
     }
 
+    generateImages() {
+        const promises = [];
+        for(let slide of this.slides) {
+            if (slide.backgroundImage) {
+                promises.push(maybeGenerateImage(slide.backgroundImage));
+            }
+            for(let image of slide.images) {
+                promises.push(maybeGenerateImage(image));
+            }
+        }
+        return Promise.all(promises);
+    }
+
+    uploadLocalImages() {
+        const promises = [];
+        const uploadImageifLocal = async (image) => {
+            let parsedUrl = new URL(image.url);
+            if (parsedUrl.protocol !== 'file:') {
+                return;
+            }
+            image.url = await uploadLocalImage(parsedUrl.pathname);
+            return;
+        };
+        for(let slide of this.slides) {
+            if (slide.backgroundImage) {
+                promises.push(uploadImageifLocal(slide.backgroundImage));
+            }
+            for(let image of slide.images) {
+                promises.push(uploadImageifLocal(image));
+            }
+        }
+        return Promise.all(promises);
+    }
     /**
      * Fetches the image sizes for each image in the presentation. Allows
      * for more accurate layout of images.
@@ -103,24 +145,35 @@ class SlideGenerator {
      * @private
      */
     probeImageSizes() {
-        const retryOptions = {
-            retries: 3,
-            randomize: true,
-        };
         const probe = function(image) {
-            return promiseRetry((retry) => {
-                return probeImageSize({ url: image.url, timeout: 5000 })
-                    .then(size => {
-                        image.width = size.width;
-                        image.height = size.height;
-                    }).catch(err => {
+            let promise;
+            let parsedUrl = new URL(image.url);
+
+            if (parsedUrl.protocol == 'file:') {
+                let stream = fs.createReadStream(parsedUrl.pathname);
+                promise = probeImageSize(stream).finally(() => stream.destroy());
+            } else {
+                const retryOptions = {
+                    retries: 3,
+                    randomize: true,
+                };
+        
+                promise = promiseRetry((retry) => {
+                    let options = { timeout: 5000 };
+                    return probeImageSize(image.url, options).catch(err => {
                         if (err.code == 'ECONNRESET' || err.code == 'ETIMEDOUT') {
                             retry(err);
                         }
                         throw err;
                     });
-            }, retryOptions);
+                }, retryOptions);
+            }
+            return promise.then(size => {
+                image.width = size.width;
+                image.height = size.height;
+            });
         };
+
         const promises = [];
         for(let slide of this.slides) {
             if (slide.backgroundImage) {
@@ -138,7 +191,7 @@ class SlideGenerator {
      *
      * @returns {Promise.<*>}
      */
-    erase() {
+    async erase() {
         debug('Erasing previous slides');
         if (this.presentation.data.slides == null) {
             return Promise.resolve(null);
@@ -152,7 +205,7 @@ class SlideGenerator {
                 }
             });
         }
-        return this.apiClient.batchUpdate({
+        return await this.api.presentations.batchUpdate({
             presentationId: this.presentation.data.presentationId,
             resource: batch});
     }
@@ -205,12 +258,12 @@ class SlideGenerator {
      * @param batch Batch of operations to execute
      * @returns {Promise.<*>}
      */
-    updatePresentation(batch) {
+    async updatePresentation(batch) {
         debug(JSON.stringify(batch, null, 2));
         if (batch.requests.length == 0) {
             return Promise.resolve(null);
         }
-        return this.apiClient.batchUpdate({
+        return await this.api.presentations.batchUpdate({
             presentationId: this.presentation.data.presentationId,
             resource: batch});
     }
@@ -220,12 +273,10 @@ class SlideGenerator {
      *
      * @returns {Promise.<*>}
      */
-    reloadPresentation() {
-        return this.apiClient.getPresentation({presentationId: this.presentation.data.presentationId})
-            .then(presentation => {
-                this.presentation.data = presentation;
-                return this.presentation;
-            });
+    async reloadPresentation() {
+        let res = await this.api.presentations.get({presentationId: this.presentation.data.presentationId});
+        this.presentation.data = res.data;
+        return this.presentation;
     }
 }
 

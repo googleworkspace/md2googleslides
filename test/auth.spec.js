@@ -26,8 +26,8 @@ const UserAuthorizer = require('../src/auth');
 
 
 function stubTokenRequest() {
-    nock('https://accounts.google.com')
-        .post('/o/oauth2/token')
+    nock('https://oauth2.googleapis.com')
+        .post('/token')
         .reply(200, {
             'access_token':'new_token',
             'expires_in':3920,
@@ -35,9 +35,9 @@ function stubTokenRequest() {
         });
 }
 
-function stubTokenRequestError() {
-    nock('https://accounts.google.com')
-        .post('/o/oauth2/token')
+function stubTokenRequestError()    {
+    nock('https://oauth2.googleapis.com')
+        .post('/token')
         .reply(400, {
             'error_description': 'Bad Request',
             'error': 'invalid_grant'
@@ -136,7 +136,7 @@ describe('UserAuthorizer', function() {
                 const credentials = authorizer.getUserCredentials(
                     'user@example.com',
                     'https://www.googleapis.com/auth/slides');
-                return expect(credentials).to.eventually.have.deep.property('credentials.access_token', 'new_token');
+                return expect(credentials).to.eventually.have.nested.property('credentials.access_token', 'new_token');
             });
         });
 
@@ -144,14 +144,14 @@ describe('UserAuthorizer', function() {
             it('should return token if still current', function() {
                 const authorizer = new UserAuthorizer(options);
                 const credentials = authorizer.getUserCredentials('current', 'https://www.googleapis.com/auth/slides');
-                return expect(credentials).to.eventually.have.deep.property('credentials.access_token', 'ya29.123');
+                return expect(credentials).to.eventually.have.nested.property('credentials.access_token', 'ya29.123');
             });
 
             it('should refresh token if expired', function() {
                 stubTokenRequest();
                 const authorizer = new UserAuthorizer(options);
                 const credentials = authorizer.getUserCredentials('expired', 'https://www.googleapis.com/auth/slides');
-                return expect(credentials).to.eventually.have.deep.property('credentials.access_token', 'new_token');
+                return expect(credentials).to.eventually.have.nested.property('credentials.access_token', 'new_token');
             });
         });
     });
