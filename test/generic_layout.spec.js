@@ -64,7 +64,7 @@ describe('GenericLayout', function() {
         });
 
         it(`should insert title text`, function() {
-            expect(requests).to.include({
+            expect(requests).to.deep.include({
                 "insertText": {
                     "text": "This is a title slide",
                     "objectId": "centered-title-element"
@@ -73,7 +73,7 @@ describe('GenericLayout', function() {
         });
 
         it(`should insert subtitle text`, function() {
-            expect(requests).to.include({
+            expect(requests).to.deep.include({
                 "insertText": {
                     "text": "Your name here",
                     "objectId": "subtitle-element"
@@ -82,7 +82,7 @@ describe('GenericLayout', function() {
         });
 
         it(`should insert speaker notes`, function() {
-            expect(requests).to.include({
+            expect(requests).to.deep.include({
                 "insertText": {
                     "text": "Speaker notes here.",
                     "objectId": "speaker-notes-element"
@@ -121,7 +121,7 @@ describe('GenericLayout', function() {
         });
 
         it(`should insert title text`, function() {
-            expect(requests).to.include({
+            expect(requests).to.deep.include({
                 "insertText": {
                     "text": "Title & body slide",
                     "objectId": "title-element"
@@ -130,7 +130,7 @@ describe('GenericLayout', function() {
         });
 
         it(`should insert body text`, function() {
-            expect(requests).to.include({
+            expect(requests).to.deep.include({
                 "insertText": {
                     "text": "This is the slide body.\n",
                     "objectId": "body-element"
@@ -169,7 +169,7 @@ describe('GenericLayout', function() {
         });
 
         it(`should insert left column text`, function() {
-            expect(requests).to.include({
+            expect(requests).to.deep.include({
                 "insertText": {
                     "text": "This is the left column\n",
                     "objectId": "body-element"
@@ -178,7 +178,7 @@ describe('GenericLayout', function() {
         });
 
         it(`should insert right column text`, function() {
-            expect(requests).to.include({
+            expect(requests).to.deep.include({
                 "insertText": {
                     "text": "This is the right column\n",
                     "objectId": "body-element-2"
@@ -216,7 +216,7 @@ describe('GenericLayout', function() {
         });
 
         it(`should set background image`, function() {
-            expect(requests).to.include({
+            expect(requests).to.deep.include({
                 "updatePageProperties": {
                     "objectId": "body-slide",
                     "fields": "pageBackgroundFill.stretchedPictureFill.contentUrl",

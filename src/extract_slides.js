@@ -20,6 +20,7 @@ const lazyHeaders = require('markdown-it-lazy-headers');
 const emoji = require('markdown-it-emoji');
 const expandTabs = require('markdown-it-expand-tabs');
 const video = require('markdown-it-video');
+const customFence= require('markdown-it-fence');
 const uuid = require('uuid');
 const extend = require('extend');
 const nativeCSS = require('native-css');
@@ -27,11 +28,20 @@ const low = require('lowlight');
 const parseColor = require('parse-color');
 const parse5 = require('parse5');
 const inlineStylesParse = require('inline-styles-parse');
+const fileUrl = require('file-url')
 const inlineTokenRules = {};
 const fullTokenRules = {};
 const htmlTokenRules = {};
 
 const NO_OP = function() {};
+
+function generatedImage(md) {
+    return customFence(md, 'generated_image', {
+        marker: '$',
+        validate: () => true
+    });
+}
+
 const mdOptions = {
     html: true,
     langPrefix: 'highlight ',
@@ -43,6 +53,7 @@ const parser = markdownIt(mdOptions)
     .use(lazyHeaders)
     .use(emoji, {shortcuts: {}})
     .use(expandTabs, {tabWidth: 4})
+    .use(generatedImage)
     .use(video, { youtube: { width: 640, height: 390 }});
 
 /**
@@ -162,11 +173,11 @@ function endStyle(env) {
     if (style.start == style.end) {
         return; // Ignore empty ranges
     }
-    if (_.isEmpty(_.keys(_.omit(style, "start", "end")))) {
-      return; // Ignore ranges with no style
+    if (_.isEmpty(_.keys(_.omit(style, 'start', 'end')))) {
+        return; // Ignore ranges with no style
     }
     if (_.find(env.text.textRuns, _.matches(style))) {
-      return; // Ignore duplicate ranges
+        return; // Ignore duplicate ranges
     }
     env.text.textRuns.push(style);
 }
@@ -213,27 +224,27 @@ inlineTokenRules['html_inline'] = function(token, env) {
         const node = fragment.childNodes[0];
         const style = getStyle(node, {});
         switch (node.nodeName) {
-            case 'strong':
-            case 'b':
-                style.bold = true;
-                break;
-            case 'em':
-            case 'i':
-                style.italic = true;
-                break;
-            case 'code':
-                style.fontFamily = 'Courier New';
-                break;
-            case 'sub':
-                style.baselineOffset = 'SUBSCRIPT';
-                break;
-            case 'sup':
-                style.baselineOffset = 'SUPERSCRIPT';
-                break;
-            case 'span':
-                break;
-            default:
-                throw new Error('Unsupported inline HTML element: ' + node.nodeName);
+        case 'strong':
+        case 'b':
+            style.bold = true;
+            break;
+        case 'em':
+        case 'i':
+            style.italic = true;
+            break;
+        case 'code':
+            style.fontFamily = 'Courier New';
+            break;
+        case 'sub':
+            style.baselineOffset = 'SUBSCRIPT';
+            break;
+        case 'sup':
+            style.baselineOffset = 'SUPERSCRIPT';
+            break;
+        case 'span':
+            break;
+        default:
+            throw new Error('Unsupported inline HTML element: ' + node.nodeName);
         }
         startStyle(style, env);
     } else {
@@ -244,7 +255,7 @@ inlineTokenRules['html_inline'] = function(token, env) {
 
 inlineTokenRules['text'] = function(token, env) {
     const style = getStyle(token, {});
-    startStyle(style, env)
+    startStyle(style, env);
     env.text.rawText += token.content;
     endStyle(env);
 };
@@ -353,7 +364,6 @@ inlineTokenRules['softbreak'] = function(token, env) {
 inlineTokenRules['blockquote_open'] = function(token, env) {
     // TODO - More interesting styling for block quotes
     const style = getStyle(token, {italic: true});
-    applyCssStyle(token, style);
     startStyle(style, env);
 };
 
@@ -464,9 +474,12 @@ fullTokenRules['hr'] = function(token, env) {
 
 fullTokenRules['image'] = function(token, env) {
     const style = getStyle(token, {});
-
+    let url = attr(token, 'src');
+    if (!url.match(/(file|https?):/)) {
+        url = fileUrl(url);
+    }
     const image = {
-        url: attr(token, 'src'),
+        url: url,
         width: undefined,
         height: undefined,
         padding: 0,
@@ -580,6 +593,26 @@ fullTokenRules['td_close'] = fullTokenRules['th_close'] = function(token, env) {
     startTextBlock(env);
 };
 
+fullTokenRules['generated_image'] = function(token, env) {
+    const image = {
+        source: token.content,
+        type: token.info.trim(),
+        width: undefined,
+        height: undefined,
+        style: attr(token, 'style'),
+        padding: 0
+    };
+    const padding = attr(token, 'pad');
+    if (padding) {
+        image.padding = parseInt(padding);
+    }
+    if (hasClass(token, 'background')) {
+        env.currentSlide.backgroundImage = image;
+    } else {
+        env.currentSlide.images.push(image);
+    }
+    
+};
 
 // These rules are specific to parsing syntax-highlighted code
 // Currently these are a very small subset of HTML, limited to
@@ -629,42 +662,64 @@ function getCssStyle(token, env) {
     return style;
 }
 
+function camelize(str) {
+    return str.replace(/-([a-z])/g, function (g) {
+      return g[1].toUpperCase();
+    });
+}
+
 function convertCssRule(rule, style = {}) {
-    if (rule['color']) {
-        style.foregroundColor = parseColorString(rule['color']);
-    }
-    if (rule['background-color']) {
-        style.backgroundColor = parseColorString(rule['background-color']);
-    }    if (rule['font-weight'] == 'bold') {
-        style.bold = true;
-    }
-    if (rule['font-style'] == 'italic') {
-        style.italic = true;
-    }
-    if (rule['text-decoration'] == 'underline') {
-        style.underline = true;
-    }
-    if (rule['text-decoration'] == 'line-through') {
-        style.strikethrough = true;
-    }
-    if (rule['font-family']) {
-        style.fontFamily = rule['font-family'];
-    }
-    if (rule['font-variant'] == 'small-caps') {
-        style.smallCaps = true;
-    }
-    if (rule['font-size']) {
-      // Font size must be expressed in points
-      const match = rule['font-size'].match(/(\d+)(?:pt)?/);
-      if (!match) {
-        console.error("Invalid font-size value:", rule['font-size']);
-      } else {
-        style.fontSize = {
-          magnitude: match[1],
-          unit: "PT"
+    let applyRule = (name, callback) => {
+        let value = rule[name] || rule[camelize(name)];
+        if (value) {
+            callback(value);
         }
-      }
     }
+    applyRule('color', (value) => {
+        style.foregroundColor = parseColorString(value);
+    })
+    applyRule('background-color', (value) => {
+        style.backgroundColor = parseColorString(value);
+
+    });
+    applyRule('font-weight', (value) => {
+        if (value == 'bold') {
+            style.bold = true;
+        }
+    });
+    applyRule('font-style', (value) => {
+        if (value == 'italic') {
+            style.italic = true;
+        }
+    });
+    applyRule('text-decoration', (value) => {
+        if (value == 'underline') {
+            style.underline = true;
+        } else if (value == 'line-through') {
+            style.strikethrough = true;
+        }
+    });
+    applyRule('font-family', (value) => {
+        style.fontFamily = value;
+
+    });
+    applyRule('font-variant', (value) => {
+        if (value == 'small-caps') {
+            style.smallCaps = true;
+        }    
+    });
+    applyRule('font-size', (value) => {
+        // Font size must be expressed in points
+        const match = value.match(/(\d+)(?:pt)?/);
+        if (!match) {
+            debug('Invalid font-size value:', value);
+        } else {
+            style.fontSize = {
+                magnitude: match[1],
+                unit: 'PT'
+            };
+        }
+    });
     return style;
 }
 
@@ -681,24 +736,24 @@ function processHtmlToken(token, env) {
 }
 
 function getStyle(token, style = {}) {
-  applyCssStyle(token, style);
-  return style;
+    applyCssStyle(token, style);
+    return style;
 }
 
 function applyCssStyle(token, style) {
-  if (!token.attrs) {
-    return;
-  }
-  for(let attr of token.attrs) {
-      let name = attr.name || attr[0];
-      let value = attr.value || attr[1];
-      if (name == 'style') {
-          const dummyRule = inlineStylesParse.declarationsToRule(value);
-          const css = nativeCSS.convert(dummyRule);
-          convertCssRule(css['dummy'], style);
-          break;
-      }
-  }
+    if (!token.attrs) {
+        return;
+    }
+    for(let attr of token.attrs) {
+        let name = attr.name || attr[0];
+        let value = attr.value || attr[1];
+        if (name == 'style') {
+            const dummyRule = inlineStylesParse.declarationsToRule(value);
+            const css = nativeCSS.convert(dummyRule);
+            convertCssRule(css['dummy'], style);
+            break;
+        }
+    }
 }
 
 

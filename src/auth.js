@@ -17,10 +17,12 @@
 const assert = require('assert');
 const debug = require('debug')('md2gslides');
 const Promise = require('promise');
-const {OAuth2Client} = require('google-auth-library');
+const { OAuth2Client } = require('google-auth-library');
 const path = require('path');
 const mkdirp = require('mkdirp');
 const lowdb = require('lowdb');
+const FileSync = require('lowdb/adapters/FileSync');
+const Memory = require('lowdb/adapters/Memory')
 
 /**
  * Handles the authorization flow, intended for command line usage.
@@ -78,13 +80,15 @@ class UserAuthorizer {
     getUserCredentials(user, scopes) {
         const oauth2Client = new OAuth2Client(this.clientId, this.clientSecret, this.redirectUrl);
         let previousToken = this.db.get(user).value();
-        let saveToken = () => this.db.set(user, oauth2Client.credentials).value();
+        let saveToken = () => {
+            let creds = oauth2Client.credentials;
+            this.db.set(user, creds).write();
+        };
         let emitCredentials = () => oauth2Client;
 
         if (previousToken) {
             oauth2Client.setCredentials(previousToken);
-            let getAccessToken = Promise.denodeify(oauth2Client.getAccessToken.bind(oauth2Client));
-            return getAccessToken()
+            return oauth2Client.getAccessToken()
                 .then(saveToken)
                 .then(emitCredentials);
         } else {
@@ -93,9 +97,9 @@ class UserAuthorizer {
                 scope: scopes,
                 login_hint: user
             });
-            let exchangeCode = Promise.denodeify(oauth2Client.getToken.bind(oauth2Client));
+            let exchangeCode = code => oauth2Client.getToken(code);
             let validateCode = code => code.null ? Promise.reject('Code is null') : code;
-            let updateClient = token => oauth2Client.setCredentials(token);
+            let updateClient = token => oauth2Client.setCredentials(token.tokens);
             return this.prompt(authUrl)
                 .then(validateCode)
                 .then(exchangeCode)
@@ -116,9 +120,10 @@ class UserAuthorizer {
         if(filePath) {
             const parentDir = path.dirname(filePath);
             mkdirp.sync(parentDir);
-            return lowdb(filePath);
+            const adapter = new FileSync(filePath);
+            return lowdb(adapter);
         } else {
-            return lowdb(); // In-memory only
+            return lowdb(new Memory()); // In-memory only
         }
     }
 }

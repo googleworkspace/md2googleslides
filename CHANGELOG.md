@@ -1,6 +1,19 @@
 # Changelog
 
-## Unreleased
+## (pending)
+
+* Support local image upload (via file.io) and rasterization of SVG and TeX/MathML expressions
+* Allow custom layouts via markdown
+* Allow offsets for images
+* Update dependencies
+
+## 0.4
+
+* Allow piping markdown from stdin
+* Update dependencies
+* Allow CSS attributes on most markdown blocks
+
+## 0.3
 
 * Allow blank slides
 

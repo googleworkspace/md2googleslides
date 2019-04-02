@@ -202,12 +202,18 @@ class GenericLayout {
         let scaledWidth = computedLayout.width * scaleRatio;
         let scaledHeight = computedLayout.height * scaleRatio;
 
-        let translateX = box.x + ((box.width - scaledWidth) / 2);
-        let translateY = box.y + ((box.height - scaledHeight) / 2);
-
+        let baseTranslateX = box.x + ((box.width - scaledWidth) / 2);
+        let baseTranslateY = box.y + ((box.height - scaledHeight) / 2);
+        
         for(let item of computedLayout.items) {
+            let itemOffsetX = item.meta.offsetX ? item.meta.offsetX : 0;
+            let itemOffsetY = item.meta.offsetY ? item.meta.offsetY : 0;
+            let itemPadding = item.meta.padding ? item.meta.padding : 0;
             let width = item.meta.width * scaleRatio;
             let height = item.meta.height * scaleRatio;
+            let translateX =  baseTranslateX + (item.x + itemPadding + itemOffsetX) * scaleRatio;
+            let translateY = baseTranslateY + (item.y + itemPadding + itemOffsetY) * scaleRatio;
+
             requests.push({
                 createImage: {
                     elementProperties: {
@@ -225,8 +231,8 @@ class GenericLayout {
                         transform: {
                             scaleX: 1,
                             scaleY: 1,
-                            translateX: translateX + (item.x + item.meta.padding + item.meta.offsetX) * scaleRatio,
-                            translateY: translateY + (item.y + item.meta.padding + item.meta.offsetY) * scaleRatio,
+                            translateX: translateX,
+                            translateY: translateY,
                             shearX: 0,
                             shearY: 0,
                             unit: 'EMU'
