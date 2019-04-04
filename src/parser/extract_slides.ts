@@ -314,7 +314,7 @@ fullTokenRules['heading_close'] = (token, context) => {
     } else if (token.tag == 'h2') {
         context.currentSlide.subtitle = context.text;
     } else {
-        debug(`Ignoring header element ${token.tag}`);
+        debug('Ignoring header element %s', token.tag);
     }
     context.endStyle();
     context.startTextBlock();
