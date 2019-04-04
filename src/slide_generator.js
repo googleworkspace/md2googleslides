@@ -88,7 +88,7 @@ class SlideGenerator {
                 name: title
             }
         });
-        return SlideGenerator.forPresentation(oauth2Client, res.id);
+        return SlideGenerator.forPresentation(oauth2Client, res.data.id);
     }
 
     /**
