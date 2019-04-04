@@ -12,18 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const debug = require('debug')('md2gslides');
-const Promise = require('promise');
-const extractSlides = require('./extract_slides');
-const Presentation = require('./presentation');
-const matchLayout = require('./match_layout');
-const probeImageSize = require('probe-image-size');
-const { maybeGenerateImage } = require('./generate_image');
-const promiseRetry = require('promise-retry');
-const URL = require('url').URL;
-const fs = require('fs');
-const { google } = require('googleapis');
-const { uploadLocalImage } = require('./upload_image');
+import Debug from 'debug';
+import extractSlides from './parser/extract_slides';
+import { SlideDefinition } from './slides';
+import matchLayout from './layout/match_layout';
+import { URL } from 'url';
+import { google, slides_v1 as SlidesV1 } from 'googleapis';
+import uploadLocalImage from './images/upload';
+import { OAuth2Client } from 'google-auth-library';
+import probeImage from './images/probe';
+import maybeGenerateImage from './images/generate';
+
+const debug = Debug('md2gslides');
 
 /**
  * Generates slides from Markdown or HTML. Requires an authorized
@@ -43,30 +43,33 @@ const { uploadLocalImage } = require('./upload_image');
  *
  * @see https://github.com/google/google-api-nodejs-client
  */
-class SlideGenerator {
+export default class SlideGenerator {
+    private slides: SlideDefinition[];
+    private api: SlidesV1.Slides;
+    private presentation: SlidesV1.Schema$Presentation;
     /**
      * @param {Object} api Authorized API client instance
      * @param {Object} presentation Initial presentation data
      * @private
      */
-    constructor(api, presentation) {
-        this.presentation = new Presentation(presentation);
+    public constructor(api: SlidesV1.Slides, presentation: SlidesV1.Schema$Presentation) {
         this.api = api;
+        this.presentation = presentation;
     }
 
     /**
      * Returns a generator that writes to a new blank presentation.
      *
-     * @param {google.auth.OAuth2} oauth2Client User credentials
+     * @param {OAuth2Client} oauth2Client User credentials
      * @param {string} title Title of presentation
      * @returns {Promise.<SlideGenerator>}
      */
-    static async newPresentation(oauth2Client, title) {
-        let api = google.slides({ version: 'v1', auth: oauth2Client});
+    public static async newPresentation(oauth2Client: OAuth2Client, title: string): Promise<SlideGenerator> {
+        let api = google.slides({ version: 'v1', auth: oauth2Client });
         let res = await api.presentations.create({
-            resource: {
-                title: title
-            }
+            requestBody: {
+                title: title,
+            },
         });
         let presentation = res.data;
         return new SlideGenerator(api, presentation);
@@ -75,32 +78,36 @@ class SlideGenerator {
     /**
      * Returns a generator that copies an existing presentation.
      *
-     * @param {google.auth.OAuth2} oauth2Client User credentials
+     * @param {OAuth2Client} oauth2Client User credentials
      * @param {string} title Title of presentation
      * @param {string} presentationId ID of presentation to copy
      * @returns {Promise.<SlideGenerator>}
      */
-    static async copyPresentation(oauth2Client, title, presentationId) {
-        let drive = google.drive({ version: 'v3', auth: oauth2Client});
+    public static async copyPresentation(
+        oauth2Client: OAuth2Client,
+        title: string,
+        presentationId: string,
+    ): Promise<SlideGenerator> {
+        let drive = google.drive({ version: 'v3', auth: oauth2Client });
         let res = await drive.files.copy({
             fileId: presentationId,
-            resource: {
-                name: title
-            }
+            requestBody: {
+                name: title,
+            },
         });
-        return SlideGenerator.forPresentation(oauth2Client, res.id);
+        return SlideGenerator.forPresentation(oauth2Client, res.data.id);
     }
 
     /**
      * Returns a generator that writes to an existing presentation.
      *
-     * @param {google.auth.OAuth2} oauth2Client User credentials
+     * @param {gOAuth2Client} oauth2Client User credentials
      * @param {string} presentationId ID of presentation to use
      * @returns {Promise.<SlideGenerator>}
      */
-    static async forPresentation(oauth2Client, presentationId) {
-        let api = google.slides({ version: 'v1', auth: oauth2Client});
-        let res = await api.presentations.get({presentationId: presentationId});
+    public static async forPresentation(oauth2Client: OAuth2Client, presentationId): Promise<SlideGenerator> {
+        let api = google.slides({ version: 'v1', auth: oauth2Client });
+        let res = await api.presentations.get({ presentationId: presentationId });
         let presentation = res.data;
         return new SlideGenerator(api, presentation);
     }
@@ -111,7 +118,7 @@ class SlideGenerator {
      * @param {String} markdown Markdown to import
      * @returns {Promise.<String>} ID of generated slide
      */
-    async generateFromMarkdown(markdown, css = null) {
+    public async generateFromMarkdown(markdown, css = null): Promise<string> {
         this.slides = extractSlides(markdown, css);
         await this.generateImages();
         await this.probeImageSizes();
@@ -119,42 +126,65 @@ class SlideGenerator {
         await this.updatePresentation(this.createSlides());
         await this.reloadPresentation();
         await this.updatePresentation(this.populateSlides());
-        return this.presentation.data.presentationId;
+        return this.presentation.presentationId;
     }
 
-    generateImages() {
+    /**
+     * Removes any existing slides from the presentation.
+     *
+     * @returns {Promise.<*>}
+     */
+    public async erase(): Promise<void> {
+        debug('Erasing previous slides');
+        if (this.presentation.slides == null) {
+            return Promise.resolve(null);
+        }
+
+        let requests = this.presentation.slides.map(slide => ({
+            deleteObject: {
+                objectId: slide.objectId,
+            },
+        }));
+        const batch = { requests };
+        await this.api.presentations.batchUpdate({
+            presentationId: this.presentation.presentationId,
+            requestBody: batch,
+        });
+    }
+
+    protected async generateImages(): Promise<void> {
         const promises = [];
-        for(let slide of this.slides) {
+        for (let slide of this.slides) {
             if (slide.backgroundImage) {
                 promises.push(maybeGenerateImage(slide.backgroundImage));
             }
-            for(let image of slide.images) {
+            for (let image of slide.images) {
                 promises.push(maybeGenerateImage(image));
             }
         }
-        return Promise.all(promises);
+        await Promise.all(promises);
     }
 
-    uploadLocalImages() {
+    protected async uploadLocalImages(): Promise<void> {
         const promises = [];
-        const uploadImageifLocal = async (image) => {
+        const uploadImageifLocal = async (image): Promise<void> => {
             let parsedUrl = new URL(image.url);
             if (parsedUrl.protocol !== 'file:') {
                 return;
             }
             image.url = await uploadLocalImage(parsedUrl.pathname);
-            return;
         };
-        for(let slide of this.slides) {
+        for (let slide of this.slides) {
             if (slide.backgroundImage) {
                 promises.push(uploadImageifLocal(slide.backgroundImage));
             }
-            for(let image of slide.images) {
+            for (let image of slide.images) {
                 promises.push(uploadImageifLocal(image));
             }
         }
-        return Promise.all(promises);
+        await Promise.all(promises);
     }
+
     /**
      * Fetches the image sizes for each image in the presentation. Allows
      * for more accurate layout of images.
@@ -164,70 +194,17 @@ class SlideGenerator {
      * @returns {Promise.<*>}
      * @private
      */
-    probeImageSizes() {
-        const probe = function(image) {
-            let promise;
-            let parsedUrl = new URL(image.url);
-            if (parsedUrl.protocol == 'file:') {
-                let stream = fs.createReadStream(parsedUrl.pathname);
-                promise = probeImageSize(stream).finally(() => stream.destroy());
-            } else {
-                const retryOptions = {
-                    retries: 3,
-                    randomize: true,
-                };
-        
-                promise = promiseRetry((retry) => {
-                    let options = { timeout: 5000 };
-                    return probeImageSize(image.url, options).catch(err => {
-                        if (err.code == 'ECONNRESET' || err.code == 'ETIMEDOUT') {
-                            retry(err);
-                        }
-                        throw err;
-                    });
-                }, retryOptions);
-            }
-            return promise.then(size => {
-                image.width = size.width;
-                image.height = size.height;
-            });
-        };
-
+    protected async probeImageSizes(): Promise<void> {
         const promises = [];
-        for(let slide of this.slides) {
+        for (let slide of this.slides) {
             if (slide.backgroundImage) {
-                promises.push(probe(slide.backgroundImage));
+                promises.push(probeImage(slide.backgroundImage));
             }
-            for(let image of slide.images) {
-                promises.push(probe(image));
+            for (let image of slide.images) {
+                promises.push(probeImage(image));
             }
         }
-        return Promise.all(promises);
-    }
-
-    /**
-     * Removes any existing slides from the presentation.
-     *
-     * @returns {Promise.<*>}
-     */
-    async erase() {
-        debug('Erasing previous slides');
-        if (this.presentation.data.slides == null) {
-            return Promise.resolve(null);
-        }
-
-        const batch = { requests: [] };
-        for(let slide of this.presentation.data.slides) {
-            batch.requests.push({
-                deleteObject: {
-                    objectId: slide.objectId
-                }
-            });
-        }
-        return await this.api.presentations.batchUpdate({
-            presentationId: this.presentation.data.presentationId,
-            resource: batch})
-            .then((response) => response.data);
+        await Promise.all(promises);
     }
 
     /**
@@ -238,16 +215,13 @@ class SlideGenerator {
      *
      * @returns {{requests: Array}}
      */
-    createSlides() {
+    protected createSlides(): SlidesV1.Schema$BatchUpdatePresentationRequest {
         debug('Creating slides');
         const batch = {
-            requests: []
+            requests: [],
         };
-        for(let slide of this.slides) {
+        for (let slide of this.slides) {
             const layout = matchLayout(this.presentation, slide);
-            if (!layout) {
-                throw new Error(`Unable to determine layout for slide # ${slide.index}`);
-            }
             layout.appendCreateSlideRequest(batch.requests);
         }
         return batch;
@@ -261,14 +235,14 @@ class SlideGenerator {
      *
      * @returns {{requests: Array}}
      */
-    populateSlides() {
+    protected populateSlides(): SlidesV1.Schema$BatchUpdatePresentationRequest {
         debug('Populating slides');
         const batch = {
-            requests: []
+            requests: [],
         };
-        for(let slide of this.slides) {
-            debug('appendContent', slide.layout);
-            slide.layout.appendContentRequests(batch.requests);
+        for (let slide of this.slides) {
+            const layout = matchLayout(this.presentation, slide);
+            layout.appendContentRequests(batch.requests);
         }
         return batch;
     }
@@ -279,15 +253,16 @@ class SlideGenerator {
      * @param batch Batch of operations to execute
      * @returns {Promise.<*>}
      */
-    async updatePresentation(batch) {
-        debug(JSON.stringify(batch, null, 2));
+    protected async updatePresentation(batch): Promise<void> {
+        debug('Updating presentation: %O', batch);
         if (batch.requests.length == 0) {
             return Promise.resolve(null);
         }
-        return await this.api.presentations.batchUpdate({
-            presentationId: this.presentation.data.presentationId,
-            resource: batch})
-            .then((response) => response.data);
+        let res = await this.api.presentations.batchUpdate({
+            presentationId: this.presentation.presentationId,
+            requestBody: batch,
+        });
+        debug('API response: %O', res.data);
     }
 
     /**
@@ -295,11 +270,10 @@ class SlideGenerator {
      *
      * @returns {Promise.<*>}
      */
-    async reloadPresentation() {
-        let res = await this.api.presentations.get({presentationId: this.presentation.data.presentationId});
-        this.presentation.data = res.data;
-        return this.presentation;
+    protected async reloadPresentation(): Promise<void> {
+        let res = await this.api.presentations.get({
+            presentationId: this.presentation.presentationId,
+        });
+        this.presentation = res.data;
     }
 }
-
-module.exports = SlideGenerator;

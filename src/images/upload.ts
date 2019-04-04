@@ -12,36 +12,41 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const debug = require('debug')('md2gslides');
-const fs = require('fs');
-const request = require('request-promise-native');
+import Debug from 'debug';
+import fs from 'fs';
+import request from 'request-promise-native';
+
+const debug = Debug('md2gslides');
 
 /**
  * Uploads a local file to temporary storage so it is HTTP/S accessible.
- * 
+ *
  * Currently uses https://file.io for free emphemeral file hosting.
- * 
+ *
  * @param {string} filePath -- Local path to image to upload
  * @returns {Promise<string>} URL to hosted image
  */
-async function uploadLocalImage(filePath) {
-        debug(`Registering file ${filePath}`);
-        const stream = fs.createReadStream(filePath);
-
+async function uploadLocalImage(filePath: string): Promise<string> {
+    debug('Registering file %s', filePath);
+    const stream = fs.createReadStream(filePath);
+    try {
         let params = {
-            file: stream
+            file: stream,
         };
         let res = await request.post({
             url: 'https://file.io?expires=1h',
-            formData: params
+            formData: params,
         });
         let responseData = JSON.parse(res);
         if (!responseData.success) {
-            debug(`Unable to upload file: ${JSON.stringify(responseData)}`);
-           throw res;
+            debug('Unable to upload file: %O', responseData);
+            throw res;
         }
-        debug(`Temporary link: ${responseData.link}`);
+        debug('Temporary link: %s', responseData.link);
         return responseData.link;
+    } finally {
+        stream.destroy();
     }
+}
 
-exports.uploadLocalImage = uploadLocalImage;
+export default uploadLocalImage;

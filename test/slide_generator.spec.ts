@@ -14,41 +14,38 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+/* eslint-disable @typescript-eslint/camelcase */
 
-const path = require('path');
-const jsonfile = require('jsonfile');
-const nock = require('nock');
-const chai = require('chai');
-chai.use(require('chai-as-promised'));
+import path from 'path';
+import jsonfile from 'jsonfile';
+import nock from 'nock';
+import chai from 'chai';
+import chaiAsPromised from 'chai-as-promised';
+import { OAuth2Client } from 'google-auth-library';
+import axios from 'axios';
+import httpAdapter from 'axios/lib/adapters/http';
+import SlideGenerator from '../src/slide_generator';
+
 const expect = chai.expect;
-const { OAuth2Client } = require('google-auth-library');
-const SlideGenerator = require('../src/slide_generator');
-
-const axios = require('axios');
-const httpAdapter = require('axios/lib/adapters/http');
+chai.use(chaiAsPromised);
 axios.defaults.adapter = httpAdapter;
 
-function buildCredentials() {
+function buildCredentials(): OAuth2Client {
     const oauth2Client = new OAuth2Client('test', 'test', null);
     oauth2Client.setCredentials({
-        'access_token':'abc',
-        'expires_in':3920,
-        'token_type':'Bearer'
+        access_token: 'abc',
+        token_type: ' Bearer',
     });
     return oauth2Client;
 }
 
 describe('SlideGenerator', function() {
-    const markdown = '# Title\n' +
-        '## subtitle';
     const fixturePath = path.join(path.dirname(__dirname), 'test', 'fixtures');
 
     describe('with new presentation', function() {
         beforeEach(function() {
-            const presentation = jsonfile.readFileSync(
-                path.join(fixturePath, 'blank_presentation.json'));
+            const presentation = jsonfile.readFileSync(path.join(fixturePath, 'blank_presentation.json'));
             nock('https://slides.googleapis.com')
-                .log(console.log)
                 .post('/v1/presentations')
                 .reply(200, presentation);
         });
@@ -61,12 +58,9 @@ describe('SlideGenerator', function() {
 
     describe('with existing presentation', function() {
         beforeEach(function() {
-            nock('https://slides.googleapis.com', {
-                reqheaders: {
-                    'Authorization': 'Bearer abc'
-                }})
+            nock('https://slides.googleapis.com')
                 .get('/v1/presentations/12345')
-                .reply(200, { "presentationId": "12345" });
+                .reply(200, { presentationId: '12345' });
         });
 
         it('should load presentation', function() {

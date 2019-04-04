@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/*eslint no-console: ["error", { allow: ["log", "warn", "error"] }] */
+/* eslint-disable no-console, @typescript-eslint/no-var-requires */
 
 require('babel-polyfill');
 
@@ -22,94 +22,66 @@ const Promise = require('promise');
 const fs = require('fs');
 const path = require('path');
 const ArgumentParser = require('argparse').ArgumentParser;
-const UserAuthorizer = require('../lib/auth');
-const SlideGenerator = require('../lib/slide_generator');
+const UserAuthorizer = require('../lib/auth').default;
+const SlideGenerator = require('../lib/slide_generator').default;
 const opener = require('opener');
 const readline = require('readline');
 
-const SCOPES = [
-    'https://www.googleapis.com/auth/presentations',
-    'https://www.googleapis.com/auth/drive',
-];
+const SCOPES = ['https://www.googleapis.com/auth/presentations', 'https://www.googleapis.com/auth/drive'];
 
 const USER_HOME = process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
 const STORED_CREDENTIALS_PATH = path.join(USER_HOME, '.md2googleslides', 'credentials.json');
 
-function parseArguments() {
-    var parser = new ArgumentParser({
-        version: '1.0.0',
-        addHelp: true,
-        description: 'Markdown to Slides converter'
-    });
+var parser = new ArgumentParser({
+    version: '1.0.0',
+    addHelp: true,
+    description: 'Markdown to Slides converter',
+});
 
-    parser.addArgument(
-        'file',
-        {
-            help: 'Path to markdown file to convert',
-            required: false
-        }
-    );
-    parser.addArgument(
-        [ '-u', '--user' ],
-        {
-            help: 'Email address of user',
-            required: false,
-            defaultValue: 'default'
-        }
-    );
-    parser.addArgument(
-        [ '-a', '--append'],
-        {
-            dest: 'id',
-            help: 'Appends slides to an existing presentation',
-            required: false
-        }
-    );
-    parser.addArgument(
-        [ '-e', '--erase'],
-        {
-            dest: 'erase',
-            action: 'storeTrue',
-            help: 'Erase existing slides prior to appending.',
-            required: false
-        }
-    );
-    parser.addArgument(
-        [ '-n', '--no-browser'],
-        {
-            action: 'storeTrue',
-            dest: 'headless',
-            help: 'Headless mode - do not launch browsers, just shows URLs',
-            required: false
-        }
-    );
-    parser.addArgument(
-        ['-s', '--style'],
-        {
-            help: 'Name of highlight.js theme for code formatting',
-            dest: 'style',
-            required: false,
-            defaultValue: 'default'
-        }
-    );
-    parser.addArgument(
-        ['-t', '--title'],
-        {
-            help: 'Title of the presentation',
-            dest: 'title',
-            required: false
-        }
-    );
-    parser.addArgument(
-        ['-c', '--copy'],
-        {
-            help: 'Id of the presentation to copy and use as a base',
-            dest: 'copy',
-            required: false
-        }
-    );
-    return parser.parseArgs();
-}
+parser.addArgument('file', {
+    help: 'Path to markdown file to convert',
+    required: false,
+});
+parser.addArgument(['-u', '--user'], {
+    help: 'Email address of user',
+    required: false,
+    defaultValue: 'default',
+});
+parser.addArgument(['-a', '--append'], {
+    dest: 'id',
+    help: 'Appends slides to an existing presentation',
+    required: false,
+});
+parser.addArgument(['-e', '--erase'], {
+    dest: 'erase',
+    action: 'storeTrue',
+    help: 'Erase existing slides prior to appending.',
+    required: false,
+});
+parser.addArgument(['-n', '--no-browser'], {
+    action: 'storeTrue',
+    dest: 'headless',
+    help: 'Headless mode - do not launch browsers, just shows URLs',
+    required: false,
+});
+parser.addArgument(['-s', '--style'], {
+    help: 'Name of highlight.js theme for code formatting',
+    dest: 'style',
+    required: false,
+    defaultValue: 'default',
+});
+parser.addArgument(['-t', '--title'], {
+    help: 'Title of the presentation',
+    dest: 'title',
+    required: false,
+});
+parser.addArgument(['-c', '--copy'], {
+    help: 'Id of the presentation to copy and use as a base',
+    dest: 'copy',
+    required: false,
+});
+
+const args = parser.parseArgs();
 
 function handleError(err) {
     console.log('Unable to generate slides:', err);
@@ -128,7 +100,7 @@ function prompt(url) {
     return new Promise(function(resolve, reject) {
         var rl = readline.createInterface({
             input: process.stdin,
-            output: process.stdout
+            output: process.stdout,
         });
         rl.question('Enter the code here: ', function(code) {
             rl.close();
@@ -151,7 +123,7 @@ function authorizeUser() {
         clientId: '52512509792-pc54t7beete33ifbhk00q3cpcpkmfi7c.apps.googleusercontent.com',
         clientSecret: '8g6up8tcVXgF7IO71mCN8Afk',
         filePath: STORED_CREDENTIALS_PATH,
-        prompt: prompt
+        prompt: prompt,
     };
     const auth = new UserAuthorizer(options);
     return auth.getUserCredentials(args.user, SCOPES);
@@ -164,17 +136,18 @@ function buildSlideGenerator(oauth2Client) {
 
     if (presentationId) {
         return SlideGenerator.forPresentation(oauth2Client, presentationId);
-    } else if(copyId != undefined) {
+    } else if (copyId != undefined) {
         return SlideGenerator.copyPresentation(oauth2Client, title, copyId);
     } else {
         return SlideGenerator.newPresentation(oauth2Client, title);
     }
-    
 }
 
 function eraseIfNeeded(slideGenerator) {
     if (args.erase || !args.id) {
-        return slideGenerator.erase().then(function() { return slideGenerator; });
+        return slideGenerator.erase().then(function() {
+            return slideGenerator;
+        });
     } else {
         return Promise.resolve(slideGenerator);
     }
@@ -192,7 +165,7 @@ function generateSlides(slideGenerator) {
         // Set working directory relative to markdown file
         process.chdir(path.dirname(file));
     }
-    const input = fs.readFileSync(file, { encoding: 'UTF-8'});
+    const input = fs.readFileSync(file, { encoding: 'UTF-8' });
     const css = loadCss(args.style);
 
     return slideGenerator.generateFromMarkdown(input, css);
@@ -207,9 +180,6 @@ function displayResults(id) {
         opener(url);
     }
 }
-
-const args = parseArguments();
-
 authorizeUser()
     .then(buildSlideGenerator)
     .then(eraseIfNeeded)
