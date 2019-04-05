@@ -57,6 +57,16 @@ This is the *right* column
 
 ---
 
+# Columns can have images
+
+This is the *left* column
+
+{.column}
+
+![](https://picsum.photos/g/1600/900)
+
+---
+
 # Slides can have background images
 
 ![](https://picsum.photos/g/1600/900){.background}
@@ -139,7 +149,7 @@ Birds  | 16 million
 Use <span style="color:red">span</span> to color text.
 
 Use <sup>superscript</sup> and <sub>subscript</sub>, <span style="text-decoration: line-through">strikethrough</span>
-or <span style="text-decoration: underline">underline</span>, even <span style="font-variant: small-caps">small caps.</span>
+or <span style="text-decoration: underline">underline</span>, even <span style="font-variant: small-caps">small <span style="color:green">caps</span>.</span>
 
 ---
 # How about some math?
@@ -164,3 +174,5 @@ Custom master slides can be selected by adding the attribute `{layout="Title and
 the slide layout will be chosen from the available master slides by the name.
 
 This can be used with the flag `--copy=[presentation id]` to copy and use an existing presentation as the source rather than a blank slide.
+
+---

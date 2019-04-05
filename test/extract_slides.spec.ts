@@ -75,7 +75,7 @@ describe('extractSlides', function() {
         });
 
         it('should have body text', function() {
-            return expect(slides).to.have.nested.property('[0].bodies[0].rawText', 'hello world\n');
+            return expect(slides).to.have.nested.property('[0].bodies[0].text.rawText', 'hello world\n');
         });
     });
 
@@ -94,11 +94,11 @@ describe('extractSlides', function() {
         });
 
         it('should have 1st column text', function() {
-            return expect(slides).to.have.nested.property('[0].bodies[0].rawText', 'hello\n');
+            return expect(slides).to.have.nested.property('[0].bodies[0].text.rawText', 'hello\n');
         });
 
         it('should have 2nd column text', function() {
-            return expect(slides).to.have.nested.property('[0].bodies[1].rawText', 'world\n');
+            return expect(slides).to.have.nested.property('[0].bodies[1].text.rawText', 'world\n');
         });
     });
 
@@ -117,15 +117,15 @@ describe('extractSlides', function() {
         const slides = extractSlides(markdown);
 
         it('should have a background image', function() {
-            return expect(slides).to.have.nested.property('[0].images[0].url', 'https://example.com/image.jpg');
+            return expect(slides).to.have.nested.property('[0].bodies[0].images[0].url', 'https://example.com/image.jpg');
         });
 
         it('should have an image x offset', function() {
-            return expect(slides).to.have.nested.property('[0].images[0].offsetX', 100);
+            return expect(slides).to.have.nested.property('[0].bodies[0].images[0].offsetX', 100);
         });
 
         it('should have an image y offset', function() {
-            return expect(slides).to.have.nested.property('[0].images[0].offsetY', 200);
+            return expect(slides).to.have.nested.property('[0].bodies[0].images[0].offsetY', 200);
         });
     });
 
@@ -134,7 +134,7 @@ describe('extractSlides', function() {
         const slides = extractSlides(markdown);
 
         it('should have a video', function() {
-            return expect(slides).to.have.nested.property('[0].videos[0].id', '12345');
+            return expect(slides).to.have.nested.property('[0].bodies[0].videos[0].id', '12345');
         });
     });
 
@@ -169,20 +169,20 @@ describe('extractSlides', function() {
 
         it('should have list markers', function() {
             return expect(slides)
-                .to.have.nested.property('[0].bodies[0].listMarkers')
+                .to.have.nested.property('[0].bodies[0].text.listMarkers')
                 .length(1);
         });
 
         it('should have the correct start', function() {
-            return expect(slides).to.have.nested.property('[0].bodies[0].listMarkers[0].start', 0);
+            return expect(slides).to.have.nested.property('[0].bodies[0].text.listMarkers[0].start', 0);
         });
 
         it('should have the correct end', function() {
-            return expect(slides).to.have.nested.property('[0].bodies[0].listMarkers[0].end', 14);
+            return expect(slides).to.have.nested.property('[0].bodies[0].text.listMarkers[0].end', 14);
         });
 
         it('should have the correct tyoe', function() {
-            return expect(slides).to.have.nested.property('[0].bodies[0].listMarkers[0].type', 'unordered');
+            return expect(slides).to.have.nested.property('[0].bodies[0].text.listMarkers[0].type', 'unordered');
         });
     });
 
@@ -193,20 +193,20 @@ describe('extractSlides', function() {
 
         it('should have list markers', function() {
             return expect(slides)
-                .to.have.nested.property('[0].bodies[0].listMarkers')
+                .to.have.nested.property('[0].bodies[0].text.listMarkers')
                 .length(1);
         });
 
         it('should have the correct start', function() {
-            return expect(slides).to.have.nested.property('[0].bodies[0].listMarkers[0].start', 0);
+            return expect(slides).to.have.nested.property('[0].bodies[0].text.listMarkers[0].start', 0);
         });
 
         it('should have the correct end', function() {
-            return expect(slides).to.have.nested.property('[0].bodies[0].listMarkers[0].end', 14);
+            return expect(slides).to.have.nested.property('[0].bodies[0].text.listMarkers[0].end', 14);
         });
 
         it('should have the correct type', function() {
-            return expect(slides).to.have.nested.property('[0].bodies[0].listMarkers[0].type', 'ordered');
+            return expect(slides).to.have.nested.property('[0].bodies[0].text.listMarkers[0].type', 'ordered');
         });
     });
 
@@ -217,44 +217,44 @@ describe('extractSlides', function() {
 
         it('should have text runs', function() {
             return expect(slides)
-                .to.have.nested.property('[0].bodies[0].textRuns')
+                .to.have.nested.property('[0].bodies[0].text.textRuns')
                 .length(3);
         });
 
         it('should have the correct italic start', function() {
-            return expect(slides).to.have.nested.property('[0].bodies[0].textRuns[0].start', 0);
+            return expect(slides).to.have.nested.property('[0].bodies[0].text.textRuns[0].start', 0);
         });
 
         it('should have the correct italic end', function() {
-            return expect(slides).to.have.nested.property('[0].bodies[0].textRuns[0].end', 6);
+            return expect(slides).to.have.nested.property('[0].bodies[0].text.textRuns[0].end', 6);
         });
 
         it('should have the correct italic style', function() {
-            return expect(slides).to.have.nested.property('[0].bodies[0].textRuns[0].italic', true);
+            return expect(slides).to.have.nested.property('[0].bodies[0].text.textRuns[0].italic', true);
         });
 
         it('should have the correct bold start', function() {
-            return expect(slides).to.have.nested.property('[0].bodies[0].textRuns[1].start', 8);
+            return expect(slides).to.have.nested.property('[0].bodies[0].text.textRuns[1].start', 8);
         });
 
         it('should have the correct bold end', function() {
-            return expect(slides).to.have.nested.property('[0].bodies[0].textRuns[1].end', 12);
+            return expect(slides).to.have.nested.property('[0].bodies[0].text.textRuns[1].end', 12);
         });
 
         it('should have the correct bold style', function() {
-            return expect(slides).to.have.nested.property('[0].bodies[0].textRuns[1].bold', true);
+            return expect(slides).to.have.nested.property('[0].bodies[0].text.textRuns[1].bold', true);
         });
 
         it('should have the correct strikethrough start', function() {
-            return expect(slides).to.have.nested.property('[0].bodies[0].textRuns[2].start', 14);
+            return expect(slides).to.have.nested.property('[0].bodies[0].text.textRuns[2].start', 14);
         });
 
         it('should have the correct strikethrough end', function() {
-            return expect(slides).to.have.nested.property('[0].bodies[0].textRuns[2].end', 27);
+            return expect(slides).to.have.nested.property('[0].bodies[0].text.textRuns[2].end', 27);
         });
 
         it('should have the correct strikethrough style', function() {
-            return expect(slides).to.have.nested.property('[0].bodies[0].textRuns[2].strikethrough', true);
+            return expect(slides).to.have.nested.property('[0].bodies[0].text.textRuns[2].strikethrough', true);
         });
     });
 
@@ -264,7 +264,7 @@ describe('extractSlides', function() {
         const slides = extractSlides(markdown);
 
         it('should have emoji', function() {
-            return expect(slides).to.have.nested.property('[0].bodies[0].rawText', '❤️\n');
+            return expect(slides).to.have.nested.property('[0].bodies[0].text.rawText', '❤️\n');
         });
     });
 
@@ -275,24 +275,24 @@ describe('extractSlides', function() {
 
         it('should have text runs', function() {
             return expect(slides)
-                .to.have.nested.property('[0].bodies[0].textRuns')
+                .to.have.nested.property('[0].bodies[0].text.textRuns')
                 .length(1);
         });
 
         it('should have the correct start', function() {
-            return expect(slides).to.have.nested.property('[0].bodies[0].textRuns[0].start', 0);
+            return expect(slides).to.have.nested.property('[0].bodies[0].text.textRuns[0].start', 0);
         });
 
         it('should have the correct end', function() {
-            return expect(slides).to.have.nested.property('[0].bodies[0].textRuns[0].end', 5);
+            return expect(slides).to.have.nested.property('[0].bodies[0].text.textRuns[0].end', 5);
         });
 
         it('should have the color style', function() {
-            return expect(slides).to.have.nested.property('[0].bodies[0].textRuns[0].foregroundColor');
+            return expect(slides).to.have.nested.property('[0].bodies[0].text.textRuns[0].foregroundColor');
         });
 
         it('should have the font size style', function() {
-            return expect(slides).to.have.nested.property('[0].bodies[0].textRuns[0].fontSize');
+            return expect(slides).to.have.nested.property('[0].bodies[0].text.textRuns[0].fontSize');
         });
     });
 
@@ -303,24 +303,24 @@ describe('extractSlides', function() {
 
         it('should have text runs', function() {
             return expect(slides)
-                .to.have.nested.property('[0].bodies[0].textRuns')
+                .to.have.nested.property('[0].bodies[0].text.textRuns')
                 .length(1);
         });
 
         it('should have the correct start', function() {
-            return expect(slides).to.have.nested.property('[0].bodies[0].textRuns[0].start', 0);
+            return expect(slides).to.have.nested.property('[0].bodies[0].text.textRuns[0].start', 0);
         });
 
         it('should have the correct end', function() {
-            return expect(slides).to.have.nested.property('[0].bodies[0].textRuns[0].end', 5);
+            return expect(slides).to.have.nested.property('[0].bodies[0].text.textRuns[0].end', 5);
         });
 
         it('should have the color style', function() {
-            return expect(slides).to.have.nested.property('[0].bodies[0].textRuns[0].foregroundColor');
+            return expect(slides).to.have.nested.property('[0].bodies[0].text.textRuns[0].foregroundColor');
         });
 
         it('should have the font size style', function() {
-            return expect(slides).to.have.nested.property('[0].bodies[0].textRuns[0].fontSize');
+            return expect(slides).to.have.nested.property('[0].bodies[0].text.textRuns[0].fontSize');
         });
     });
 
@@ -331,20 +331,20 @@ describe('extractSlides', function() {
 
         it('should have text runs', function() {
             return expect(slides)
-                .to.have.nested.property('[0].bodies[0].textRuns')
+                .to.have.nested.property('[0].bodies[0].text.textRuns')
                 .length(1);
         });
 
         it('should have the correct start', function() {
-            return expect(slides).to.have.nested.property('[0].bodies[0].textRuns[0].start', 1);
+            return expect(slides).to.have.nested.property('[0].bodies[0].text.textRuns[0].start', 1);
         });
 
         it('should have the correct end', function() {
-            return expect(slides).to.have.nested.property('[0].bodies[0].textRuns[0].end', 2);
+            return expect(slides).to.have.nested.property('[0].bodies[0].text.textRuns[0].end', 2);
         });
 
         it('should have the correct style', function() {
-            return expect(slides).to.have.nested.property('[0].bodies[0].textRuns[0].baselineOffset', 'SUBSCRIPT');
+            return expect(slides).to.have.nested.property('[0].bodies[0].text.textRuns[0].baselineOffset', 'SUBSCRIPT');
         });
     });
 
@@ -355,20 +355,20 @@ describe('extractSlides', function() {
 
         it('should have text runs', function() {
             return expect(slides)
-                .to.have.nested.property('[0].bodies[0].textRuns')
+                .to.have.nested.property('[0].bodies[0].text.textRuns')
                 .length(1);
         });
 
         it('should have the correct start', function() {
-            return expect(slides).to.have.nested.property('[0].bodies[0].textRuns[0].start', 5);
+            return expect(slides).to.have.nested.property('[0].bodies[0].text.textRuns[0].start', 5);
         });
 
         it('should have the correct end', function() {
-            return expect(slides).to.have.nested.property('[0].bodies[0].textRuns[0].end', 6);
+            return expect(slides).to.have.nested.property('[0].bodies[0].text.textRuns[0].end', 6);
         });
 
         it('should have the correct style', function() {
-            return expect(slides).to.have.nested.property('[0].bodies[0].textRuns[0].baselineOffset', 'SUPERSCRIPT');
+            return expect(slides).to.have.nested.property('[0].bodies[0].text.textRuns[0].baselineOffset', 'SUPERSCRIPT');
         });
     });
 

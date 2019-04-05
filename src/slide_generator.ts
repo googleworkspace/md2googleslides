@@ -14,7 +14,7 @@
 
 import Debug from 'debug';
 import extractSlides from './parser/extract_slides';
-import { SlideDefinition } from './slides';
+import { SlideDefinition, ImageDefinition } from './slides';
 import matchLayout from './layout/match_layout';
 import { URL } from 'url';
 import { google, slides_v1 as SlidesV1 } from 'googleapis';
@@ -47,6 +47,7 @@ export default class SlideGenerator {
     private slides: SlideDefinition[];
     private api: SlidesV1.Slides;
     private presentation: SlidesV1.Schema$Presentation;
+    private allowUpload = false;
     /**
      * @param {Object} api Authorized API client instance
      * @param {Object} presentation Initial presentation data
@@ -118,8 +119,9 @@ export default class SlideGenerator {
      * @param {String} markdown Markdown to import
      * @returns {Promise.<String>} ID of generated slide
      */
-    public async generateFromMarkdown(markdown, css = null): Promise<string> {
+    public async generateFromMarkdown(markdown, { css, useFileio }): Promise<string> {
         this.slides = extractSlides(markdown, css);
+        this.allowUpload = useFileio;
         await this.generateImages();
         await this.probeImageSizes();
         await this.uploadLocalImages();
@@ -152,37 +154,36 @@ export default class SlideGenerator {
         });
     }
 
-    protected async generateImages(): Promise<void> {
+    protected async processImages<T>(fn: (img: ImageDefinition) => Promise<T>): Promise<void> {
         const promises = [];
         for (let slide of this.slides) {
             if (slide.backgroundImage) {
-                promises.push(maybeGenerateImage(slide.backgroundImage));
+                promises.push(fn(slide.backgroundImage));
             }
-            for (let image of slide.images) {
-                promises.push(maybeGenerateImage(image));
+            for (let body of slide.bodies) {
+                for (let image of body.images) {
+                    promises.push(fn(image));
+                }
             }
         }
         await Promise.all(promises);
     }
+    protected async generateImages(): Promise<void> {
+        return this.processImages(maybeGenerateImage);
+    }
 
     protected async uploadLocalImages(): Promise<void> {
-        const promises = [];
         const uploadImageifLocal = async (image): Promise<void> => {
             let parsedUrl = new URL(image.url);
             if (parsedUrl.protocol !== 'file:') {
                 return;
             }
+            if (!this.allowUpload) {
+                return Promise.reject('Local images require --use-fileio option');
+            }
             image.url = await uploadLocalImage(parsedUrl.pathname);
         };
-        for (let slide of this.slides) {
-            if (slide.backgroundImage) {
-                promises.push(uploadImageifLocal(slide.backgroundImage));
-            }
-            for (let image of slide.images) {
-                promises.push(uploadImageifLocal(image));
-            }
-        }
-        await Promise.all(promises);
+        return this.processImages(uploadImageifLocal);
     }
 
     /**
@@ -195,16 +196,7 @@ export default class SlideGenerator {
      * @private
      */
     protected async probeImageSizes(): Promise<void> {
-        const promises = [];
-        for (let slide of this.slides) {
-            if (slide.backgroundImage) {
-                promises.push(probeImage(slide.backgroundImage));
-            }
-            for (let image of slide.images) {
-                promises.push(probeImage(image));
-            }
-        }
-        await Promise.all(promises);
+        return this.processImages(probeImage);
     }
 
     /**

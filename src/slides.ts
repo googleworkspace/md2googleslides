@@ -57,6 +57,12 @@ export interface TableDefinition {
 export interface LinkDefinition {
     url: string;
 }
+
+export interface BodyDefinition {
+    text: TextDefinition;
+    images: ImageDefinition[];
+    videos: VideoDefinition[];
+}
 export interface SlideDefinition {
     index?: number;
     objectId?: string;
@@ -64,10 +70,8 @@ export interface SlideDefinition {
     title?: TextDefinition;
     subtitle?: TextDefinition;
     backgroundImage?: ImageDefinition;
-    bodies: TextDefinition[];
+    bodies: BodyDefinition[];
     tables: TableDefinition[];
-    videos: VideoDefinition[];
-    images: ImageDefinition[];
     notes?: TextDefinition;
 }
 

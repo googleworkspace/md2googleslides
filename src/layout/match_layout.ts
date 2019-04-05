@@ -65,9 +65,7 @@ function hasTextContent(slide: SlideDefinition): boolean {
 
 // Anything which takes up the main body space
 function hasContent(slide: SlideDefinition): boolean {
-    return (
-        slide.bodies.length !== 0 || slide.tables.length !== 0 || slide.videos.length !== 0 || slide.images.length !== 0
-    );
+    return slide.bodies.length !== 0 || slide.tables.length !== 0;
 }
 
 // Define rules for picking slide layouts based on the default

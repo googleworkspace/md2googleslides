@@ -61,6 +61,7 @@ function isVideo(token: any): token is VideoToken {
 }
 
 function processMarkdownToken(token: Token, context: Context): void {
+    debug('Token: %O', token);
     let rule = ruleSet[token.type];
     if (rule) {
         rule(token, context);
@@ -162,7 +163,14 @@ inlineTokenRules['text'] = (token, context) => {
 inlineTokenRules['paragraph_open'] = (token, context) => {
     if (hasClass(token, 'column')) {
         context.markerParagraph = true;
-        context.currentSlide.bodies.push(context.text);
+        let body = {
+            text: context.text,
+            images: context.images,
+            videos: context.videos,
+        };
+        context.images = [];
+        context.videos = [];
+        context.currentSlide.bodies.push(body);
         context.startTextBlock();
     } else if (!context.text) {
         context.startTextBlock();
@@ -381,7 +389,7 @@ fullTokenRules['image'] = (token, context) => {
     if (hasClass(token, 'background')) {
         context.currentSlide.backgroundImage = image;
     } else {
-        context.currentSlide.images.push(image);
+        context.images.push(image);
     }
 };
 
@@ -399,7 +407,7 @@ fullTokenRules['video'] = (token, context) => {
         autoPlay: true,
         id: token.videoID,
     };
-    context.currentSlide.videos.push(video);
+    context.videos.push(video);
 };
 
 fullTokenRules['table_open'] = (token, context) => {
@@ -489,7 +497,7 @@ fullTokenRules['generated_image'] = (token, context) => {
     if (hasClass(token, 'background')) {
         context.currentSlide.backgroundImage = image;
     } else {
-        context.currentSlide.images.push(image);
+        context.images.push(image);
     }
 };
 

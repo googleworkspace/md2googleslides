@@ -30,13 +30,6 @@ interface BoundingBox {
     y: number;
 }
 
-function asArrayOrNull<T>(value: T): T[] | null {
-    if (!value) {
-        return null;
-    }
-    return [value];
-}
-
 /**
  * Performs most of the work of converting a slide into API requests.
  *
@@ -72,10 +65,9 @@ export default class GenericLayout {
     }
 
     public appendContentRequests(requests: SlidesV1.Schema$Request[]): SlidesV1.Schema$Request[] {
-        this.appendFillPlaceholderTextRequest(asArrayOrNull(this.slide.title), 'TITLE', requests);
-        this.appendFillPlaceholderTextRequest(asArrayOrNull(this.slide.title), 'CENTERED_TITLE', requests);
-        this.appendFillPlaceholderTextRequest(asArrayOrNull(this.slide.subtitle), 'SUBTITLE', requests);
-        this.appendFillPlaceholderTextRequest(this.slide.bodies, 'BODY', requests);
+        this.appendFillPlaceholderTextRequest(this.slide.title, 'TITLE', requests);
+        this.appendFillPlaceholderTextRequest(this.slide.title, 'CENTERED_TITLE', requests);
+        this.appendFillPlaceholderTextRequest(this.slide.subtitle, 'SUBTITLE', requests);
 
         if (this.slide.backgroundImage) {
             this.appendSetBackgroundImageRequest(this.slide.backgroundImage, requests);
@@ -85,12 +77,18 @@ export default class GenericLayout {
             this.appendCreateTableRequests(this.slide.tables, requests);
         }
 
-        if (this.slide.images.length) {
-            this.appendCreateImageRequests(this.slide.images, requests);
-        }
-
-        if (this.slide.videos.length) {
-            this.appendCreateVideoRequests(this.slide.videos, requests);
+        if (this.slide.bodies) {
+            const bodyElements = findPlaceholder(this.presentation, this.slide.objectId, 'BODY');
+            this.slide.bodies.forEach((body, index) => {
+                let placeholder = bodyElements[index];
+                this.appendFillPlaceholderTextRequest(body.text, placeholder, requests);
+                if (body.images && body.images.length) {
+                    this.appendCreateImageRequests(body.images, placeholder, requests);
+                }
+                if (body.videos && body.videos.length) {
+                    this.appendCreateVideoRequests(body.videos, placeholder, requests);
+                }
+            });
         }
 
         if (this.slide.notes) {
@@ -102,28 +100,25 @@ export default class GenericLayout {
     }
 
     protected appendFillPlaceholderTextRequest(
-        values: TextDefinition[],
-        placeholderName: string,
+        value: TextDefinition,
+        placeholder: string | SlidesV1.Schema$PageElement,
         requests: SlidesV1.Schema$Request[],
     ): SlidesV1.Schema$Request[] {
-        if (!(values && values.length)) {
-            debug('No text for placeholder %s', placeholderName);
+        if (!value) {
+            debug('No text for placeholder %s');
             return;
         }
 
-        const pageElements = findPlaceholder(this.presentation, this.slide.objectId, placeholderName);
-        if (!pageElements) {
-            debug('Skipping undefined placeholder %s', placeholderName);
-            return;
-        }
-
-        for (let i in pageElements) {
-            if (values[i] != undefined) {
-                debug('Slide #%d: setting %s[%d] to %s', this.slide.index, placeholderName, i, values[i].rawText);
-                let id = pageElements[i].objectId;
-                this.appendInsertTextRequests(values[i], { objectId: id }, requests);
+        if (typeof placeholder === 'string') {
+            const pageElements = findPlaceholder(this.presentation, this.slide.objectId, placeholder);
+            if (!pageElements) {
+                debug('Skipping undefined placeholder %s', placeholder);
+                return;
             }
+            placeholder = pageElements[0];
         }
+
+        this.appendInsertTextRequests(value, { objectId: placeholder.objectId }, requests);
     }
 
     protected appendInsertTextRequests(text: TextDefinition, locationProps, requests: SlidesV1.Schema$Request[]): void {
@@ -215,7 +210,7 @@ export default class GenericLayout {
         });
     }
 
-    protected appendCreateImageRequests(images, requests: SlidesV1.Schema$Request[]): void {
+    protected appendCreateImageRequests(images, placeholder, requests: SlidesV1.Schema$Request[]): void {
         // TODO - Fix weird cast
         const layer = (Layout as (s: string) => Layout.PackingSmith)('left-right'); // TODO - Configurable?
         for (let image of images) {
@@ -227,7 +222,7 @@ export default class GenericLayout {
             });
         }
 
-        const box = this.getBodyBoundingBox(false);
+        const box = this.getBodyBoundingBox(placeholder);
         const computedLayout = layer.export();
 
         let scaleRatio = Math.min(box.width / computedLayout.width, box.height / computedLayout.height);
@@ -277,7 +272,11 @@ export default class GenericLayout {
         }
     }
 
-    protected appendCreateVideoRequests(videos: VideoDefinition[], requests: SlidesV1.Schema$Request[]): void {
+    protected appendCreateVideoRequests(
+        videos: VideoDefinition[],
+        placeholder,
+        requests: SlidesV1.Schema$Request[],
+    ): void {
         if (videos.length > 1) {
             throw new Error('Multiple videos per slide are not supported.');
         }
@@ -285,7 +284,7 @@ export default class GenericLayout {
 
         debug('Slide #%d: adding video %s', this.slide.index, video.id);
 
-        const box = this.getBodyBoundingBox(false);
+        const box = this.getBodyBoundingBox(placeholder);
 
         const scaleRatio = Math.min(box.width / video.width, box.height / video.height);
 
@@ -389,10 +388,9 @@ export default class GenericLayout {
         };
     }
 
-    protected getBodyBoundingBox(fullScreen: boolean): BoundingBox {
-        const body = findPlaceholder(this.presentation, this.slide.objectId, 'BODY');
-        if (body && !fullScreen) {
-            return this.calculateBoundingBox(body[0]);
+    protected getBodyBoundingBox(placeholder): BoundingBox {
+        if (placeholder) {
+            return this.calculateBoundingBox(placeholder);
         }
         return {
             width: this.presentation.pageSize.width.magnitude,

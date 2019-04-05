@@ -107,10 +107,12 @@ describe('GenericLayout', function() {
                 backgroundImage: null,
                 bodies: [
                     {
-                        rawText: 'This is the slide body.\n',
-                        textRuns: [],
-                        listMarkers: [],
-                        big: false,
+                        text: {
+                            rawText: 'This is the slide body.\n',
+                            textRuns: [],
+                            listMarkers: [],
+                            big: false,
+                        },        
                     },
                 ],
                 tables: [],
@@ -151,16 +153,20 @@ describe('GenericLayout', function() {
                 backgroundImage: null,
                 bodies: [
                     {
-                        big: false,
-                        rawText: 'This is the left column\n',
-                        textRuns: [],
-                        listMarkers: [],
+                        text: {
+                            big: false,
+                            rawText: 'This is the left column\n',
+                            textRuns: [],
+                            listMarkers: [],
+                        }
                     },
                     {
-                        big: false,
-                        rawText: 'This is the right column\n',
-                        textRuns: [],
-                        listMarkers: [],
+                        text: {
+                            big: false,
+                            rawText: 'This is the right column\n',
+                            textRuns: [],
+                            listMarkers: [],
+                        }
                     },
                 ],
                 tables: [],
@@ -205,15 +211,15 @@ describe('GenericLayout', function() {
                 },
                 bodies: [
                     {
-                        big: false,
-                        rawText: '\n',
-                        textRuns: [],
-                        listMarkers: [],
+                        text: {
+                            big: false,
+                            rawText: '\n',
+                            textRuns: [],
+                            listMarkers: [],
+                        }
                     },
                 ],
                 tables: [],
-                videos: [],
-                images: [],
             };
             const layout = new GenericLayout('', presentation, input);
             layout.appendContentRequests(requests);
@@ -245,16 +251,19 @@ describe('GenericLayout', function() {
                 title: null,
                 subtitle: null,
                 backgroundImage: null,
-                bodies: [],
                 tables: [],
-                videos: [],
-                images: [
+                bodies: [
                     {
-                        url: 'https://placekitten.com/350/315',
-                        width: 350,
-                        height: 315,
-                    },
-                ],
+                        videos: [],
+                        images: [
+                            {
+                                url: 'https://placekitten.com/350/315',
+                                width: 350,
+                                height: 315,
+                            },
+                        ],        
+                    }
+                ]
             };
             const layout = new GenericLayout('', presentation, input);
             layout.appendContentRequests(requests);
@@ -283,17 +292,21 @@ describe('GenericLayout', function() {
                 title: null,
                 subtitle: null,
                 backgroundImage: null,
-                bodies: [],
-                tables: [],
-                videos: [
+                bodies: [
                     {
-                        width: 1600,
-                        height: 900,
-                        autoPlay: true,
-                        id: 'MG8KADiRbOU',
-                    },
+                        videos: [
+                            {
+                                width: 1600,
+                                height: 900,
+                                autoPlay: true,
+                                id: 'MG8KADiRbOU',
+                            },
+                        ],
+                        images: [],
+                    }
                 ],
-                images: [],
+                tables: [],
+                
             };
             const layout = new GenericLayout('', presentation, input);
             layout.appendContentRequests(requests);
@@ -399,8 +412,6 @@ describe('GenericLayout', function() {
                         ],
                     },
                 ],
-                videos: [],
-                images: [],
             };
             const layout = new GenericLayout('', presentation, input);
             layout.appendContentRequests(requests);
@@ -460,37 +471,37 @@ describe('GenericLayout', function() {
                 backgroundImage: null,
                 bodies: [
                     {
-                        big: false,
-                        rawText: 'Item 1\nItem 2\n\tfoo\n\tbar\n\tbaz\nItem 3\n',
-                        textRuns: [
-                            {
-                                bold: true,
-                                start: 0,
-                                end: 4,
-                            },
-                            {
-                                italic: true,
-                                start: 7,
-                                end: 11,
-                            },
-                            {
-                                fontFamily: 'Courier New',
-                                start: 29,
-                                end: 33,
-                            },
-                        ],
-                        listMarkers: [
-                            {
-                                start: 0,
-                                end: 36,
-                                type: 'unordered',
-                            },
-                        ],
-                    },
+                        text: {
+                            big: false,
+                            rawText: 'Item 1\nItem 2\n\tfoo\n\tbar\n\tbaz\nItem 3\n',
+                            textRuns: [
+                                {
+                                    bold: true,
+                                    start: 0,
+                                    end: 4,
+                                },
+                                {
+                                    italic: true,
+                                    start: 7,
+                                    end: 11,
+                                },
+                                {
+                                    fontFamily: 'Courier New',
+                                    start: 29,
+                                    end: 33,
+                                },
+                            ],
+                            listMarkers: [
+                                {
+                                    start: 0,
+                                    end: 36,
+                                    type: 'unordered',
+                                },
+                            ],
+                        },
+                    }
                 ],
                 tables: [],
-                videos: [],
-                images: [],
             };
             const layout = new GenericLayout('', presentation, input);
             layout.appendContentRequests(requests);

@@ -63,10 +63,8 @@ describe('matchLayout', function() {
             {
                 title: { rawText: 'title' },
                 subtitle: { rawText: 'subtitle' },
-                bodies: [{ rawText: 'body' }],
+                bodies: [{ text: {rawText: 'body' }}],
                 tables: [],
-                images: [],
-                videos: [],
             },
         ],
         [
@@ -74,10 +72,8 @@ describe('matchLayout', function() {
             {
                 title: { rawText: 'title', big: true },
                 subtitle: null,
-                bodies: [{ rawText: 'body' }],
+                bodies: [{ text: {rawText: 'body' }}],
                 tables: [],
-                images: [],
-                videos: [],
             },
         ],
         [
@@ -85,7 +81,16 @@ describe('matchLayout', function() {
             {
                 title: { rawText: 'title' },
                 subtitle: null,
-                bodies: [{ rawText: 'column1' }, { rawText: 'column2' }],
+                bodies: [{ text: { rawText: 'column1' }}, { text: { rawText: 'column2' }}],
+                tables: [],
+            },
+        ],
+        [
+            'TITLE_AND_BODY',
+            {
+                title: { rawText: 'title' },
+                subtitle: null,
+                bodies: [{ text: { rawText: 'body' }}],
                 tables: [],
                 images: [],
                 videos: [],
@@ -96,42 +101,26 @@ describe('matchLayout', function() {
             {
                 title: { rawText: 'title' },
                 subtitle: null,
-                bodies: [{ rawText: 'body' }],
+                bodies: [{ images: [{ url: 'https://source.unsplash.com/78A265wPiO4/1600x900', padding: 0 }]}],
                 tables: [],
-                images: [],
-                videos: [],
+            },
+        ],
+        [
+            'BLANK',
+            {
+                title: null,
+                subtitle: null,
+                bodies: [],
+                tables: [],
             },
         ],
         [
             'TITLE_AND_BODY',
             {
-                title: { rawText: 'title' },
-                subtitle: null,
-                bodies: [],
-                tables: [],
-                images: [{ url: 'https://source.unsplash.com/78A265wPiO4/1600x900', padding: 0 }],
-                videos: [],
-            },
-        ],
-        [
-            'BLANK',
-            {
                 title: null,
                 subtitle: null,
-                bodies: [],
+                bodies: [{ images: [{ url: 'https://source.unsplash.com/78A265wPiO4/1600x900', padding: 0 }]}],
                 tables: [],
-                images: [],
-                videos: [],
-            },
-        ],
-        [
-            'BLANK',
-            {
-                title: null,
-                subtitle: null,
-                bodies: [],
-                tables: [],
-                images: [{ url: 'https://source.unsplash.com/78A265wPiO4/1600x900', padding: 0 }],
                 videos: [],
             },
         ],

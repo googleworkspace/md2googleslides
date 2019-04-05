@@ -1,4 +1,12 @@
-import { SlideDefinition, TextDefinition, StyleDefinition, TableDefinition, ListDefinition } from '../slides';
+import {
+    SlideDefinition,
+    TextDefinition,
+    StyleDefinition,
+    TableDefinition,
+    ListDefinition,
+    ImageDefinition,
+    VideoDefinition,
+} from '../slides';
 import { uuid } from '../utils';
 import extend from 'extend';
 import * as _ from 'lodash';
@@ -16,6 +24,8 @@ export class Context {
     public table?: TableDefinition;
     public list?: ListDefinition;
     public inlineHtmlContext?: object;
+    public images: ImageDefinition[] = [];
+    public videos: VideoDefinition[] = [];
 
     public constructor(css: Stylesheet) {
         this.css = css;
@@ -41,11 +51,19 @@ export class Context {
 
     public endSlide(): void {
         if (this.currentSlide) {
-            if (this.text && this.text.rawText.trim().length) {
-                this.currentSlide.bodies.push(this.text);
+            if (this.images.length || this.videos.length || (this.text && this.text.rawText.trim().length)) {
+                this.currentSlide.bodies.push({
+                    text: this.text,
+                    images: this.images,
+                    videos: this.videos,
+                });
+                this.images = [];
+                this.videos = [];
             }
             this.slides.push(this.currentSlide);
         }
+        this.currentSlide = undefined;
+        this.text = undefined;
     }
 
     public startSlide(): void {
@@ -57,8 +75,6 @@ export class Context {
             backgroundImage: null,
             bodies: [],
             tables: [],
-            videos: [],
-            images: [],
             notes: null,
         };
     }

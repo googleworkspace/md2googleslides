@@ -19,7 +19,7 @@
     "exec": "npm run compile && node bin/md2gslides.js",
     "test": "mocha --require ./test/register --timeout 5000 \"test/**/*.spec.ts\"",
     "test-debug": "mocha --debug-brk --inspect --require ./test/register --timeout 5000 \"test/**/*.spec.ts\"",
-    "lint": "./node_modules/.bin/eslint --fix \"src/**/*.ts\" bin",
+    "lint": "./node_modules/.bin/eslint --fix \"src/**/*.ts\" \"test/**/*.ts\" bin",
     "eslint-check": "eslint --print-config . | eslint-config-prettier-check"
   },
   "repository": {

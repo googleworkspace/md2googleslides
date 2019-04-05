@@ -80,13 +80,17 @@ parser.addArgument(['-c', '--copy'], {
     dest: 'copy',
     required: false,
 });
+parser.addArgument(['--use-fileio'], {
+    help: 'Acknolwedge local and generated images are uploaded to https://file.io',
+    action: 'storeTrue',
+    dest: 'useFileio',
+    require: false,
+});
 
 const args = parser.parseArgs();
 
 function handleError(err) {
     console.log('Unable to generate slides:', err);
-    console.log(err.stack);
-    console.log(JSON.stringify(err, null, 2));
 }
 
 function prompt(url) {
@@ -168,7 +172,10 @@ function generateSlides(slideGenerator) {
     const input = fs.readFileSync(file, { encoding: 'UTF-8' });
     const css = loadCss(args.style);
 
-    return slideGenerator.generateFromMarkdown(input, css);
+    return slideGenerator.generateFromMarkdown(input, {
+        css: css,
+        useFileio: args.useFileio,
+    });
 }
 
 function displayResults(id) {
