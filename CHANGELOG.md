@@ -3,9 +3,12 @@
 ## (pending)
 
 * Support local image upload (via file.io) and rasterization of SVG and TeX/MathML expressions
-* Allow custom layouts via markdown
+* Fix image alignment when included in a column
 * Allow offsets for images
+* Allow custom layouts via markdown, copying from existing template. Note
+  this changes the drive scope and requires reauthorization.
 * Update dependencies
+* Migrate code to TypeScript
 
 ## 0.4
 

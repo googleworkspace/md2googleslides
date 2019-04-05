@@ -14,11 +14,13 @@
   ],
   "scripts": {
     "clean": "rm -rf lib",
-    "compile": "babel --source-maps both -d lib/ src/",
+    "compile": "babel --extensions '.ts,.js' --source-maps both -d lib/ src/",
     "prepublish": "npm run compile",
     "exec": "npm run compile && node bin/md2gslides.js",
-    "test": "npm run compile && mocha --require @babel/register --timeout 5000",
-    "lint": "./node_modules/.bin/eslint --fix src bin"
+    "test": "mocha --require ./test/register --timeout 5000 \"test/**/*.spec.ts\"",
+    "test-debug": "mocha --debug-brk --inspect --require ./test/register --timeout 5000 \"test/**/*.spec.ts\"",
+    "lint": "./node_modules/.bin/eslint --fix \"src/**/*.ts\" \"test/**/*.ts\" bin",
+    "eslint-check": "eslint --print-config . | eslint-config-prettier-check"
   },
   "repository": {
     "type": "git",
@@ -33,6 +35,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "argparse": "^1.0.7",
+    "await-to-js": "^2.1.1",
     "babel-polyfill": "^6.26.0",
     "debug": "^4.1.1",
     "extend": "^3.0.0",
@@ -77,15 +80,26 @@
   "devDependencies": {
     "@babel/cli": "^7.2.3",
     "@babel/core": "^7.4.0",
+    "@babel/plugin-proposal-class-properties": "^7.4.0",
     "@babel/preset-env": "^7.4.2",
+    "@babel/preset-typescript": "^7.3.3",
     "@babel/register": "^7.4.0",
+    "@types/lowdb": "^1.0.7",
+    "@types/markdown-it": "0.0.7",
+    "@types/sharp": "^0.22.1",
+    "@typescript-eslint/eslint-plugin": "^1.6.0",
+    "@typescript-eslint/parser": "^1.6.0",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
     "chai-subset": "^1.3.0",
     "eslint": "^5.16.0",
+    "eslint-config-prettier": "^4.1.0",
+    "eslint-plugin-prettier": "^3.0.1",
     "mocha": "^5.2.0",
     "mock-fs": "^4.8.0",
-    "nock": "^10.0.6"
+    "nock": "^10.0.6",
+    "prettier": "^1.16.4",
+    "typescript": "^3.4.1"
   },
   "bin": {
     "md2gslides": "bin/md2gslides.js"

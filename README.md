@@ -295,6 +295,17 @@ are supported. For example, to use the github theme
 md2gslides slides.md --style github
 ```
 
+You can also apply additional style changes to the entire block, such as changing
+the font size:
+
+<pre>
+### Hello World
+
+```javascript
+console.log('Hello world');
+```{style="font-size: 36pt"}
+</pre>
+
 ### Tables
 
 Tables are supported via
@@ -316,13 +327,59 @@ Dogs   | 75 million
 Birds  | 16 million
 </pre>
 
+### Local images
+
+Images referencing local paths temporarily uploaded and hosted to [file.io](https://file.io)
+
+### Image rasterization
+
+Slides can also include generated images, using `$$$` fenced blocks
+for the data. Currently supported generated images are math expression (TeX
+and MathML) as well as SVG
+
+Using TeX:
+
+<pre>
+# How about some math?
+
+$$$ math
+\cos (2\theta) = \cos^2 \theta - \sin^2 \theta
+$$$
+</pre>
+
+SVG
+
+<pre>
+# Or some SVG?
+
+$$$ svg
+&lt;svg xmlns="http://www.w3.org/2000/svg"
+     xmlns:xlink="http://www.w3.org/1999/xlink"
+     viewBox="0 0 48 48">
+  &lt;defs>
+    &lt;path id="a" d="M44.5 20H24v8.5h11.8C34.7 33.9 30.1 37 24 37c-7.2 0-13-5.8-13-13s5.8-13 13-13c3.1 0 5.9 1.1 8.1 2.9l6.4-6.4C34.6 4.1 29.6 2 24 2 11.8 2 2 11.8 2 24s9.8 22 22 22c11 0 21-8 21-22 0-1.3-.2-2.7-.5-4z"/>
+  &lt;/defs>
+  &lt;clipPath id="b">
+    &lt;use xlink:href="#a" overflow="visible"/>
+  &lt;/clipPath><path clip-path="url(#b)" fill="#FBBC05" d="M0 37V11l17 13z"/>
+  &lt;path clip-path="url(#b)" fill="#EA4335" d="M0 11l17 13 7-6.1L48 14V0H0z"/>
+  &lt;path clip-path="url(#b)" fill="#34A853" d="M0 37l30-23 7.9 1L48 0v48H0z"/>
+  &lt;path clip-path="url(#b)" fill="#4285F4" d="M48 48L17 24l-4-3 35-10z"/>
+&lt;/svg>
+$$$
+</pre>
+
+Like local images, generated images are temporarily served via file.io.
+
+Pull requests for other image generators (e.g. mermaid, chartjs, etc.) are welcome!
+
 ## Reading from standard input
 
 You can also pipe markdown into the tool by using `STDIN` as the file name.
 
 ## Contributing
 
-With the exception of `/bin/md2gslides.js`, ES6 is used throughout and compiled
+With the exception of `/bin/md2gslides.js`, TypeScript is used throughout and compiled
 with [Babel](https://babeljs.io/). [Mocha](https://mochajs.org/) and [Chai](http://chaijs.com/)
 are used for testing.
 
@@ -336,6 +393,12 @@ To run unit tests:
 
 ```sh
 npm run test
+```
+
+To lint/format tests:
+
+```sh
+npm run lint
 ```
 
 See [CONTRIBUTING](CONTRIBUTING.md) for additional terms.

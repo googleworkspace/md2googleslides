@@ -14,15 +14,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const assert = require('assert');
-const debug = require('debug')('md2gslides');
-const Promise = require('promise');
-const { OAuth2Client } = require('google-auth-library');
-const path = require('path');
-const mkdirp = require('mkdirp');
-const lowdb = require('lowdb');
-const FileSync = require('lowdb/adapters/FileSync');
-const Memory = require('lowdb/adapters/Memory')
+import Debug from 'debug';
+import { OAuth2Client, Credentials } from 'google-auth-library';
+import path from 'path';
+import mkdirp from 'mkdirp';
+import lowdb from 'lowdb';
+import FileSync from 'lowdb/adapters/FileSync';
+import Memory from 'lowdb/adapters/Memory';
+
+const debug = Debug('md2gslides');
+
+export type UserPrompt = (message: string) => Promise<string>;
+
+export interface AuthOptions {
+    clientId: string;
+    clientSecret: string;
+    prompt: UserPrompt;
+    filePath?: string;
+}
 
 /**
  * Handles the authorization flow, intended for command line usage.
@@ -44,7 +53,13 @@ const Memory = require('lowdb/adapters/Memory')
  *   @param {String} url Authorization URL to display to user or open in browser
  *   @returns {Promise.<String>} Promise yielding the authorization code
  */
-class UserAuthorizer {
+export default class UserAuthorizer {
+    private redirectUrl = 'urn:ietf:wg:oauth:2.0:oob';
+    private db: lowdb.LowdbSync<Credentials>;
+    private clientId: string;
+    private clientSecret: string;
+    private prompt: UserPrompt;
+
     /**
      * Initialize the authorizer.
      *
@@ -55,17 +70,11 @@ class UserAuthorizer {
      * @param {String} filePath Path to file where tokens are saved
      * @param {UserAuthorizer~promptCallback} prompt Function to acquire the authorization code
      */
-    constructor({clientId, clientSecret, prompt, filePath = null}) {
-        debug('Creating UserAuthorizer, storage path: %s', filePath);
-
-        assert(clientId, 'Missing clientId');
-        assert(clientSecret, 'Missing clientSecret');
-
-        this.clientId = clientId;
-        this.clientSecret = clientSecret;
-        this.redirectUrl = 'urn:ietf:wg:oauth:2.0:oob';
-        this.db = UserAuthorizer.initDbSync(filePath);
-        this.prompt = prompt;
+    public constructor(options: AuthOptions) {
+        this.db = this.initDbSync(options.filePath);
+        this.clientId = options.clientId;
+        this.clientSecret = options.clientSecret;
+        this.prompt = options.prompt;
     }
 
     /**
@@ -77,36 +86,34 @@ class UserAuthorizer {
      * @param {String} scopes Authorization scopes to request
      * @returns {Promise.<google.auth.OAuth2>}
      */
-    getUserCredentials(user, scopes) {
+    public async getUserCredentials(user: string, scopes: string): Promise<OAuth2Client> {
         const oauth2Client = new OAuth2Client(this.clientId, this.clientSecret, this.redirectUrl);
-        let previousToken = this.db.get(user).value();
-        let saveToken = () => {
-            let creds = oauth2Client.credentials;
-            this.db.set(user, creds).write();
-        };
-        let emitCredentials = () => oauth2Client;
+        oauth2Client.on('tokens', (tokens: Credentials) => {
+            if (tokens.refresh_token) {
+                debug('Saving refresh token');
+                this.db.set(user, tokens).write();
+            }
+        });
 
-        if (previousToken) {
-            oauth2Client.setCredentials(previousToken);
-            return oauth2Client.getAccessToken()
-                .then(saveToken)
-                .then(emitCredentials);
-        } else {
-            const authUrl = oauth2Client.generateAuthUrl({
-                access_type: 'offline',
-                scope: scopes,
-                login_hint: user
-            });
-            let exchangeCode = code => oauth2Client.getToken(code);
-            let validateCode = code => code.null ? Promise.reject('Code is null') : code;
-            let updateClient = token => oauth2Client.setCredentials(token.tokens);
-            return this.prompt(authUrl)
-                .then(validateCode)
-                .then(exchangeCode)
-                .then(updateClient)
-                .then(saveToken)
-                .then(emitCredentials);
+        let tokens = this.db.get(user).value();
+        if (tokens) {
+            debug('User previously authorized, refreshing');
+            oauth2Client.setCredentials(tokens);
+            await oauth2Client.getAccessToken();
+            return oauth2Client;
         }
+
+        debug('Challenging for authorization');
+        /* eslint-disable @typescript-eslint/camelcase */
+        const authUrl = oauth2Client.generateAuthUrl({
+            access_type: 'offline',
+            scope: scopes,
+            login_hint: user,
+        });
+        let code = await this.prompt(authUrl);
+        let tokenResponse = await oauth2Client.getToken(code);
+        oauth2Client.setCredentials(tokenResponse.tokens);
+        return oauth2Client;
     }
 
     /**
@@ -116,16 +123,15 @@ class UserAuthorizer {
      * @returns {lowdb} database instance
      * @private
      */
-    static initDbSync(filePath) {
-        if(filePath) {
+    private initDbSync<T>(filePath: string): lowdb.LowdbSync<T> {
+        let adapter: lowdb.AdapterSync;
+        if (filePath) {
             const parentDir = path.dirname(filePath);
             mkdirp.sync(parentDir);
-            const adapter = new FileSync(filePath);
-            return lowdb(adapter);
+            adapter = new FileSync<T>(filePath);
         } else {
-            return lowdb(new Memory()); // In-memory only
+            adapter = new Memory<T>('');
         }
+        return lowdb(adapter);
     }
 }
-
-module.exports = UserAuthorizer;
