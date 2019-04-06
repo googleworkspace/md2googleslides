@@ -61,7 +61,7 @@ describe('matchLayout', function() {
             {
                 title: { rawText: 'title' },
                 subtitle: { rawText: 'subtitle' },
-                bodies: [{ text: {rawText: 'body' }}],
+                bodies: [{ text: { rawText: 'body' } }],
                 tables: [],
             },
         ],
@@ -70,7 +70,7 @@ describe('matchLayout', function() {
             {
                 title: { rawText: 'title', big: true },
                 subtitle: null,
-                bodies: [{ text: {rawText: 'body' }}],
+                bodies: [{ text: { rawText: 'body' } }],
                 tables: [],
             },
         ],
@@ -79,7 +79,7 @@ describe('matchLayout', function() {
             {
                 title: { rawText: 'title' },
                 subtitle: null,
-                bodies: [{ text: { rawText: 'column1' }}, { text: { rawText: 'column2' }}],
+                bodies: [{ text: { rawText: 'column1' } }, { text: { rawText: 'column2' } }],
                 tables: [],
             },
         ],
@@ -88,7 +88,7 @@ describe('matchLayout', function() {
             {
                 title: { rawText: 'title' },
                 subtitle: null,
-                bodies: [{ text: { rawText: 'body' }}],
+                bodies: [{ text: { rawText: 'body' } }],
                 tables: [],
                 images: [],
                 videos: [],
@@ -99,7 +99,7 @@ describe('matchLayout', function() {
             {
                 title: { rawText: 'title' },
                 subtitle: null,
-                bodies: [{ images: [{ url: 'https://source.unsplash.com/78A265wPiO4/1600x900', padding: 0 }]}],
+                bodies: [{ images: [{ url: 'https://source.unsplash.com/78A265wPiO4/1600x900', padding: 0 }] }],
                 tables: [],
             },
         ],
@@ -117,7 +117,7 @@ describe('matchLayout', function() {
             {
                 title: null,
                 subtitle: null,
-                bodies: [{ images: [{ url: 'https://source.unsplash.com/78A265wPiO4/1600x900', padding: 0 }]}],
+                bodies: [{ images: [{ url: 'https://source.unsplash.com/78A265wPiO4/1600x900', padding: 0 }] }],
                 tables: [],
                 videos: [],
             },

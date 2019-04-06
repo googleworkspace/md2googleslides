@@ -110,7 +110,7 @@ describe('GenericLayout', function() {
                             textRuns: [],
                             listMarkers: [],
                             big: false,
-                        },        
+                        },
                     },
                 ],
                 tables: [],
@@ -156,7 +156,7 @@ describe('GenericLayout', function() {
                             rawText: 'This is the left column\n',
                             textRuns: [],
                             listMarkers: [],
-                        }
+                        },
                     },
                     {
                         text: {
@@ -164,7 +164,7 @@ describe('GenericLayout', function() {
                             rawText: 'This is the right column\n',
                             textRuns: [],
                             listMarkers: [],
-                        }
+                        },
                     },
                 ],
                 tables: [],
@@ -214,7 +214,7 @@ describe('GenericLayout', function() {
                             rawText: '\n',
                             textRuns: [],
                             listMarkers: [],
-                        }
+                        },
                     },
                 ],
                 tables: [],
@@ -259,9 +259,9 @@ describe('GenericLayout', function() {
                                 width: 350,
                                 height: 315,
                             },
-                        ],        
-                    }
-                ]
+                        ],
+                    },
+                ],
             };
             const layout = new GenericLayout('', presentation, input);
             layout.appendContentRequests(requests);
@@ -301,10 +301,9 @@ describe('GenericLayout', function() {
                             },
                         ],
                         images: [],
-                    }
+                    },
                 ],
                 tables: [],
-                
             };
             const layout = new GenericLayout('', presentation, input);
             layout.appendContentRequests(requests);
@@ -497,7 +496,7 @@ describe('GenericLayout', function() {
                                 },
                             ],
                         },
-                    }
+                    },
                 ],
                 tables: [],
             };
