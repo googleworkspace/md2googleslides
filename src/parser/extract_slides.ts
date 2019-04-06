@@ -113,7 +113,6 @@ inlineTokenRules['inline'] = (token, context) => {
 inlineTokenRules['html_inline'] = (token, context) => {
     const fragment = parse5.parseFragment(context.inlineHtmlContext, token.content);
     if (fragment.childNodes && fragment.childNodes.length) {
-        context.inlineHtmlContext = fragment.childNodes[0];
         const node = fragment.childNodes[0];
         let style: StyleDefinition = {};
 
@@ -137,6 +136,11 @@ inlineTokenRules['html_inline'] = (token, context) => {
                 break;
             case 'span':
                 break;
+            case '#comment':
+                // Depending on spacing, comment blocks
+                // sometimes appear as inline elements
+                fullTokenRules['html_block'](token, context);
+                return
             default:
                 throw new Error('Unsupported inline HTML element: ' + node.nodeName);
         }
@@ -146,7 +150,7 @@ inlineTokenRules['html_inline'] = (token, context) => {
             let css = parseInlineStyle(styleAttr.value);
             updateStyleDefinition(css, style);
         }
-
+        context.inlineHtmlContext = fragment.childNodes[0];
         context.startStyle(style);
     } else {
         context.endStyle();
