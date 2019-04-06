@@ -39,12 +39,13 @@ var parser = new ArgumentParser({
 });
 
 parser.addArgument('file', {
-    help: 'Path to markdown file to convert',
-    required: false,
+    help: 'Path to markdown file to convert, If omitted, reads from stdin',
+    nargs: '?'
 });
 parser.addArgument(['-u', '--user'], {
     help: 'Email address of user',
     required: false,
+    dest: 'user',
     defaultValue: 'default',
 });
 parser.addArgument(['-a', '--append'], {
@@ -164,12 +165,15 @@ function loadCss(theme) {
 }
 
 function generateSlides(slideGenerator) {
-    const file = args.file == 'STDIN' ? 0 : path.resolve(args.file);
-    if (file != 0) {
+    let source;
+    if (args.file) {
+        source = path.resolve(args.file);
         // Set working directory relative to markdown file
-        process.chdir(path.dirname(file));
+        process.chdir(path.dirname(source));
+    } else {
+        source = 0;
     }
-    const input = fs.readFileSync(file, { encoding: 'UTF-8' });
+    const input = fs.readFileSync(source, { encoding: 'UTF-8' });
     const css = loadCss(args.style);
 
     return slideGenerator.generateFromMarkdown(input, {
