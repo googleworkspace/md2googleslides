@@ -40,7 +40,7 @@ var parser = new ArgumentParser({
 
 parser.addArgument('file', {
     help: 'Path to markdown file to convert, If omitted, reads from stdin',
-    nargs: '?'
+    nargs: '?',
 });
 parser.addArgument(['-u', '--user'], {
     help: 'Email address of user',

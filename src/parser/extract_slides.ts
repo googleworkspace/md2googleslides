@@ -140,7 +140,7 @@ inlineTokenRules['html_inline'] = (token, context) => {
                 // Depending on spacing, comment blocks
                 // sometimes appear as inline elements
                 fullTokenRules['html_block'](token, context);
-                return
+                return;
             default:
                 throw new Error('Unsupported inline HTML element: ' + node.nodeName);
         }

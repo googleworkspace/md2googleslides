@@ -115,7 +115,10 @@ describe('extractSlides', function() {
         const slides = extractSlides(markdown);
 
         it('should have a background image', function() {
-            return expect(slides).to.have.nested.property('[0].bodies[0].images[0].url', 'https://example.com/image.jpg');
+            return expect(slides).to.have.nested.property(
+                '[0].bodies[0].images[0].url',
+                'https://example.com/image.jpg',
+            );
         });
 
         it('should have an image x offset', function() {
@@ -366,7 +369,10 @@ describe('extractSlides', function() {
         });
 
         it('should have the correct style', function() {
-            return expect(slides).to.have.nested.property('[0].bodies[0].text.textRuns[0].baselineOffset', 'SUPERSCRIPT');
+            return expect(slides).to.have.nested.property(
+                '[0].bodies[0].text.textRuns[0].baselineOffset',
+                'SUPERSCRIPT',
+            );
         });
     });
 
