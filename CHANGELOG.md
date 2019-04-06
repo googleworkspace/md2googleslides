@@ -1,7 +1,8 @@
 # Changelog
 
-## (pending)
+## 0.5 
 
+* Change handling of STDIN from command line. File arg is now optional, reads from stdin when omitted
 * Support local image upload (via file.io) and rasterization of SVG and TeX/MathML expressions
 * Fix image alignment when included in a column
 * Allow offsets for images
