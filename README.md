@@ -375,7 +375,7 @@ Pull requests for other image generators (e.g. mermaid, chartjs, etc.) are welco
 
 ## Reading from standard input
 
-You can also pipe markdown into the tool by using `STDIN` as the file name.
+You can also pipe markdown into the tool by omitting the file name argument.
 
 ## Contributing
 
