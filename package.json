@@ -72,7 +72,7 @@
     "promise-retry": "^1.1.1",
     "request": "^2.88.0",
     "request-promise-native": "^1.0.7",
-    "sharp": "^0.21.3",
+    "sharp": "^0.22.0",
     "tmp": "0.0.33",
     "tmp-promise": "^1.0.5",
     "uuid": "^3.3.2"
