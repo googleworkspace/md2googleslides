@@ -3020,10 +3020,10 @@ markdown-it-video@^0.6.3:
   resolved "https://registry.yarnpkg.com/markdown-it-video/-/markdown-it-video-0.6.3.tgz#ee96a8fce4a262872f8aaf9706c31540d40104c2"
   integrity sha512-T4th1kwy0OcvyWSN4u3rqPGxvbDclpucnVSSaH3ZacbGsAts964dxokx9s/I3GYsrDCJs4ogtEeEeVP18DQj0Q==
 
-markdown-it@^9.0.1:
-  version "9.0.1"
-  resolved "https://registry.yarnpkg.com/markdown-it/-/markdown-it-9.0.1.tgz#aafe363c43718720b6575fd10625cde6e4ff2d47"
-  integrity sha512-XC9dMBHg28Xi7y5dPuLjM61upIGPJG8AiHNHYqIaXER2KNnn7eKnM5/sF0ImNnyoV224Ogn9b1Pck8VH4k0bxw==
+markdown-it@^8.0.0:
+  version "8.4.2"
+  resolved "https://registry.yarnpkg.com/markdown-it/-/markdown-it-8.4.2.tgz#386f98998dc15a37722aa7722084f4020bdd9b54"
+  integrity sha512-GcRz3AWTqSUphY3vsUqQSFMbgR38a4Lh3GWlHRh/7MRwz8mcu9n2IO7HOh+bXHrR9kOPDl5RNCaEsrneb+xhHQ==
   dependencies:
     argparse "^1.0.7"
     entities "~1.1.1"

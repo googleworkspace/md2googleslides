@@ -50,7 +50,7 @@
     "lowdb": "^1.0",
     "lowlight": "^1.12.1",
     "markdown": "^0.5.0",
-    "markdown-it": "^9.0.1",
+    "markdown-it": "^8.0.0",
     "markdown-it-attrs": "^2.4.1",
     "markdown-it-container": "^2.0.0",
     "markdown-it-emoji": "^1.4.0",
