@@ -329,13 +329,20 @@ Birds  | 16 million
 
 ### Local images
 
-Images referencing local paths temporarily uploaded and hosted to [file.io](https://file.io)
+Images referencing local paths temporarily uploaded and hosted to [file.io](https://file.io). File.io
+is an emphemeral file serving service that generates short-lived random URLs to the upload file and deletes
+content shortly after use.
+
+Since local images are uploaded to a thrid party, explicit opt-in is required to use this feature.
+Include the `--use-fileio` option to opt-in to uploading images. This applies to file-based images as well
+as automatically rasterized content like math expressions and SVGs.
 
 ### Image rasterization
 
 Slides can also include generated images, using `$$$` fenced blocks
 for the data. Currently supported generated images are math expression (TeX
-and MathML) as well as SVG
+and MathML) as well as SVG. Rasterized images are treated like local images are require
+opt-in to uploading images to a 3rd party service via the `--use-fileio` option.
 
 Using TeX:
 
