@@ -31,6 +31,7 @@ const SCOPES = ['https://www.googleapis.com/auth/presentations', 'https://www.go
 
 const USER_HOME = process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
 const STORED_CREDENTIALS_PATH = path.join(USER_HOME, '.md2googleslides', 'credentials.json');
+const STORED_CLIENT_ID_PATH = path.join(USER_HOME, '.md2googleslides', 'client_id.json');
 
 var parser = new ArgumentParser({
     version: '1.0.0',
@@ -124,9 +125,23 @@ function authorizeUser() {
     // application/utility such as this.  Of course, in such cases the "secret" is
     // actually publicly known; security depends entirely on the secrecy of refresh
     // tokens, which effectively become bearer tokens.
+
+    // Load and parse client ID and secret from client_id.json file. (Create
+    // OAuth client ID from Credentials tab at console.developers.google.com
+    // and download the credentials as client_id.json to ~/.md2googleslides
+    var data; // needs to be scoped outside of try-catch
+    try {
+        data = fs.readFileSync(STORED_CLIENT_ID_PATH);
+    } catch(err) {
+        return console.log('Error loading client secret file:', err);
+    }
+    if(data === undefined) return console.log('Error loading client secret data:', err);
+    const creds = JSON.parse(data).installed;
+
+    // Authorize user and get (& store) a valid access token.
     const options = {
-        clientId: '52512509792-pc54t7beete33ifbhk00q3cpcpkmfi7c.apps.googleusercontent.com',
-        clientSecret: '8g6up8tcVXgF7IO71mCN8Afk',
+        clientId: creds.client_id,
+        clientSecret: creds.client_secret,
         filePath: STORED_CREDENTIALS_PATH,
         prompt: prompt,
     };
