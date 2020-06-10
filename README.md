@@ -20,11 +20,14 @@ npm install -g md2gslides
 ```
 
 Then get your OAuth client ID credentials:
-- Create (or reuse) a developer project at <https://console.developers.google.com>
-- Enable Google Slides API at [API library page](https://console.developers.google.com/apis/library)
-- Go to [Credentials page](https://console.developers.google.com/apis/credentials) and click "+ Create credentials" at the top
-- Select "OAuth client ID" authorization credentials, choose "Other", and give it a name (or take the default)
-- Download client credentials file... you'll be prompted with a long name like, `client\_secret\__LARGE-HASH_.json`, but simplify to `client_id.json` and save to `~/.md2googleslides`.
+
+* Create (or reuse) a developer project at <https://console.developers.google.com>
+* Enable Google Slides API at [API library page](https://console.developers.google.com/apis/library)
+* Go to [Credentials page](https://console.developers.google.com/apis/credentials) and click "+ Create credentials" at the top
+* Select "OAuth client ID" authorization credentials
+* Choose type "Computer Application" and give it some name.
+* Download client credentials file.
+* Copy it to `client_id.json` (name has to match) and save to `~/.md2googleslides`.
 
 After installing, import your slides by running:
 
