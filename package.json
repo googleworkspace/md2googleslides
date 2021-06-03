@@ -78,12 +78,12 @@
     "uuid": "^3.3.2"
   },
   "devDependencies": {
-    "@babel/cli": "^7.2.3",
-    "@babel/core": "^7.4.0",
-    "@babel/plugin-proposal-class-properties": "^7.4.0",
-    "@babel/preset-env": "^7.4.2",
-    "@babel/preset-typescript": "^7.3.3",
-    "@babel/register": "^7.4.0",
+    "@babel/cli": "7.14.3",
+    "@babel/core": "7.14.3",
+    "@babel/plugin-proposal-class-properties": "7.13.0",
+    "@babel/preset-env": "7.14.4",
+    "@babel/preset-typescript": "7.13.0",
+    "@babel/register": "7.13.16",
     "@types/lowdb": "1.0.10",
     "@types/markdown-it": "0.0.9",
     "@types/sharp": "^0.22.1",
