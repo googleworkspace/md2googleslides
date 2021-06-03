@@ -85,7 +85,7 @@
     "@babel/preset-typescript": "^7.3.3",
     "@babel/register": "^7.4.0",
     "@types/lowdb": "1.0.10",
-    "@types/markdown-it": "0.0.7",
+    "@types/markdown-it": "0.0.9",
     "@types/sharp": "^0.22.1",
     "@typescript-eslint/eslint-plugin": "^1.6.0",
     "@typescript-eslint/parser": "^1.6.0",
