@@ -35,7 +35,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "argparse": "^2.0.0",
-    "await-to-js": "^2.1.1",
+    "await-to-js": "^3.0.0",
     "babel-polyfill": "^6.26.0",
     "debug": "^4.1.1",
     "extend": "^3.0.0",
