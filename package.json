@@ -34,7 +34,7 @@
   "author": "Steven Bazyl",
   "license": "Apache-2.0",
   "dependencies": {
-    "argparse": "^1.0.7",
+    "argparse": "^2.0.0",
     "await-to-js": "^2.1.1",
     "babel-polyfill": "^6.26.0",
     "debug": "^4.1.1",
