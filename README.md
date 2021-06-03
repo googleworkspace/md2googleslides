@@ -19,14 +19,24 @@ For command line use, install md2gslides globally:
 npm install -g md2gslides
 ```
 
+Then get your OAuth client ID credentials:
+
+* Create (or reuse) a developer project at <https://console.developers.google.com>
+* Enable Google Slides API at [API library page](https://console.developers.google.com/apis/library)
+* Go to [Credentials page](https://console.developers.google.com/apis/credentials) and click "+ Create credentials" at the top
+* Select "OAuth client ID" authorization credentials
+* Choose type "Computer Application" and give it some name.
+* Download client credentials file.
+* Copy it to `client_id.json` (name has to match) and save to `~/.md2googleslides`.
+
 After installing, import your slides by running:
 
 ```sh
 md2gslides slides.md
 ```
 
-The first time the command is run you will be prompted for authorization. Credentials
-will be stored locally in a file named `~/.credentials/md2gslides.json`.
+The first time the command is run you will be prompted for authorization. OAuth token
+credentials will be stored locally in a file named `~/.md2googleslides/credentials.json`.
 
 ## Supported markdown rules
 
