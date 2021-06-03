@@ -20,13 +20,10 @@ import nock from 'nock';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import { OAuth2Client } from 'google-auth-library';
-import axios from 'axios';
-import httpAdapter from 'axios/lib/adapters/http';
 import SlideGenerator from '../src/slide_generator';
 
 const expect = chai.expect;
 chai.use(chaiAsPromised);
-axios.defaults.adapter = httpAdapter;
 
 function buildCredentials(): OAuth2Client {
     const oauth2Client = new OAuth2Client('test', 'test', null);
