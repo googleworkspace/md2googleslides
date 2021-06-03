@@ -20,12 +20,9 @@ import fs from 'fs';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import UserAuthorizer from '../src/auth';
-import axios from 'axios';
-import httpAdapter from 'axios/lib/adapters/http';
 
 const expect = chai.expect;
 chai.use(chaiAsPromised);
-axios.defaults.adapter = httpAdapter;
 
 function stubTokenRequest(): void {
     nock('https://oauth2.googleapis.com')
