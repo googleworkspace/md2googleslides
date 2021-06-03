@@ -1270,10 +1270,10 @@ atob@~1.1.0:
   resolved "https://registry.npmjs.org/atob/-/atob-1.1.3.tgz"
   integrity sha1-lfE2KbEsOlGl0hWr3OKqnzL4B3M=
 
-await-to-js@^2.1.1:
-  version "2.1.1"
-  resolved "https://registry.npmjs.org/await-to-js/-/await-to-js-2.1.1.tgz"
-  integrity sha512-CHBC6gQGCIzjZ09tJ+XmpQoZOn4GdWePB4qUweCaKNJ0D3f115YdhmYVTZ4rMVpiJ3cFzZcTYK1VMYEICV4YXw==
+await-to-js@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.npmjs.org/await-to-js/-/await-to-js-3.0.0.tgz"
+  integrity sha512-zJAaP9zxTcvTHRlejau3ZOY4V7SRpiByf3/dxx2uyKxxor19tpmpV2QRsTKikckwhaPmr2dVpxxMr7jOCYVp5g==
 
 aws-sign2@~0.7.0:
   version "0.7.0"
