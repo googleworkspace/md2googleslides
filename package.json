@@ -98,7 +98,7 @@
     "mocha": "8.4.0",
     "mock-fs": "4.14.0",
     "nock": "10.0.6",
-    "prettier": "1.19.1",
+    "prettier": "2.3.1",
     "typescript": "3.9.9"
   },
   "bin": {
