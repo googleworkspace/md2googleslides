@@ -92,7 +92,7 @@
     "chai": "4.3.4",
     "chai-as-promised": "7.1.1",
     "chai-subset": "1.6.0",
-    "eslint": "5.16.0",
+    "eslint": "7.29.0",
     "eslint-config-prettier": "4.3.0",
     "eslint-plugin-prettier": "3.4.0",
     "mocha": "8.4.0",
