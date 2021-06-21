@@ -15,58 +15,58 @@
 import Debug from 'debug';
 import mathJax from 'mathjax-node';
 import renderSVG from './svg';
-import { ImageDefinition } from '../slides';
+import {ImageDefinition} from '../slides';
 
 const debug = Debug('md2gslides');
 let mathJaxInitialized = false;
 
 function lazyInitMathJax(): void {
-    if (mathJaxInitialized) {
-        return;
-    }
-    mathJax.config({
-        MathJax: {
-            SVG: {
-                scale: 500,
-            },
-        },
-    });
-    mathJax.start();
-    mathJaxInitialized = true;
+  if (mathJaxInitialized) {
+    return;
+  }
+  mathJax.config({
+    MathJax: {
+      SVG: {
+        scale: 500,
+      },
+    },
+  });
+  mathJax.start();
+  mathJaxInitialized = true;
 }
 
 function formatFor(expression: string): string {
-    return expression.trim().startsWith('<math>') ? 'MathML' : 'TeX';
+  return expression.trim().startsWith('<math>') ? 'MathML' : 'TeX';
 }
 
 function addOrMergeStyles(svg: string, style?: string): string {
-    if (!style) {
-        return svg;
-    }
-    let match = svg.match(/(<svg[^>]+)(style="([^"]+)")([^>]+>)/);
-    if (match) {
-        return (
-            svg.slice(0, match[1].length) +
-            `style="${style};${match[3]}"` +
-            svg.slice(match[1].length + match[2].length)
-        );
-    } else {
-        let i = svg.indexOf('>');
-        return svg.slice(0, i) + ` style="${style}"` + svg.slice(i);
-    }
+  if (!style) {
+    return svg;
+  }
+  const match = svg.match(/(<svg[^>]+)(style="([^"]+)")([^>]+>)/);
+  if (match) {
+    return (
+      svg.slice(0, match[1].length) +
+      `style="${style};${match[3]}"` +
+      svg.slice(match[1].length + match[2].length)
+    );
+  } else {
+    const i = svg.indexOf('>');
+    return svg.slice(0, i) + ` style="${style}"` + svg.slice(i);
+  }
 }
 
 async function renderMathJax(image: ImageDefinition): Promise<string> {
-    debug('Generating math image: %O', image);
-    lazyInitMathJax();
-    let out = await mathJax.typeset({
-        math: image.source,
-        format: formatFor(image.source),
-        svg: true,
-    });
-    image.source = addOrMergeStyles(out.svg, image.style);
-    image.type = 'svg';
-    return await renderSVG(image);
+  debug('Generating math image: %O', image);
+  lazyInitMathJax();
+  const out = await mathJax.typeset({
+    math: image.source,
+    format: formatFor(image.source),
+    svg: true,
+  });
+  image.source = addOrMergeStyles(out.svg, image.style);
+  image.type = 'svg';
+  return await renderSVG(image);
 }
 
 export default renderMathJax;

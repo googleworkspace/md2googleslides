@@ -27,26 +27,26 @@ const debug = Debug('md2gslides');
  * @returns {Promise<string>} URL to hosted image
  */
 async function uploadLocalImage(filePath: string): Promise<string> {
-    debug('Registering file %s', filePath);
-    const stream = fs.createReadStream(filePath);
-    try {
-        let params = {
-            file: stream,
-        };
-        let res = await request.post({
-            url: 'https://file.io?expires=1h',
-            formData: params,
-        });
-        let responseData = JSON.parse(res);
-        if (!responseData.success) {
-            debug('Unable to upload file: %O', responseData);
-            throw res;
-        }
-        debug('Temporary link: %s', responseData.link);
-        return responseData.link;
-    } finally {
-        stream.destroy();
+  debug('Registering file %s', filePath);
+  const stream = fs.createReadStream(filePath);
+  try {
+    const params = {
+      file: stream,
+    };
+    const res = await request.post({
+      url: 'https://file.io?expires=1h',
+      formData: params,
+    });
+    const responseData = JSON.parse(res);
+    if (!responseData.success) {
+      debug('Unable to upload file: %O', responseData);
+      throw res;
     }
+    debug('Temporary link: %s', responseData.link);
+    return responseData.link;
+  } finally {
+    stream.destroy();
+  }
 }
 
 export default uploadLocalImage;

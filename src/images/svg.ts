@@ -19,13 +19,11 @@ const debug = Debug('md2gslides');
 tmp.setGracefulCleanup();
 
 async function renderSVG(image): Promise<string> {
-    debug('Generating SVG', image);
-    let path = await tmp.tmpName({ postfix: '.png' });
-    let buffer = Buffer.from(image.source);
-    await sharp(buffer, { density: 2400 })
-        .png()
-        .toFile(path);
-    return path;
+  debug('Generating SVG', image);
+  const path = await tmp.tmpName({postfix: '.png'});
+  const buffer = Buffer.from(image.source);
+  await sharp(buffer, {density: 2400}).png().toFile(path);
+  return path;
 }
 
 export default renderSVG;

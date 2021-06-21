@@ -12,11 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { slides_v1 as SlidesV1 } from 'googleapis';
+import {slides_v1 as SlidesV1} from 'googleapis';
 
 export interface Dimensions {
-    width: number;
-    height: number;
+  width: number;
+  height: number;
 }
 
 /**
@@ -25,18 +25,23 @@ export interface Dimensions {
  * @param {string} pageId Object ID of page to find
  * @returns {Object} Page or null if not found
  */
-export function findPage(presentation: SlidesV1.Schema$Presentation, pageId: string): SlidesV1.Schema$Page | undefined {
-    if (!presentation.slides) {
-        return undefined;
-    }
-    return presentation.slides.find((p): boolean => p.objectId === pageId);
+export function findPage(
+  presentation: SlidesV1.Schema$Presentation,
+  pageId: string
+): SlidesV1.Schema$Page | undefined {
+  if (!presentation.slides) {
+    return undefined;
+  }
+  return presentation.slides.find((p): boolean => p.objectId === pageId);
 }
 
-export function pageSize(presentation: SlidesV1.Schema$Presentation): Dimensions {
-    return {
-        width: presentation.pageSize.width.magnitude,
-        height: presentation.pageSize.height.magnitude,
-    };
+export function pageSize(
+  presentation: SlidesV1.Schema$Presentation
+): Dimensions {
+  return {
+    width: presentation.pageSize.width.magnitude,
+    height: presentation.pageSize.height.magnitude,
+  };
 }
 
 /**
@@ -45,15 +50,20 @@ export function pageSize(presentation: SlidesV1.Schema$Presentation): Dimensions
  * @param {string} name
  * @returns {string} layout ID or null if not found
  */
-export function findLayoutIdByName(presentation: SlidesV1.Schema$Presentation, name: string): string | undefined {
-    if (!presentation.layouts) {
-        return undefined;
-    }
-    const layout = presentation.layouts.find((l): boolean => l.layoutProperties.name === name);
-    if (!layout) {
-        return undefined;
-    }
-    return layout.objectId;
+export function findLayoutIdByName(
+  presentation: SlidesV1.Schema$Presentation,
+  name: string
+): string | undefined {
+  if (!presentation.layouts) {
+    return undefined;
+  }
+  const layout = presentation.layouts.find(
+    (l): boolean => l.layoutProperties.name === name
+  );
+  if (!layout) {
+    return undefined;
+  }
+  return layout.objectId;
 }
 
 /**
@@ -64,31 +74,35 @@ export function findLayoutIdByName(presentation: SlidesV1.Schema$Presentation, n
  * @returns {Array} Array of placeholders
  */
 export function findPlaceholder(
-    presentation: SlidesV1.Schema$Presentation,
-    pageId: string,
-    name: string,
+  presentation: SlidesV1.Schema$Presentation,
+  pageId: string,
+  name: string
 ): SlidesV1.Schema$PageElement[] | undefined {
-    const page = findPage(presentation, pageId);
-    if (!page) {
-        throw new Error(`Can't find page ${pageId}`);
-    }
+  const page = findPage(presentation, pageId);
+  if (!page) {
+    throw new Error(`Can't find page ${pageId}`);
+  }
 
-    let placeholders = [];
-    if (!page.pageElements) {
-        return undefined;
-    }
-
-    for (let element of page.pageElements) {
-        if (element.shape && element.shape.placeholder && name == element.shape.placeholder.type) {
-            placeholders.push(element);
-        }
-    }
-
-    if (placeholders.length) {
-        return placeholders;
-    }
-
+  const placeholders = [];
+  if (!page.pageElements) {
     return undefined;
+  }
+
+  for (const element of page.pageElements) {
+    if (
+      element.shape &&
+      element.shape.placeholder &&
+      name === element.shape.placeholder.type
+    ) {
+      placeholders.push(element);
+    }
+  }
+
+  if (placeholders.length) {
+    return placeholders;
+  }
+
+  return undefined;
 }
 
 /**
@@ -98,30 +112,30 @@ export function findPlaceholder(
  * @returns {Object} Object or null if not found
  */
 export function findPageElement(
-    presentation: SlidesV1.Schema$Presentation,
-    pageId: string,
-    id: string,
+  presentation: SlidesV1.Schema$Presentation,
+  pageId: string,
+  id: string
 ): SlidesV1.Schema$PageElement | undefined {
-    const page = findPage(presentation, pageId);
-    if (!page) {
-        throw new Error(`Can't find page ${pageId}`);
-    }
+  const page = findPage(presentation, pageId);
+  if (!page) {
+    throw new Error(`Can't find page ${pageId}`);
+  }
 
-    for (let element of page.pageElements) {
-        if (element.objectId == id) {
-            return element;
-        }
+  for (const element of page.pageElements) {
+    if (element.objectId === id) {
+      return element;
     }
-    return undefined;
+  }
+  return undefined;
 }
 
 export function findSpeakerNotesObjectId(
-    presentation: SlidesV1.Schema$Presentation,
-    pageId: string,
+  presentation: SlidesV1.Schema$Presentation,
+  pageId: string
 ): string | undefined {
-    let page = findPage(presentation, pageId);
-    if (page) {
-        return page.slideProperties.notesPage.notesProperties.speakerNotesObjectId;
-    }
-    return undefined;
+  const page = findPage(presentation, pageId);
+  if (page) {
+    return page.slideProperties.notesPage.notesProperties.speakerNotesObjectId;
+  }
+  return undefined;
 }

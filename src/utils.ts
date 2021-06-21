@@ -15,5 +15,5 @@
 import uuidV1 from 'uuid/v1';
 
 export function uuid(): string {
-    return uuidV1();
+  return uuidV1();
 }

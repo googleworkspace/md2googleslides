@@ -14,60 +14,60 @@
 
 import Debug from 'debug';
 import probeImageSize from 'probe-image-size';
-import { ImageDefinition } from '../slides';
+import {ImageDefinition} from '../slides';
 import retry from 'promise-retry';
 import fs from 'fs';
-import { URL } from 'url';
+import {URL} from 'url';
 
 const debug = Debug('md2gslides');
 const retriableCodes = ['ENOTFOUND', 'ECONNRESET', 'ETIMEDOUT'];
-const probeOptions = { timeout: 5000 };
+const probeOptions = {timeout: 5000};
 const retryOptions = {
-    retries: 3,
-    randomize: true,
+  retries: 3,
+  randomize: true,
 };
 
 interface ImageSize {
-    width: number;
-    height: number;
+  width: number;
+  height: number;
 }
 
 async function probeUrl(url): Promise<ImageSize> {
-    return await retry(async doRetry => {
-        try {
-            return await probeImageSize(url, probeOptions);
-        } catch (err) {
-            if (retriableCodes.includes(err.code)) {
-                doRetry(err);
-            }
-            throw err;
-        }
-    }, retryOptions);
+  return await retry(async doRetry => {
+    try {
+      return await probeImageSize(url, probeOptions);
+    } catch (err) {
+      if (retriableCodes.includes(err.code)) {
+        doRetry(err);
+      }
+      throw err;
+    }
+  }, retryOptions);
 }
 
 async function probeFile(path): Promise<ImageSize> {
-    let stream = fs.createReadStream(path);
-    try {
-        return await probeImageSize(stream);
-    } finally {
-        stream.destroy();
-    }
+  const stream = fs.createReadStream(path);
+  try {
+    return await probeImageSize(stream);
+  } finally {
+    stream.destroy();
+  }
 }
 
 async function probeImage(image: ImageDefinition): Promise<ImageDefinition> {
-    debug('Probing image size: %s', image.url);
-    let promise;
-    let parsedUrl = new URL(image.url);
-    if (parsedUrl.protocol == 'file:') {
-        promise = probeFile(parsedUrl.pathname);
-    } else {
-        promise = probeUrl(image.url);
-    }
+  debug('Probing image size: %s', image.url);
+  let promise;
+  const parsedUrl = new URL(image.url);
+  if (parsedUrl.protocol === 'file:') {
+    promise = probeFile(parsedUrl.pathname);
+  } else {
+    promise = probeUrl(image.url);
+  }
 
-    let size = await promise;
-    image.width = size.width;
-    image.height = size.height;
-    return image;
+  const size = await promise;
+  image.width = size.width;
+  image.height = size.height;
+  return image;
 }
 
 export default probeImage;

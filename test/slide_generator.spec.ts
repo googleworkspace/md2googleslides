@@ -12,55 +12,61 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-/* eslint-disable @typescript-eslint/camelcase */
-
 import path from 'path';
 import jsonfile from 'jsonfile';
 import nock from 'nock';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import { OAuth2Client } from 'google-auth-library';
+import {OAuth2Client} from 'google-auth-library';
 import SlideGenerator from '../src/slide_generator';
 
 const expect = chai.expect;
 chai.use(chaiAsPromised);
 
 function buildCredentials(): OAuth2Client {
-    const oauth2Client = new OAuth2Client('test', 'test', null);
-    oauth2Client.setCredentials({
-        access_token: 'abc',
-        token_type: ' Bearer',
-    });
-    return oauth2Client;
+  const oauth2Client = new OAuth2Client('test', 'test', null);
+  oauth2Client.setCredentials({
+    access_token: 'abc',
+    token_type: ' Bearer',
+  });
+  return oauth2Client;
 }
 
-describe('SlideGenerator', function() {
-    const fixturePath = path.join(path.dirname(__dirname), 'test', 'fixtures');
+describe('SlideGenerator', () => {
+  const fixturePath = path.join(path.dirname(__dirname), 'test', 'fixtures');
 
-    describe('with new presentation', function() {
-        beforeEach(function() {
-            const presentation = jsonfile.readFileSync(path.join(fixturePath, 'blank_presentation.json'));
-            nock('https://slides.googleapis.com')
-                .post('/v1/presentations')
-                .reply(200, presentation);
-        });
-
-        it('should create a presentation', function() {
-            const generator = SlideGenerator.newPresentation(buildCredentials(), 'title');
-            return expect(generator).to.eventually.be.instanceof(SlideGenerator);
-        });
+  describe('with new presentation', () => {
+    beforeEach(() => {
+      const presentation = jsonfile.readFileSync(
+        path.join(fixturePath, 'blank_presentation.json')
+      );
+      nock('https://slides.googleapis.com')
+        .post('/v1/presentations')
+        .reply(200, presentation);
     });
 
-    describe('with existing presentation', function() {
-        beforeEach(function() {
-            nock('https://slides.googleapis.com')
-                .get('/v1/presentations/12345')
-                .reply(200, { presentationId: '12345' });
-        });
-
-        it('should load presentation', function() {
-            const generator = SlideGenerator.forPresentation(buildCredentials(), '12345');
-            return expect(generator).to.eventually.be.instanceof(SlideGenerator);
-        });
+    it('should create a presentation', () => {
+      const generator = SlideGenerator.newPresentation(
+        buildCredentials(),
+        'title'
+      );
+      return expect(generator).to.eventually.be.instanceof(SlideGenerator);
     });
+  });
+
+  describe('with existing presentation', () => {
+    beforeEach(() => {
+      nock('https://slides.googleapis.com')
+        .get('/v1/presentations/12345')
+        .reply(200, {presentationId: '12345'});
+    });
+
+    it('should load presentation', () => {
+      const generator = SlideGenerator.forPresentation(
+        buildCredentials(),
+        '12345'
+      );
+      return expect(generator).to.eventually.be.instanceof(SlideGenerator);
+    });
+  });
 });

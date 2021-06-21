@@ -15,13 +15,13 @@
 import Debug from 'debug';
 import renderSVG from './svg';
 import renderMathJax from './/mathjax';
-import { ImageDefinition } from '../slides';
+import {ImageDefinition} from '../slides';
 
 const debug = Debug('md2gslides');
 
-let renderers = {
-    svg: renderSVG,
-    math: renderMathJax,
+const renderers = {
+  svg: renderSVG,
+  math: renderMathJax,
 };
 
 /**
@@ -29,23 +29,24 @@ let renderers = {
  * @param {Image} image to generate if needed
  * @return {Promise<Image>} Promise resolved with image URL
  */
-async function maybeGenerateImage(image: ImageDefinition): Promise<ImageDefinition> {
-    if (image.url) {
-        debug('Image already rasterized: %s', image.url);
-        return image;
-    }
-
-    let filePath: string;
-    let imageType = image.type.trim().toLowerCase();
-
-    let renderer = renderers[imageType];
-    if (renderer === undefined) {
-        throw 'Unsupported generated image: ' + image.source;
-    }
-    filePath = await renderer(image);
-    image.url = 'file://' + filePath;
-    debug('Local image path: %s', image.url);
+async function maybeGenerateImage(
+  image: ImageDefinition
+): Promise<ImageDefinition> {
+  if (image.url) {
+    debug('Image already rasterized: %s', image.url);
     return image;
+  }
+
+  const imageType = image.type.trim().toLowerCase();
+
+  const renderer = renderers[imageType];
+  if (renderer === undefined) {
+    throw 'Unsupported generated image: ' + image.source;
+  }
+  const filePath = await renderer(image);
+  image.url = 'file://' + filePath;
+  debug('Local image path: %s', image.url);
+  return image;
 }
 
 export default maybeGenerateImage;

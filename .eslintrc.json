@@ -1,33 +1,3 @@
 {
-    "env": {
-        "node": true
-    },
-    "parser": "@typescript-eslint/parser",
-    "parserOptions": {
-        "ecmaVersion":  2018,
-        "sourceType":  "module"
-    },
-    "extends": [
-        "plugin:@typescript-eslint/recommended",
-        "prettier",
-        "plugin:prettier/recommended",
-        "prettier/@typescript-eslint"
-    ],
-    "rules": {
-        "@typescript-eslint/explicit-function-return-type": [
-            "error",
-            {
-                "allowExpressions": true
-            }
-        ],
-        "@typescript-eslint/no-unused-vars": [
-            "error",
-            {
-                "vars": "all",
-                "args": "after-used",
-                "ignoreRestSiblings": false
-            }
-        ]
-
-    }
+  "extends": "./node_modules/gts/"
 }
