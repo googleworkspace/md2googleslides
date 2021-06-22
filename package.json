@@ -65,7 +65,7 @@
     "mathjax-node": "^2.1.1",
     "md5-file": "^4.0.0",
     "mime-types": "^2.1.22",
-    "mkdirp": "^0.5.1",
+    "mkdirp": "^1.0.0",
     "native-css": "^2.0.0",
     "node-fetch": "^2.3.0",
     "opener": "^1.4.2",
