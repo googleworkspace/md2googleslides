@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import uuidV1 from 'uuid/v1';
+import {v1 as uuidV1} from 'uuid';
 
 export function uuid(): string {
   return uuidV1();

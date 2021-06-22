@@ -78,7 +78,7 @@
     "sharp": "^0.28.0",
     "tmp": "0.2.1",
     "tmp-promise": "^1.0.5",
-    "uuid": "^3.3.2"
+    "uuid": "^8.3.2"
   },
   "devDependencies": {
     "@babel/cli": "7.14.5",
