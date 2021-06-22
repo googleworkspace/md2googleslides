@@ -19,14 +19,34 @@ For command line use, install md2gslides globally:
 npm install -g md2gslides
 ```
 
+Then get your OAuth client ID credentials:
+
+* Create (or reuse) a developer project at <https://console.developers.google.com>
+* Enable Google Slides API at [API library page](https://console.developers.google.com/apis/library)
+* Go to [Credentials page](https://console.developers.google.com/apis/credentials) and click "+ Create credentials" at the top
+* Select "OAuth client ID" authorization credentials
+* Choose type "Computer Application" and give it some name.
+* Download client credentials file.
+* Copy it to `client_id.json` (name has to match) and save to `~/.md2googleslides`.
+
 After installing, import your slides by running:
 
 ```sh
-md2gslides slides.md
+md2gslides slides.md --title "Talk Title"
 ```
 
-The first time the command is run you will be prompted for authorization. Credentials
-will be stored locally in a file named `~/.credentials/md2gslides.json`.
+This will generate new Google Slides in your account with title `Talk Title`. 
+
+NOTE: The first time the command is run you will be prompted for authorization. OAuth token
+credentials are stored locally in a file named `~/.md2googleslides/credentials.json`.
+
+Each time you will run the above comment, new slide deck will be generated. In order to work on exactly the same
+deck, just get the ID of the already generated slides. For example, you can use following command:
+
+```
+# To reuse deck available at: https://docs.google.com/presentation/d/<some id>/edit#
+md2gslides slides.md --title "Talk Title" --append <some id> --erase
+```
 
 ## Supported markdown rules
 
@@ -136,6 +156,10 @@ on its own line with a blank both before and after.
 
 ![Two column slide](https://github.com/googlesamples/md2googleslides/raw/master/examples/two_column_slide.png)
 
+### Themes
+
+`md2googleslides` does not edit or control any theme related options. Just set a base theme you want on Google Slides directly.
+Even if you will use `--append` option for deck reuse, theme will be not changed.
 
 ### Images
 
@@ -389,6 +413,12 @@ You can also pipe markdown into the tool by omitting the file name argument.
 With the exception of `/bin/md2gslides.js`, TypeScript is used throughout and compiled
 with [Babel](https://babeljs.io/). [Mocha](https://mochajs.org/) and [Chai](http://chaijs.com/)
 are used for testing.
+
+Before anything, ensure you have all dependencies:
+
+```sh
+npm install
+```
 
 To compile:
 
