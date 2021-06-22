@@ -77,7 +77,7 @@
     "request-promise-native": "^1.0.7",
     "sharp": "^0.28.0",
     "tmp": "0.2.1",
-    "tmp-promise": "^1.0.5",
+    "tmp-promise": "^3.0.2",
     "uuid": "^8.3.2"
   },
   "devDependencies": {
