@@ -83,9 +83,9 @@
   },
   "devDependencies": {
     "@babel/cli": "7.14.5",
-    "@babel/core": "7.14.5",
+    "@babel/core": "7.14.6",
     "@babel/plugin-proposal-class-properties": "7.14.5",
-    "@babel/preset-env": "7.14.5",
+    "@babel/preset-env": "7.14.7",
     "@babel/preset-typescript": "7.14.5",
     "@babel/register": "7.14.5",
     "@types/lowdb": "1.0.10",
