@@ -2648,10 +2648,10 @@
   dependencies:
     "flat-cache" "^3.0.4"
 
-"file-url@^2.0.2":
-  "integrity" "sha1-6VF4TXkJUSfTcTApqwY/QIGMoq4="
-  "resolved" "https://registry.npmjs.org/file-url/-/file-url-2.0.2.tgz"
-  "version" "2.0.2"
+"file-url@^3.0.0":
+  "integrity" "sha512-g872QGsHexznxkIAdK8UiZRe7SkE6kvylShU4Nsj8NvfvZag7S0QuQ4IgvPDkk75HxgjIVDwycFTDAgIiO4nDA=="
+  "resolved" "https://registry.npmjs.org/file-url/-/file-url-3.0.0.tgz"
+  "version" "3.0.0"
 
 "fill-range@^4.0.0":
   "integrity" "sha1-1USBHUKPmOsGpj3EAtJAPDKMOPc="
