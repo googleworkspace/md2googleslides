@@ -21,7 +21,7 @@ import {URL} from 'url';
 
 const debug = Debug('md2gslides');
 const retriableCodes = ['ENOTFOUND', 'ECONNRESET', 'ETIMEDOUT'];
-const probeOptions = {timeout: 5000};
+
 const retryOptions = {
   retries: 3,
   randomize: true,
@@ -35,9 +35,9 @@ interface ImageSize {
 async function probeUrl(url): Promise<ImageSize> {
   return await retry(async doRetry => {
     try {
-      return await probeImageSize(url, probeOptions);
+      return await probeImageSize(url);
     } catch (err) {
-      if (retriableCodes.includes(err.code)) {
+      if (retriableCodes.includes(err.code) || err.status >= 500) {
         doRetry(err);
       }
       throw err;
