@@ -145,12 +145,12 @@ function authorizeUser() {
   try {
     data = fs.readFileSync(STORED_CLIENT_ID_PATH);
   } catch (err) {
-     console.log('Error loading client secret file:', err);
-     throw err;
+    console.log('Error loading client secret file:', err);
+    throw err;
   }
   if (data === undefined) {
     console.log('Error loading client secret data');
-    throw('No client secret found.');
+    throw 'No client secret found.';
   }
   const creds = JSON.parse(data).installed;
 
