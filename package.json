@@ -63,7 +63,6 @@
     "markdown-it-lazy-headers": "^0.1.3",
     "markdown-it-video": "^0.6.3",
     "mathjax-node": "^2.1.1",
-    "md5-file": "^4.0.0",
     "mime-types": "^2.1.22",
     "mkdirp": "^0.5.1",
     "native-css": "^2.0.0",

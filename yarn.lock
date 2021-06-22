@@ -3981,11 +3981,6 @@
   "resolved" "https://registry.npmjs.org/mathjax/-/mathjax-2.7.9.tgz"
   "version" "2.7.9"
 
-"md5-file@^4.0.0":
-  "integrity" "sha512-UC0qFwyAjn4YdPpKaDNw6gNxRf7Mcx7jC1UGCY4boCzgvU2Aoc1mOGzTtrjjLKhM5ivsnhoKpQVxKPp+1j1qwg=="
-  "resolved" "https://registry.npmjs.org/md5-file/-/md5-file-4.0.0.tgz"
-  "version" "4.0.0"
-
 "mdurl@^1.0.1":
   "integrity" "sha1-/oWy7HWlkDfyrf7BAP1sYBdhFS4="
   "resolved" "https://registry.npmjs.org/mdurl/-/mdurl-1.0.1.tgz"
