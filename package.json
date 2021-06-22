@@ -71,7 +71,7 @@
     "opener": "^1.4.2",
     "parse-color": "^1.0.0",
     "parse5": "^5.1.0",
-    "probe-image-size": "^4.0.0",
+    "probe-image-size": "^7.0.0",
     "promise": "^8.0.3",
     "promise-retry": "^1.1.1",
     "request": "^2.88.0",
