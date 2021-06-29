@@ -45,7 +45,7 @@
     "extend": "^3.0.0",
     "file-url": "^3.0.0",
     "google-auth-library": "^7.1.2",
-    "googleapis": "^78.0.0",
+    "googleapis": "^79.0.0",
     "highlight.js": "^10.7.3",
     "inline-styles-parse": "^1.2.0",
     "jsonfile": "^6.0.1",

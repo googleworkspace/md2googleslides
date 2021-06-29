@@ -2880,10 +2880,10 @@ googleapis-common@^5.0.2:
     url-template "^2.0.8"
     uuid "^8.0.0"
 
-googleapis@^78.0.0:
-  version "78.0.0"
-  resolved "https://registry.npmjs.org/googleapis/-/googleapis-78.0.0.tgz"
-  integrity sha512-Qx3WyG0kP1EHMc5z5lHDZyNg/u/1T9P0yudfp9y/ZrtQTpCLQM+7hH2Ca/C3Gnnn0qwN8hsn9E5Os03L46fldA==
+googleapis@^79.0.0:
+  version "79.0.0"
+  resolved "https://registry.npmjs.org/googleapis/-/googleapis-79.0.0.tgz"
+  integrity sha512-yHY0fmcuSQyU3zYUort/gOENCkrEpVLN4ziWdXvSIRG4n1BS9A8ajwzgDKsf68FYpzYRjtMzeh11IKN45cwbOQ==
   dependencies:
     google-auth-library "^7.0.2"
     googleapis-common "^5.0.2"
