@@ -24,7 +24,7 @@ const expect = chai.expect;
 chai.use(chaiAsPromised);
 
 function buildCredentials(): OAuth2Client {
-  const oauth2Client = new OAuth2Client('test', 'test', null);
+  const oauth2Client = new OAuth2Client('test', 'test');
   oauth2Client.setCredentials({
     access_token: 'abc',
     token_type: ' Bearer',

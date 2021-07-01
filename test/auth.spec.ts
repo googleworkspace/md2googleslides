@@ -64,6 +64,7 @@ describe('UserAuthorizer', () => {
       clientId: '123',
       clientSecret: 'abc',
       filePath: '/not_a_real_dir/token.json',
+      prompt: () => Promise.resolve('code'),
     };
     new UserAuthorizer(options);
     expect(() => fs.accessSync('/not_a_real_dir')).to.not.throw(Error);
@@ -74,17 +75,15 @@ describe('UserAuthorizer', () => {
       clientId: '123',
       clientSecret: 'abc',
       filePath: '/tmp/tokens.json',
-      prompt: function () {
-        return Promise.reject(new Error('Prompt not expected'));
-      },
+      prompt: () => Promise.reject(new Error('Prompt not expected')),
     };
 
     describe('with no saved token', () => {
       it('should report error if no code provided', () => {
-        const authorizer = new UserAuthorizer(options);
-        authorizer.prompt = () => {
-          return Promise.resolve(null);
-        };
+        const authorizer = new UserAuthorizer({
+          ...options,
+          prompt: () => Promise.resolve('code'),
+        });
         const credentials = authorizer.getUserCredentials(
           'user@example.com',
           'https://www.googleapis.com/auth/slides'
@@ -94,10 +93,10 @@ describe('UserAuthorizer', () => {
 
       it('should report error if invalid code provided', () => {
         stubTokenRequestError();
-        const authorizer = new UserAuthorizer(options);
-        authorizer.prompt = () => {
-          return Promise.resolve('not a valid code');
-        };
+        const authorizer = new UserAuthorizer({
+          ...options,
+          prompt: () => Promise.resolve('not a valid code'),
+        });
         const credentials = authorizer.getUserCredentials(
           'user@example.com',
           'https://www.googleapis.com/auth/slides'
@@ -107,10 +106,10 @@ describe('UserAuthorizer', () => {
 
       it('should exchange the code if provided', () => {
         stubTokenRequest();
-        const authorizer = new UserAuthorizer(options);
-        authorizer.prompt = () => {
-          return Promise.resolve('code');
-        };
+        const authorizer = new UserAuthorizer({
+          ...options,
+          prompt: () => Promise.resolve('code'),
+        });
         const credentials = authorizer.getUserCredentials(
           'user@example.com',
           'https://www.googleapis.com/auth/slides'

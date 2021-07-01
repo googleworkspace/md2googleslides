@@ -18,6 +18,8 @@ import chaiSubset from 'chai-subset';
 import path from 'path';
 import GenericLayout from '../src/layout/generic_layout';
 import jsonfile from 'jsonfile';
+import {slides_v1} from 'googleapis';
+import {SlideDefinition} from '../src/slides';
 
 const expect = chai.expect;
 chai.use(chaiAsPromised);
@@ -30,10 +32,10 @@ describe('GenericLayout', () => {
   );
 
   describe('with title slide', () => {
-    const requests = [];
+    const requests: slides_v1.Schema$Request[] = [];
 
     before(() => {
-      const input = {
+      const input: SlideDefinition = {
         objectId: 'title-slide',
         title: {
           rawText: 'This is a title slide',
@@ -47,11 +49,8 @@ describe('GenericLayout', () => {
           listMarkers: [],
           big: false,
         },
-        backgroundImage: null,
         bodies: [],
         tables: [],
-        videos: [],
-        images: [],
         notes: {
           rawText: 'Speaker notes here.',
           textRuns: [],
@@ -92,10 +91,10 @@ describe('GenericLayout', () => {
   });
 
   describe('with title & body slide', () => {
-    const requests = [];
+    const requests: slides_v1.Schema$Request[] = [];
 
     before(() => {
-      const input = {
+      const input: SlideDefinition = {
         objectId: 'body-slide',
         title: {
           rawText: 'Title & body slide',
@@ -103,10 +102,10 @@ describe('GenericLayout', () => {
           listMarkers: [],
           big: false,
         },
-        subtitle: null,
-        backgroundImage: null,
         bodies: [
           {
+            images: [],
+            videos: [],
             text: {
               rawText: 'This is the slide body.\n',
               textRuns: [],
@@ -116,8 +115,6 @@ describe('GenericLayout', () => {
           },
         ],
         tables: [],
-        videos: [],
-        images: [],
       };
       const layout = new GenericLayout('', presentation, input);
       layout.appendContentRequests(requests);
@@ -143,16 +140,15 @@ describe('GenericLayout', () => {
   });
 
   describe('with two column slide', () => {
-    const requests = [];
+    const requests: slides_v1.Schema$Request[] = [];
 
     before(() => {
-      const input = {
+      const input: SlideDefinition = {
         objectId: 'two-column-slide',
-        title: null,
-        subtitle: null,
-        backgroundImage: null,
         bodies: [
           {
+            images: [],
+            videos: [],
             text: {
               big: false,
               rawText: 'This is the left column\n',
@@ -161,6 +157,8 @@ describe('GenericLayout', () => {
             },
           },
           {
+            images: [],
+            videos: [],
             text: {
               big: false,
               rawText: 'This is the right column\n',
@@ -170,8 +168,6 @@ describe('GenericLayout', () => {
           },
         ],
         tables: [],
-        videos: [],
-        images: [],
       };
       const layout = new GenericLayout('', presentation, input);
       layout.appendContentRequests(requests);
@@ -197,20 +193,23 @@ describe('GenericLayout', () => {
   });
 
   describe('with background images', () => {
-    const requests = [];
+    const requests: slides_v1.Schema$Request[] = [];
 
     before(() => {
-      const input = {
+      const input: SlideDefinition = {
         objectId: 'body-slide',
-        title: null,
-        subtitle: null,
         backgroundImage: {
           url: 'https://placekitten.com/1600/900',
           width: 1600,
           height: 900,
+          padding: 0,
+          offsetX: 0,
+          offsetY: 0,
         },
         bodies: [
           {
+            images: [],
+            videos: [],
             text: {
               big: false,
               rawText: '\n',
@@ -243,14 +242,11 @@ describe('GenericLayout', () => {
   });
 
   describe('with inline images', () => {
-    const requests = [];
+    const requests: slides_v1.Schema$Request[] = [];
 
     before(() => {
-      const input = {
+      const input: SlideDefinition = {
         objectId: 'body-slide',
-        title: null,
-        subtitle: null,
-        backgroundImage: null,
         tables: [],
         bodies: [
           {
@@ -260,8 +256,17 @@ describe('GenericLayout', () => {
                 url: 'https://placekitten.com/350/315',
                 width: 350,
                 height: 315,
+                padding: 0,
+                offsetX: 0,
+                offsetY: 0,
               },
             ],
+            text: {
+              rawText: '',
+              big: false,
+              listMarkers: [],
+              textRuns: [],
+            },
           },
         ],
       };
@@ -284,14 +289,11 @@ describe('GenericLayout', () => {
   });
 
   describe('with video', () => {
-    const requests = [];
+    const requests: slides_v1.Schema$Request[] = [];
 
     before(() => {
-      const input = {
+      const input: SlideDefinition = {
         objectId: 'body-slide',
-        title: null,
-        subtitle: null,
-        backgroundImage: null,
         bodies: [
           {
             videos: [
@@ -303,6 +305,12 @@ describe('GenericLayout', () => {
               },
             ],
             images: [],
+            text: {
+              rawText: '',
+              big: false,
+              listMarkers: [],
+              textRuns: [],
+            },
           },
         ],
         tables: [],
@@ -324,14 +332,11 @@ describe('GenericLayout', () => {
   });
 
   describe('with table', () => {
-    const requests = [];
+    const requests: slides_v1.Schema$Request[] = [];
 
     before(() => {
-      const input = {
+      const input: SlideDefinition = {
         objectId: 'body-slide',
-        title: null,
-        subtitle: null,
-        backgroundImage: null,
         bodies: [],
         tables: [
           {
@@ -450,8 +455,8 @@ describe('GenericLayout', () => {
           insertText: {
             text: 'Animal',
             cellLocation: {
-              rowIndex: '0',
-              columnIndex: '0',
+              rowIndex: 0,
+              columnIndex: 0,
             },
           },
         },
@@ -460,16 +465,15 @@ describe('GenericLayout', () => {
   });
 
   describe('with formatted text', () => {
-    const requests = [];
+    const requests: slides_v1.Schema$Request[] = [];
 
     before(() => {
-      const input = {
+      const input: SlideDefinition = {
         objectId: 'body-slide',
-        title: null,
-        subtitle: null,
-        backgroundImage: null,
         bodies: [
           {
+            images: [],
+            videos: [],
             text: {
               big: false,
               rawText: 'Item 1\nItem 2\n\tfoo\n\tbar\n\tbaz\nItem 3\n',

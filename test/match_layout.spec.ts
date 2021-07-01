@@ -16,97 +16,142 @@ import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
 import matchLayout from '../src/layout/match_layout';
 import {SlideDefinition} from '../src/slides';
-import {slides_v1 as SlidesV1} from 'googleapis';
 
 const expect = chai.expect;
 chai.use(chaiAsPromised);
 
 describe('matchLayout', () => {
-  const tests = [
+  const tests: [string, SlideDefinition][] = [
     [
       'TITLE',
       {
-        title: {rawText: 'title'},
-        subtitle: {rawText: 'subtitle'},
+        title: {rawText: 'title', listMarkers: [], textRuns: [], big: false},
+        subtitle: {
+          rawText: 'subtitle',
+          listMarkers: [],
+          textRuns: [],
+          big: false,
+        },
         bodies: [],
         tables: [],
-        images: [],
-        videos: [],
       },
     ],
     [
       'SECTION_HEADER',
       {
-        title: {rawText: 'title'},
-        subtitle: null,
+        title: {rawText: 'title', listMarkers: [], textRuns: [], big: false},
         bodies: [],
         tables: [],
-        images: [],
-        videos: [],
       },
     ],
     [
       'MAIN_POINT',
       {
-        title: {rawText: 'title', big: true},
-        subtitle: null,
+        title: {rawText: 'title', big: true, listMarkers: [], textRuns: []},
         bodies: [],
         tables: [],
-        images: [],
-        videos: [],
       },
     ],
     [
       'SECTION_TITLE_AND_DESCRIPTION',
       {
-        title: {rawText: 'title'},
-        subtitle: {rawText: 'subtitle'},
-        bodies: [{text: {rawText: 'body'}}],
+        title: {rawText: 'title', listMarkers: [], textRuns: [], big: false},
+        subtitle: {
+          rawText: 'subtitle',
+          listMarkers: [],
+          textRuns: [],
+          big: false,
+        },
+        bodies: [
+          {
+            text: {rawText: 'body', listMarkers: [], textRuns: [], big: false},
+            images: [],
+            videos: [],
+          },
+        ],
         tables: [],
       },
     ],
     [
       'BIG_NUMBER',
       {
-        title: {rawText: 'title', big: true},
-        subtitle: null,
-        bodies: [{text: {rawText: 'body'}}],
+        title: {rawText: 'title', big: true, listMarkers: [], textRuns: []},
+        bodies: [
+          {
+            text: {rawText: 'body', listMarkers: [], textRuns: [], big: false},
+            images: [],
+            videos: [],
+          },
+        ],
         tables: [],
       },
     ],
     [
       'TITLE_AND_TWO_COLUMNS',
       {
-        title: {rawText: 'title'},
-        subtitle: null,
-        bodies: [{text: {rawText: 'column1'}}, {text: {rawText: 'column2'}}],
+        title: {rawText: 'title', listMarkers: [], textRuns: [], big: false},
+        bodies: [
+          {
+            text: {
+              rawText: 'column1',
+              listMarkers: [],
+              textRuns: [],
+              big: false,
+            },
+            images: [],
+            videos: [],
+          },
+          {
+            text: {
+              rawText: 'column2',
+              listMarkers: [],
+              textRuns: [],
+              big: false,
+            },
+            images: [],
+            videos: [],
+          },
+        ],
         tables: [],
       },
     ],
     [
       'TITLE_AND_BODY',
       {
-        title: {rawText: 'title'},
-        subtitle: null,
-        bodies: [{text: {rawText: 'body'}}],
+        title: {rawText: 'title', listMarkers: [], textRuns: [], big: false},
+        bodies: [
+          {
+            text: {rawText: 'body', listMarkers: [], textRuns: [], big: false},
+            images: [],
+            videos: [],
+          },
+        ],
         tables: [],
-        images: [],
-        videos: [],
       },
     ],
     [
       'TITLE_AND_BODY',
       {
-        title: {rawText: 'title'},
-        subtitle: null,
+        title: {rawText: 'title', listMarkers: [], textRuns: [], big: false},
         bodies: [
           {
             images: [
               {
                 url: 'https://source.unsplash.com/78A265wPiO4/1600x900',
                 padding: 0,
+                offsetX: 0,
+                offsetY: 0,
+                height: 900,
+                width: 1600,
               },
             ],
+            videos: [],
+            text: {
+              big: false,
+              textRuns: [],
+              listMarkers: [],
+              rawText: '',
+            },
           },
         ],
         tables: [],
@@ -115,8 +160,6 @@ describe('matchLayout', () => {
     [
       'BLANK',
       {
-        title: null,
-        subtitle: null,
         bodies: [],
         tables: [],
       },
@@ -124,27 +167,35 @@ describe('matchLayout', () => {
     [
       'TITLE_AND_BODY',
       {
-        title: null,
-        subtitle: null,
         bodies: [
           {
             images: [
               {
                 url: 'https://source.unsplash.com/78A265wPiO4/1600x900',
                 padding: 0,
+                offsetX: 0,
+                offsetY: 0,
+                height: 900,
+                width: 1600,
               },
             ],
+            videos: [],
+            text: {
+              rawText: '',
+              listMarkers: [],
+              textRuns: [],
+              big: false,
+            },
           },
         ],
         tables: [],
-        videos: [],
       },
     ],
   ];
 
   for (const test of tests) {
     it(`should match ${test[0]}`, () => {
-      const layout = matchLayout(null, test[1] as SlideDefinition);
+      const layout = matchLayout({}, test[1]);
       expect(layout.name).to.eql(test[0]);
     });
   }
@@ -152,13 +203,9 @@ describe('matchLayout', () => {
 
 describe('matchCustomLayout', () => {
   it('should use a custom layout', () => {
-    const slide = {
-      title: null,
-      subtitle: null,
+    const slide: SlideDefinition = {
       bodies: [],
       tables: [],
-      images: [],
-      videos: [],
       customLayout: 'mylayout',
     };
 
@@ -172,10 +219,7 @@ describe('matchCustomLayout', () => {
         },
       ],
     };
-    const layout = matchLayout(
-      presentation as SlidesV1.Schema$Presentation,
-      slide
-    );
+    const layout = matchLayout(presentation, slide);
     expect(layout.name).to.eql('MYLAYOUT');
   });
 });

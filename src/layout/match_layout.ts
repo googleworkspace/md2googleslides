@@ -30,12 +30,12 @@ export default function matchLayout(
   slide: SlideDefinition
 ): GenericLayout {
   // if we have manually set the slide layout get the master from the presentation
-  let layoutName: string = undefined;
+  let layoutName: string | undefined = undefined;
   if (slide.customLayout !== undefined) {
-    const layout = presentation.layouts.find(
-      layout => layout.layoutProperties.displayName === slide.customLayout
+    const layout = presentation.layouts?.find(
+      layout => layout.layoutProperties?.displayName === slide.customLayout
     );
-    if (layout) {
+    if (layout?.layoutProperties?.name) {
       layoutName = layout.layoutProperties.name;
     }
   }
@@ -56,12 +56,12 @@ function defineLayout(name: string, matchFn: MatchFn): void {
   });
 }
 
-function hasText(text: TextDefinition): boolean {
-  return text && text.rawText && text.rawText.length !== 0;
+function hasText(text?: TextDefinition): boolean {
+  return text?.rawText !== undefined && text.rawText.length > 0;
 }
 
-function hasBigTitle(slide: SlideDefinition): boolean {
-  return hasText(slide.title) && slide.title.big;
+function hasBigTitle(slide?: SlideDefinition): boolean {
+  return hasText(slide?.title) && slide?.title?.big === true;
 }
 
 function hasTextContent(slide: SlideDefinition): boolean {
@@ -69,8 +69,8 @@ function hasTextContent(slide: SlideDefinition): boolean {
 }
 
 // Anything which takes up the main body space
-function hasContent(slide: SlideDefinition): boolean {
-  return slide.bodies.length !== 0 || slide.tables.length !== 0;
+function hasContent(slide?: SlideDefinition): boolean {
+  return slide?.bodies.length !== 0 || slide?.tables.length !== 0;
 }
 
 // Define rules for picking slide layouts based on the default

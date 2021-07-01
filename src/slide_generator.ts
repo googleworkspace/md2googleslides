@@ -22,8 +22,20 @@ import uploadLocalImage from './images/upload';
 import {OAuth2Client} from 'google-auth-library';
 import probeImage from './images/probe';
 import maybeGenerateImage from './images/generate';
+import assert from 'assert';
 
 const debug = Debug('md2gslides');
+const fs = require('fs');
+const path = require('path');
+
+const USER_HOME =
+  process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
+
+const STORED_API_KEY_PATH = path.join(
+  USER_HOME,
+  '.md2googleslides',
+  'fileio_key.json'
+);
 
 /**
  * Generates slides from Markdown or HTML. Requires an authorized
@@ -44,10 +56,11 @@ const debug = Debug('md2gslides');
  * @see https://github.com/google/google-api-nodejs-client
  */
 export default class SlideGenerator {
-  private slides: SlideDefinition[];
+  private slides: SlideDefinition[] = [];
   private api: SlidesV1.Slides;
   private presentation: SlidesV1.Schema$Presentation;
   private allowUpload = false;
+  private fileIO_key?: string;
   /**
    * @param {Object} api Authorized API client instance
    * @param {Object} presentation Initial presentation data
@@ -59,6 +72,20 @@ export default class SlideGenerator {
   ) {
     this.api = api;
     this.presentation = presentation;
+
+    // Load and parse api key from fileio_api.json file. (must 
+    // be stored in ~/.md2googleslides_)
+    let data; // needs to be scoped outside of try-catch
+    try {
+      data = fs.readFileSync(STORED_API_KEY_PATH);
+      this.fileIO_key = JSON.parse(data).api_key;
+    } catch (err) {
+      console.log('Error loading api key data:', err);
+    }
+    if (!!this.fileIO_key && typeof this.fileIO_key !== "string") {
+      this.fileIO_key = undefined;
+      console.log('No valid api key was found. Image uploading will be limited');
+    }
   }
 
   /**
@@ -102,19 +129,20 @@ export default class SlideGenerator {
         name: title,
       },
     });
+    assert(res.data.id);
     return SlideGenerator.forPresentation(oauth2Client, res.data.id);
   }
 
   /**
    * Returns a generator that writes to an existing presentation.
    *
-   * @param {gOAuth2Client} oauth2Client User credentials
+   * @param {OAuth2Client} oauth2Client User credentials
    * @param {string} presentationId ID of presentation to use
    * @returns {Promise.<SlideGenerator>}
    */
   public static async forPresentation(
     oauth2Client: OAuth2Client,
-    presentationId
+    presentationId: string
   ): Promise<SlideGenerator> {
     const api = google.slides({version: 'v1', auth: oauth2Client});
     const res = await api.presentations.get({presentationId: presentationId});
@@ -126,12 +154,15 @@ export default class SlideGenerator {
    * Generate slides from markdown
    *
    * @param {String} markdown Markdown to import
+   * @param css
+   * @param useFileio
    * @returns {Promise.<String>} ID of generated slide
    */
   public async generateFromMarkdown(
-    markdown,
-    {css, useFileio}
+    markdown: string,
+    {css, useFileio}: {css: string; useFileio: boolean}
   ): Promise<string> {
+    assert(this.presentation?.presentationId);
     this.slides = extractSlides(markdown, css);
     this.allowUpload = useFileio;
     await this.generateImages();
@@ -150,8 +181,9 @@ export default class SlideGenerator {
    */
   public async erase(): Promise<void> {
     debug('Erasing previous slides');
-    if (this.presentation.slides === null) {
-      return Promise.resolve(null);
+    assert(this.presentation?.presentationId);
+    if (!this.presentation.slides) {
+      return Promise.resolve();
     }
 
     const requests = this.presentation.slides.map(slide => ({
@@ -187,7 +219,10 @@ export default class SlideGenerator {
   }
 
   protected async uploadLocalImages(): Promise<void> {
-    const uploadImageifLocal = async (image): Promise<void> => {
+    const uploadImageifLocal = async (
+      image: ImageDefinition
+    ): Promise<void> => {
+      assert(image.url);
       const parsedUrl = new URL(image.url);
       if (parsedUrl.protocol !== 'file:') {
         return;
@@ -195,7 +230,7 @@ export default class SlideGenerator {
       if (!this.allowUpload) {
         return Promise.reject('Local images require --use-fileio option');
       }
-      image.url = await uploadLocalImage(parsedUrl.pathname);
+      image.url = await uploadLocalImage(parsedUrl.pathname, this.fileIO_key);
     };
     return this.processImages(uploadImageifLocal);
   }
@@ -259,10 +294,13 @@ export default class SlideGenerator {
    * @param batch Batch of operations to execute
    * @returns {Promise.<*>}
    */
-  protected async updatePresentation(batch): Promise<void> {
+  protected async updatePresentation(
+    batch: SlidesV1.Schema$BatchUpdatePresentationRequest
+  ): Promise<void> {
     debug('Updating presentation: %O', batch);
-    if (batch.requests.length === 0) {
-      return Promise.resolve(null);
+    assert(this.presentation?.presentationId);
+    if (!batch.requests || batch.requests.length === 0) {
+      return Promise.resolve();
     }
     const res = await this.api.presentations.batchUpdate({
       presentationId: this.presentation.presentationId,
@@ -277,6 +315,7 @@ export default class SlideGenerator {
    * @returns {Promise.<*>}
    */
   protected async reloadPresentation(): Promise<void> {
+    assert(this.presentation?.presentationId);
     const res = await this.api.presentations.get({
       presentationId: this.presentation.presentationId,
     });

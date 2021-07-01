@@ -14,13 +14,20 @@
 
 import markdownIt from 'markdown-it';
 import Token from 'markdown-it/lib/token';
+// @ts-ignore
 import attrs from 'markdown-it-attrs';
+// @ts-ignore
 import lazyHeaders from 'markdown-it-lazy-headers';
+// @ts-ignore
 import emoji from 'markdown-it-emoji';
+// @ts-ignore
 import expandTabs from 'markdown-it-expand-tabs';
+// @ts-ignore
 import video from 'markdown-it-video';
+// @ts-ignore
 import customFence from 'markdown-it-fence';
-function generatedImage(md): void {
+
+function generatedImage(md: unknown): void {
   return customFence(md, 'generated_image', {
     marker: '$',
     validate: () => true,

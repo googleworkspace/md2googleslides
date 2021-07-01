@@ -15,13 +15,14 @@
 import Debug from 'debug';
 import extend from 'extend';
 import Token from 'markdown-it/lib/token';
-import parse5 from 'parse5';
+import parse5, {Element} from 'parse5';
 import fileUrl from 'file-url';
 import {SlideDefinition, StyleDefinition} from '../slides';
 import parseMarkdown from './parser';
 import {Context} from './env';
 import highlightSyntax from './syntax_highlight';
 import {parseStyleSheet, parseInlineStyle, updateStyleDefinition} from './css';
+import assert from 'assert';
 
 const debug = Debug('md2gslides');
 
@@ -40,7 +41,7 @@ const fullTokenRules: MarkdownRules = {};
 
 let ruleSet: MarkdownRules;
 
-function attr(token: Token, name: string): string {
+function attr(token: Token, name: string): string | undefined {
   if (!token.attrs) {
     return undefined;
   }
@@ -51,7 +52,7 @@ function attr(token: Token, name: string): string {
   return attr[1];
 }
 
-function hasClass(token, cls): boolean {
+function hasClass(token: Token, cls: string): boolean {
   return cls === attr(token, 'class');
 }
 
@@ -108,18 +109,20 @@ inlineTokenRules['heading_open'] = (token, context) => {
 inlineTokenRules['heading_close'] = (token, context) => context.endStyle();
 
 inlineTokenRules['inline'] = (token, context) => {
+  if (!token.children) {
+    return;
+  }
   for (const child of token.children) {
     processMarkdownToken(child, context);
   }
 };
 
 inlineTokenRules['html_inline'] = (token, context) => {
-  const fragment = parse5.parseFragment(
-    context.inlineHtmlContext,
-    token.content
-  );
+  const fragment = context.inlineHtmlContext
+    ? parse5.parseFragment(context.inlineHtmlContext, token.content)
+    : parse5.parseFragment(token.content);
   if (fragment.childNodes && fragment.childNodes.length) {
-    const node = fragment.childNodes[0];
+    const node = fragment.childNodes[0] as Element;
     const style: StyleDefinition = {};
 
     switch (node.nodeName) {
@@ -151,12 +154,14 @@ inlineTokenRules['html_inline'] = (token, context) => {
         throw new Error('Unsupported inline HTML element: ' + node.nodeName);
     }
 
-    const styleAttr = node.attrs.find(attr => attr.name === 'style');
+    const styleAttr = node.attrs.find(
+      (attr: {name: string}) => attr.name === 'style'
+    );
     if (styleAttr) {
       const css = parseInlineStyle(styleAttr.value);
       updateStyleDefinition(css, style);
     }
-    context.inlineHtmlContext = fragment.childNodes[0];
+    context.inlineHtmlContext = node;
     context.startStyle(style);
   } else {
     context.endStyle();
@@ -171,6 +176,7 @@ inlineTokenRules['text'] = (token, context) => {
 };
 
 inlineTokenRules['paragraph_open'] = (token, context) => {
+  assert(context.currentSlide);
   if (hasClass(token, 'column')) {
     context.markerParagraph = true;
     const body = {
@@ -243,7 +249,7 @@ inlineTokenRules['strong_close'] = (token, context) => context.endStyle();
 inlineTokenRules['link_open'] = (token, context) => {
   const style = applyTokenStyle(token, {
     link: {
-      url: attr(token, 'href'),
+      url: attr(token, 'href') ?? '#',
     },
   });
   context.startStyle(style);
@@ -278,6 +284,7 @@ inlineTokenRules['bullet_list_open'] = inlineTokenRules['ordered_list_open'] = (
   token,
   context
 ) => {
+  assert(context.text);
   const style = applyTokenStyle(token, {});
   context.startStyle(style);
   if (context.list) {
@@ -296,6 +303,8 @@ inlineTokenRules['bullet_list_open'] = inlineTokenRules['ordered_list_open'] = (
 
 inlineTokenRules['bullet_list_close'] = inlineTokenRules['ordered_list_close'] =
   (token, context) => {
+    assert(context.list);
+    assert(context.text);
     if (context.list.depth === 0) {
       // TODO - Support nested lists with mixed styles when API supports it.
       // Currently nested lists must match the parent style.
@@ -304,7 +313,7 @@ inlineTokenRules['bullet_list_close'] = inlineTokenRules['ordered_list_close'] =
         end: context.text.rawText.length,
         type: token.tag === 'ul' ? 'unordered' : 'ordered',
       });
-      context.list = null;
+      context.list = undefined;
     } else {
       context.list.depth -= 1;
     }
@@ -312,6 +321,7 @@ inlineTokenRules['bullet_list_close'] = inlineTokenRules['ordered_list_close'] =
   };
 
 inlineTokenRules['list_item_open'] = (token, context) => {
+  assert(context.list);
   const style = applyTokenStyle(token, {});
   context.startStyle(style);
   context.appendText(new Array(context.list.depth + 1).join('\t'));
@@ -329,10 +339,12 @@ fullTokenRules['heading_open'] = (token, context) => {
   const style = applyTokenStyle(token, {});
   context.startTextBlock();
   context.startStyle(style);
+  assert(context.text);
   context.text.big = hasClass(token, 'big');
 };
 
 fullTokenRules['heading_close'] = (token, context) => {
+  assert(context.currentSlide);
   if (token.tag === 'h1') {
     context.currentSlide.title = context.text;
   } else if (token.tag === 'h2') {
@@ -345,6 +357,7 @@ fullTokenRules['heading_close'] = (token, context) => {
 };
 
 fullTokenRules['html_block'] = (token, context) => {
+  assert(context.currentSlide);
   const re = /<!--([\s\S]*)-->/m;
   const match = re.exec(token.content);
   if (match === null) {
@@ -374,14 +387,15 @@ fullTokenRules['hr'] = (token, context) => {
 };
 
 fullTokenRules['image'] = (token, context) => {
+  assert(context.currentSlide);
   let url = attr(token, 'src');
-  if (!url.match(/(file|https?):/)) {
+  if (url && !url.match(/(file|https?):/)) {
     url = fileUrl(url);
   }
   const image = {
     url: url,
-    width: undefined,
-    height: undefined,
+    width: 0,
+    height: 0,
     padding: 0,
     offsetX: 0,
     offsetY: 0,
@@ -437,6 +451,8 @@ fullTokenRules['table_open'] = (token, context) => {
 };
 
 fullTokenRules['table_close'] = (token, context) => {
+  assert(context.currentSlide);
+  assert(context.table);
   context.currentSlide.tables.push(context.table);
   context.endStyle();
 };
@@ -454,6 +470,7 @@ fullTokenRules['tr_open'] = (token, context) => {
 };
 
 fullTokenRules['tr_close'] = (token, context) => {
+  assert(context.table);
   const row = context.row;
   context.table.cells.push(row);
   context.table.columns = Math.max(context.table.columns, row.length);
@@ -490,17 +507,19 @@ fullTokenRules['th_open'] = (token, context) => {
 };
 
 fullTokenRules['td_close'] = fullTokenRules['th_close'] = (token, context) => {
+  assert(context.text);
   context.endStyle();
   context.row.push(context.text);
   context.startTextBlock();
 };
 
 fullTokenRules['generated_image'] = (token, context) => {
+  assert(context.currentSlide);
   const image = {
     source: token.content,
     type: token.info.trim(),
-    width: undefined,
-    height: undefined,
+    width: 0,
+    height: 0,
     style: attr(token, 'style'),
     padding: 0,
     offsetX: 0,
@@ -530,7 +549,7 @@ fullTokenRules['generated_image'] = (token, context) => {
  */
 export default function extractSlides(
   markdown: string,
-  stylesheet: string = null
+  stylesheet?: string
 ): SlideDefinition[] {
   const tokens = parseMarkdown(markdown);
   const css = parseStyleSheet(stylesheet);

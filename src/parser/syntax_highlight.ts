@@ -14,7 +14,7 @@
 
 import low from 'lowlight';
 import {Context} from './env';
-import {updateStyleDefinition} from './css';
+import {CssRule, updateStyleDefinition} from './css';
 import {StyleDefinition} from '../slides';
 
 type RuleFn = (node: lowlight.HastNode, context: Context) => void;
@@ -26,37 +26,43 @@ const hastRules: Rules = {};
 
 // Type guard
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function isTextNode(node: any): node is lowlight.AST.Text {
-  return node.value !== undefined;
+function isTextNode(node: lowlight.HastNode): node is lowlight.AST.Text {
+  return node.type === 'text';
 }
 
 // Type guard
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function isElementNode(node: any): node is lowlight.AST.Element {
-  return node.properties !== undefined;
+  return node.type === 'element';
 }
 
 function processHastNode(node: lowlight.HastNode, context: Context): void {
-  if (node.type !== 'text' && node.type !== 'element') {
+  if (isTextNode(node)) {
+    // For code blocks, replace line feeds with vertical tabs to keep
+    // the block as a single paragraph. This avoid the extra vertical
+    // space that appears between paragraphs
+    context.appendText(node.value.replace(/\n/g, '\u000b'));
     return;
   }
-  const ruleName = node.type === 'text' ? 'text' : node.tagName;
-  const fn = hastRules[ruleName];
-  if (!fn) {
-    return;
+  if (isElementNode(node)) {
+    const ruleName = node.tagName;
+    const fn = hastRules[ruleName];
+    if (!fn) {
+      return;
+    }
+    fn(node, context);
   }
-  fn(node, context);
 }
 
 function extractStyle(
   node: lowlight.HastNode,
-  cssRules: object
+  cssRules: {[key: string]: CssRule}
 ): StyleDefinition {
+  let style = {};
   if (!isElementNode(node)) {
-    return;
+    return style;
   }
   const classNames = node.properties['className'];
-  let style = {};
   for (const cls of classNames || []) {
     const normalizedClassName = cls.replace(/-/g, '_');
     const rule = cssRules[normalizedClassName];
@@ -67,21 +73,11 @@ function extractStyle(
   return style;
 }
 
-hastRules['text'] = (node, context) => {
-  if (!isTextNode(node)) {
-    return;
-  }
-  // For code blocks, replace line feeds with vertical tabs to keep
-  // the block as a single paragraph. This avoid the extra vertical
-  // space that appears between paragraphs
-  context.appendText(node.value.replace(/\n/g, '\u000b'));
-};
-
 hastRules['span'] = (node, context) => {
   if (!isElementNode(node)) {
     return;
   }
-  const style = extractStyle(node, context.css);
+  const style = extractStyle(node, context.css ?? {});
   context.startStyle(style);
   for (const childNode of node.children || []) {
     processHastNode(childNode as lowlight.HastNode, context);

@@ -13,9 +13,11 @@
 // limitations under the License.
 
 import Debug from 'debug';
+// @ts-ignore
 import mathJax from 'mathjax-node';
 import renderSVG from './svg';
 import {ImageDefinition} from '../slides';
+import assert from 'assert';
 
 const debug = Debug('md2gslides');
 let mathJaxInitialized = false;
@@ -58,6 +60,7 @@ function addOrMergeStyles(svg: string, style?: string): string {
 
 async function renderMathJax(image: ImageDefinition): Promise<string> {
   debug('Generating math image: %O', image);
+  assert(image.source);
   lazyInitMathJax();
   const out = await mathJax.typeset({
     math: image.source,

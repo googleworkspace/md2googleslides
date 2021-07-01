@@ -16,10 +16,11 @@ import Debug from 'debug';
 import renderSVG from './svg';
 import renderMathJax from './/mathjax';
 import {ImageDefinition} from '../slides';
+import assert from 'assert';
 
 const debug = Debug('md2gslides');
 
-const renderers = {
+const renderers: {[key: string]: (img: ImageDefinition) => Promise<String>} = {
   svg: renderSVG,
   math: renderMathJax,
 };
@@ -36,6 +37,8 @@ async function maybeGenerateImage(
     debug('Image already rasterized: %s', image.url);
     return image;
   }
+
+  assert(image.type);
 
   const imageType = image.type.trim().toLowerCase();
 

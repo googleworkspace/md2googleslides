@@ -59,7 +59,7 @@ export interface LinkDefinition {
 }
 
 export interface BodyDefinition {
-  text: TextDefinition;
+  text: TextDefinition | undefined;
   images: ImageDefinition[];
   videos: VideoDefinition[];
 }

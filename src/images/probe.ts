@@ -18,6 +18,7 @@ import {ImageDefinition} from '../slides';
 import retry from 'promise-retry';
 import fs from 'fs';
 import {URL} from 'url';
+import assert from 'assert';
 
 const debug = Debug('md2gslides');
 const retriableCodes = ['ENOTFOUND', 'ECONNRESET', 'ETIMEDOUT'];
@@ -32,7 +33,7 @@ interface ImageSize {
   height: number;
 }
 
-async function probeUrl(url): Promise<ImageSize> {
+async function probeUrl(url: string): Promise<ImageSize> {
   return await retry(async doRetry => {
     try {
       return await probeImageSize(url);
@@ -45,7 +46,7 @@ async function probeUrl(url): Promise<ImageSize> {
   }, retryOptions);
 }
 
-async function probeFile(path): Promise<ImageSize> {
+async function probeFile(path: string): Promise<ImageSize> {
   const stream = fs.createReadStream(path);
   try {
     return await probeImageSize(stream);
@@ -56,17 +57,18 @@ async function probeFile(path): Promise<ImageSize> {
 
 async function probeImage(image: ImageDefinition): Promise<ImageDefinition> {
   debug('Probing image size: %s', image.url);
-  let promise;
+  assert(image.url);
   const parsedUrl = new URL(image.url);
   if (parsedUrl.protocol === 'file:') {
-    promise = probeFile(parsedUrl.pathname);
+    const size = await probeFile(parsedUrl.pathname);
+    image.width = size.width;
+    image.height = size.height;
   } else {
-    promise = probeUrl(image.url);
+    const size = await probeUrl(image.url);
+    image.width = size.width;
+    image.height = size.height;
   }
 
-  const size = await promise;
-  image.width = size.width;
-  image.height = size.height;
   return image;
 }
 

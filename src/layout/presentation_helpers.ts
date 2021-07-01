@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import {slides_v1 as SlidesV1} from 'googleapis';
+import assert from 'assert';
 
 export interface Dimensions {
   width: number;
@@ -22,6 +23,7 @@ export interface Dimensions {
 /**
  * Locates a page by ID
  *
+ * @param presentation
  * @param {string} pageId Object ID of page to find
  * @returns {Object} Page or null if not found
  */
@@ -38,6 +40,8 @@ export function findPage(
 export function pageSize(
   presentation: SlidesV1.Schema$Presentation
 ): Dimensions {
+  assert(presentation.pageSize?.width?.magnitude);
+  assert(presentation.pageSize?.height?.magnitude);
   return {
     width: presentation.pageSize.width.magnitude,
     height: presentation.pageSize.height.magnitude,
@@ -47,6 +51,7 @@ export function pageSize(
 /**
  * Locates a layout.
  *
+ * @param presentation
  * @param {string} name
  * @returns {string} layout ID or null if not found
  */
@@ -58,17 +63,18 @@ export function findLayoutIdByName(
     return undefined;
   }
   const layout = presentation.layouts.find(
-    (l): boolean => l.layoutProperties.name === name
+    (l): boolean => l.layoutProperties?.name === name
   );
   if (!layout) {
     return undefined;
   }
-  return layout.objectId;
+  return layout.objectId ?? undefined;
 }
 
 /**
  * Find a named placeholder on the page.
  *
+ * @param presentation
  * @param {string} pageId Object ID of page to find element on
  * @param name Placeholder name.
  * @returns {Array} Array of placeholders
@@ -105,37 +111,16 @@ export function findPlaceholder(
   return undefined;
 }
 
-/**
- * Locates a element on a page by ID.
- *
- * @param {string} pageId Object ID of page to find element on
- * @returns {Object} Object or null if not found
- */
-export function findPageElement(
-  presentation: SlidesV1.Schema$Presentation,
-  pageId: string,
-  id: string
-): SlidesV1.Schema$PageElement | undefined {
-  const page = findPage(presentation, pageId);
-  if (!page) {
-    throw new Error(`Can't find page ${pageId}`);
-  }
-
-  for (const element of page.pageElements) {
-    if (element.objectId === id) {
-      return element;
-    }
-  }
-  return undefined;
-}
-
 export function findSpeakerNotesObjectId(
   presentation: SlidesV1.Schema$Presentation,
   pageId: string
 ): string | undefined {
   const page = findPage(presentation, pageId);
   if (page) {
-    return page.slideProperties.notesPage.notesProperties.speakerNotesObjectId;
+    return (
+      page.slideProperties?.notesPage?.notesProperties?.speakerNotesObjectId ??
+      undefined
+    );
   }
   return undefined;
 }
