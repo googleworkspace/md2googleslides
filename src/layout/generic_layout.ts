@@ -15,15 +15,23 @@
 import Debug from 'debug';
 import {uuid} from '../utils';
 import extend from 'extend';
+// @ts-ignore
 import Layout from 'layout';
 import * as _ from 'lodash';
 import {slides_v1 as SlidesV1} from 'googleapis';
-import {SlideDefinition, TextDefinition, VideoDefinition} from '../slides';
+import {
+  ImageDefinition,
+  SlideDefinition,
+  TableDefinition,
+  TextDefinition,
+  VideoDefinition,
+} from '../slides';
 import {
   findLayoutIdByName,
   findPlaceholder,
   findSpeakerNotesObjectId,
 } from './presentation_helpers';
+import assert from 'assert';
 
 const debug = Debug('md2gslides');
 
@@ -101,13 +109,19 @@ export default class GenericLayout {
     }
 
     if (this.slide.bodies) {
+      assert(this.slide.objectId);
       const bodyElements = findPlaceholder(
         this.presentation,
         this.slide.objectId,
         'BODY'
       );
-      this.slide.bodies.forEach((body, index) => {
-        const placeholder = bodyElements[index];
+      const bodyCount = Math.min(
+        bodyElements?.length ?? 0,
+        this.slide.bodies.length
+      );
+      for (let i = 0; i < bodyCount; ++i) {
+        const placeholder = bodyElements![i];
+        const body = this.slide.bodies[i];
         this.appendFillPlaceholderTextRequest(body.text, placeholder, requests);
         if (body.images && body.images.length) {
           this.appendCreateImageRequests(body.images, placeholder, requests);
@@ -115,10 +129,11 @@ export default class GenericLayout {
         if (body.videos && body.videos.length) {
           this.appendCreateVideoRequests(body.videos, placeholder, requests);
         }
-      });
+      }
     }
 
     if (this.slide.notes) {
+      assert(this.slide.objectId);
       const objectId = findSpeakerNotesObjectId(
         this.presentation,
         this.slide.objectId
@@ -134,16 +149,17 @@ export default class GenericLayout {
   }
 
   protected appendFillPlaceholderTextRequest(
-    value: TextDefinition,
+    value: TextDefinition | undefined,
     placeholder: string | SlidesV1.Schema$PageElement,
     requests: SlidesV1.Schema$Request[]
-  ): SlidesV1.Schema$Request[] {
+  ): void {
     if (!value) {
       debug('No text for placeholder %s');
       return;
     }
 
     if (typeof placeholder === 'string') {
+      assert(this.slide.objectId);
       const pageElements = findPlaceholder(
         this.presentation,
         this.slide.objectId,
@@ -165,7 +181,9 @@ export default class GenericLayout {
 
   protected appendInsertTextRequests(
     text: TextDefinition,
-    locationProps,
+    locationProps:
+      | Partial<SlidesV1.Schema$UpdateTextStyleRequest>
+      | Partial<SlidesV1.Schema$CreateParagraphBulletsRequest>,
     requests: SlidesV1.Schema$Request[]
   ): void {
     // Insert the raw text first
@@ -208,6 +226,7 @@ export default class GenericLayout {
           locationProps
         ),
       };
+      assert(request.updateTextStyle?.style);
       request.updateTextStyle.fields = this.computeShallowFieldMask(
         request.updateTextStyle.style
       );
@@ -243,7 +262,7 @@ export default class GenericLayout {
   }
 
   protected appendSetBackgroundImageRequest(
-    image,
+    image: ImageDefinition,
     requests: SlidesV1.Schema$Request[]
   ): void {
     debug(
@@ -268,8 +287,8 @@ export default class GenericLayout {
   }
 
   protected appendCreateImageRequests(
-    images,
-    placeholder,
+    images: ImageDefinition[],
+    placeholder: SlidesV1.Schema$PageElement | undefined,
     requests: SlidesV1.Schema$Request[]
   ): void {
     // TODO - Fix weird cast
@@ -340,7 +359,7 @@ export default class GenericLayout {
 
   protected appendCreateVideoRequests(
     videos: VideoDefinition[],
-    placeholder,
+    placeholder: SlidesV1.Schema$PageElement | undefined,
     requests: SlidesV1.Schema$Request[]
   ): void {
     if (videos.length > 1) {
@@ -405,7 +424,7 @@ export default class GenericLayout {
   }
 
   protected appendCreateTableRequests(
-    tables,
+    tables: TableDefinition[],
     requests: SlidesV1.Schema$Request[]
   ): void {
     if (tables.length > 1) {
@@ -434,8 +453,8 @@ export default class GenericLayout {
           {
             objectId: tableId,
             cellLocation: {
-              rowIndex: r,
-              columnIndex: c,
+              rowIndex: parseInt(r),
+              columnIndex: parseInt(c),
             },
           },
           requests
@@ -447,25 +466,32 @@ export default class GenericLayout {
   protected calculateBoundingBox(
     element: SlidesV1.Schema$PageElement
   ): BoundingBox {
+    assert(element);
+    assert(element.size?.height?.magnitude);
+    assert(element.size?.width?.magnitude);
     const height = element.size.height.magnitude;
     const width = element.size.width.magnitude;
-    const scaleX = element.transform.scaleX || 1;
-    const scaleY = element.transform.scaleY || 1;
-    const shearX = element.transform.shearX || 0;
-    const shearY = element.transform.shearY || 0;
+    const scaleX = element.transform?.scaleX ?? 1;
+    const scaleY = element.transform?.scaleY ?? 1;
+    const shearX = element.transform?.shearX ?? 0;
+    const shearY = element.transform?.shearY ?? 0;
 
     return {
       width: scaleX * width + shearX * height,
       height: scaleY * height + shearY * width,
-      x: element.transform.translateX,
-      y: element.transform.translateY,
+      x: element.transform?.translateX ?? 0,
+      y: element.transform?.translateY ?? 0,
     };
   }
 
-  protected getBodyBoundingBox(placeholder): BoundingBox {
+  protected getBodyBoundingBox(
+    placeholder: SlidesV1.Schema$PageElement | undefined
+  ): BoundingBox {
     if (placeholder) {
       return this.calculateBoundingBox(placeholder);
     }
+    assert(this.presentation.pageSize?.width?.magnitude);
+    assert(this.presentation.pageSize?.height?.magnitude);
     return {
       width: this.presentation.pageSize.width.magnitude,
       height: this.presentation.pageSize.height.magnitude,
@@ -474,10 +500,10 @@ export default class GenericLayout {
     };
   }
 
-  protected computeShallowFieldMask(object: object): string {
+  protected computeShallowFieldMask<T>(object: T): string {
     const fields = [];
     for (const field of Object.keys(object)) {
-      if (object[field] !== undefined) {
+      if (object[field as keyof T] !== undefined) {
         fields.push(field);
       }
     }

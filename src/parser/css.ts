@@ -14,7 +14,9 @@
 
 import parseColor from 'parse-color';
 import Debug from 'debug';
+// @ts-ignore
 import inlineStylesParse from 'inline-styles-parse';
+// @ts-ignore
 import nativeCSS from 'native-css';
 import {Color, StyleDefinition} from '../slides';
 import * as _ from 'lodash';
@@ -28,7 +30,7 @@ export interface Stylesheet {
   [key: string]: CssRule;
 }
 
-function parseColorString(hexString: string): Color {
+function parseColorString(hexString: string): Color | undefined {
   const c = parseColor(hexString);
   if (!c.rgba) {
     return;
@@ -45,11 +47,10 @@ function parseColorString(hexString: string): Color {
 }
 
 function normalizeKeys(css: CssRule): CssRule {
-  const normalized = _.mapKeys(css, (value, key) => _.camelCase(key));
-  return normalized;
+  return _.mapKeys(css, (value, key) => _.camelCase(key));
 }
 
-export function parseStyleSheet(stylesheet: string): Stylesheet {
+export function parseStyleSheet(stylesheet: string | undefined): Stylesheet {
   return nativeCSS.convert(stylesheet) as Stylesheet;
 }
 
@@ -99,7 +100,7 @@ export function updateStyleDefinition(
         const match = (value as string).match(/(\d+)(?:pt)?/);
         if (!match) {
           debug('Invalid font-size value: %s', value);
-          return;
+          break;
         }
         style.fontSize = {
           magnitude: Number.parseInt(match[1]),

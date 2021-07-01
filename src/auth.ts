@@ -63,13 +63,10 @@ export default class UserAuthorizer {
    *
    * This may block briefly to ensure the token file exists.
    *
-   * @param {String} clientId Client ID
-   * @param {String} clientSecret Client secret
-   * @param {String} filePath Path to file where tokens are saved
-   * @param {UserAuthorizer~promptCallback} prompt Function to acquire the authorization code
+   * @param options
    */
   public constructor(options: AuthOptions) {
-    this.db = this.initDbSync(options.filePath);
+    this.db = UserAuthorizer.initDbSync(options?.filePath);
     this.clientId = options.clientId;
     this.clientSecret = options.clientSecret;
     this.prompt = options.prompt;
@@ -127,7 +124,7 @@ export default class UserAuthorizer {
    * @returns {lowdb} database instance
    * @private
    */
-  private initDbSync<T>(filePath: string): lowdb.LowdbSync<T> {
+  private static initDbSync<T>(filePath?: string): lowdb.LowdbSync<T> {
     let adapter: lowdb.AdapterSync;
     if (filePath) {
       const parentDir = path.dirname(filePath);

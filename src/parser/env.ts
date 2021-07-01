@@ -25,6 +25,8 @@ import {uuid} from '../utils';
 import extend from 'extend';
 import * as _ from 'lodash';
 import {Stylesheet} from './css';
+import assert from 'assert';
+import {Element} from 'parse5';
 
 export class Context {
   public slides: SlideDefinition[] = [];
@@ -37,11 +39,11 @@ export class Context {
   public row: TextDefinition[] = [];
   public table?: TableDefinition;
   public list?: ListDefinition;
-  public inlineHtmlContext?: object;
+  public inlineHtmlContext?: Element;
   public images: ImageDefinition[] = [];
   public videos: VideoDefinition[] = [];
 
-  public constructor(css: Stylesheet) {
+  public constructor(css?: Stylesheet) {
     this.css = css;
     this.startSlide();
   }
@@ -60,6 +62,7 @@ export class Context {
   }
 
   public appendText(content: string): void {
+    assert(this.text);
     this.text.rawText += content;
   }
 
@@ -87,13 +90,8 @@ export class Context {
   public startSlide(): void {
     this.currentSlide = {
       objectId: uuid(),
-      customLayout: null,
-      title: null,
-      subtitle: null,
-      backgroundImage: null,
       bodies: [],
       tables: [],
-      notes: null,
     };
   }
 
@@ -104,12 +102,16 @@ export class Context {
   public startStyle(newStyle: StyleDefinition): void {
     const previousStyle = this.currentStyle();
     const style = extend({}, newStyle, previousStyle);
-    style.start = this.text.rawText.length;
+    style.start = this.text?.rawText.length ?? 0;
     this.styles.push(style);
   }
 
   public endStyle(): void {
     const style = this.styles.pop();
+    assert(style);
+    if (!this.text) {
+      return; // Ignore empty text style
+    }
     style.end = this.text.rawText.length;
     if (style.start === style.end) {
       return; // Ignore empty ranges

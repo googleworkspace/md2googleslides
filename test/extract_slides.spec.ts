@@ -58,7 +58,7 @@ describe('extractSlides', () => {
     });
 
     it('should have no title', () => {
-      return expect(slides).to.have.nested.property('[0].title', null);
+      return expect(slides).to.not.have.nested.property('[0].title');
     });
 
     it('should have empty bodies', () => {

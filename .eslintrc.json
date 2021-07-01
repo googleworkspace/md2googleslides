@@ -1,3 +1,6 @@
 {
-  "extends": "./node_modules/gts/"
+  "extends": "./node_modules/gts/",
+  "rules": {
+    "@typescript-eslint/ban-ts-comment": 0
+  }
 }

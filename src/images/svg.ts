@@ -14,12 +14,15 @@
 import Debug from 'debug';
 import sharp from 'sharp';
 import tmp from 'tmp-promise';
+import {ImageDefinition} from '../slides';
+import assert from 'assert';
 
 const debug = Debug('md2gslides');
 tmp.setGracefulCleanup();
 
-async function renderSVG(image): Promise<string> {
+async function renderSVG(image: ImageDefinition): Promise<string> {
   debug('Generating SVG', image);
+  assert(image.source);
   const path = await tmp.tmpName({postfix: '.png'});
   const buffer = Buffer.from(image.source);
   await sharp(buffer, {density: 2400}).png().toFile(path);
