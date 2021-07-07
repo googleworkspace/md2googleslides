@@ -97,7 +97,7 @@
     "@types/lowlight": "^0.0.2",
     "@types/markdown-it": "12.0.2",
     "@types/mkdirp": "^1.0.1",
-    "@types/mocha": "^8.2.2",
+    "@types/mocha": "8.2.3",
     "@types/mock-fs": "^4.13.0",
     "@types/node": "15.12.4",
     "@types/parse-color": "^1.0.0",
