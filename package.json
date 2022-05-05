@@ -41,6 +41,7 @@
     "argparse": "^2.0.0",
     "await-to-js": "^3.0.0",
     "babel-polyfill": "^6.26.0",
+    "cli-progress": "^3.11.0",
     "debug": "^4.1.1",
     "extend": "^3.0.0",
     "file-url": "^3.0.0",

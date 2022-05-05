@@ -27,6 +27,7 @@ import assert from 'assert';
 const debug = Debug('md2gslides');
 const fs = require('fs');
 const path = require('path');
+const cliProgress = require('cli-progress');
 
 const USER_HOME =
   process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
@@ -36,6 +37,14 @@ const STORED_API_KEY_PATH = path.join(
   '.md2googleslides',
   'fileio_key.json'
 );
+
+// wait a given number of milliseconds
+async function sleep(ms: number) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
 
 /**
  * Generates slides from Markdown or HTML. Requires an authorized
@@ -199,20 +208,38 @@ export default class SlideGenerator {
   }
 
   protected async processImages<T>(
-    fn: (img: ImageDefinition) => Promise<T>
+    fn: (img: ImageDefinition) => Promise<T>,
+    upload: boolean = false
   ): Promise<void> {
     const promises = [];
-    for (const slide of this.slides) {
+    const images: ImageDefinition[] = [];
+    
+    // collect all the background images and body images
+    this.slides.forEach(slide => {
       if (slide.backgroundImage) {
-        promises.push(fn(slide.backgroundImage));
+        images.push(slide.backgroundImage);
       }
-      for (const body of slide.bodies) {
-        for (const image of body.images) {
-          promises.push(fn(image));
-        }
+      slide.bodies.forEach(body =>
+        body.images.forEach(image => images.push(image)));
+    });
+
+    // process each image, throttling if it's an upload
+    if(upload) {
+      console.log("Uploading images for this slide deck");
+      const bar = new cliProgress.SingleBar({}, cliProgress.Presets.shades_classic);
+      bar.start(images.length-1, 0);
+      for(const [i, image] of images.entries()) {
+        bar.update(i);
+        await sleep(150);
+        promises.push(fn(image));
       }
+      bar.stop();
+    } else {
+      images.forEach(image => promises.push(fn(image)));
     }
+
     await Promise.all(promises);
+    
   }
   protected async generateImages(): Promise<void> {
     return this.processImages(maybeGenerateImage);
@@ -232,7 +259,7 @@ export default class SlideGenerator {
       }
       image.url = await uploadLocalImage(parsedUrl.pathname, this.fileIO_key);
     };
-    return this.processImages(uploadImageifLocal);
+    return this.processImages(uploadImageifLocal, true);
   }
 
   /**

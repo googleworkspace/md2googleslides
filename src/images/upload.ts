@@ -33,13 +33,16 @@ async function uploadLocalImage(filePath: string, key?: string): Promise<string>
     const params = {
       file: stream,
     };
+
+    // all requests should expire in an hour, and be auto-deleted
     const req : {url: string, formData: any, headers?: any} = {
-      url: 'https://file.io?expires=1h', formData: params
+      url: 'https://file.io?expires=1h&autoDelete=true', formData: params
     };
+
+    // add the authorization key, if one is defined
     if(key) {
       req.headers = {"Authorization" : key}
     }
-    debug('POSTing with request:', req);
     const res = await request.post(req);
     const responseData = JSON.parse(res);
     if (!responseData.success) {
