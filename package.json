@@ -65,7 +65,7 @@
     "mathjax-node": "^2.1.1",
     "mime-types": "^2.1.35",
     "mkdirp": "^1.0.4",
-    "native-css": "^2.0.0",
+    "native-css": "^1.2.5",
     "node-fetch": "^3.2.4",
     "opener": "^1.4.2",
     "parse-color": "^1.0.0",
