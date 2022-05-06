@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import Debug from 'debug';
-import {OAuth2Client, Credentials} from 'google-auth-library';
+import {google, Auth} from 'googleapis';
 import path from 'path';
 import mkdirp from 'mkdirp';
 import lowdb from 'lowdb';
@@ -53,7 +53,7 @@ export interface AuthOptions {
  */
 export default class UserAuthorizer {
   private redirectUrl = 'urn:ietf:wg:oauth:2.0:oob';
-  private db: lowdb.LowdbSync<Credentials>;
+  private db: lowdb.LowdbSync<Auth.Credentials>;
   private clientId: string;
   private clientSecret: string;
   private prompt: UserPrompt;
@@ -84,13 +84,13 @@ export default class UserAuthorizer {
   public async getUserCredentials(
     user: string,
     scopes: string
-  ): Promise<OAuth2Client> {
-    const oauth2Client = new OAuth2Client(
+  ): Promise<Auth.OAuth2Client> {
+    const oauth2Client = new google.auth.OAuth2(
       this.clientId,
       this.clientSecret,
       this.redirectUrl
     );
-    oauth2Client.on('tokens', (tokens: Credentials) => {
+    oauth2Client.on('tokens', (tokens: Auth.Credentials) => {
       if (tokens.refresh_token) {
         debug('Saving refresh token');
         this.db.set(user, tokens).write();

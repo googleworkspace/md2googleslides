@@ -17,9 +17,8 @@ import extractSlides from './parser/extract_slides';
 import {SlideDefinition, ImageDefinition} from './slides';
 import matchLayout from './layout/match_layout';
 import {URL} from 'url';
-import {google, slides_v1 as SlidesV1} from 'googleapis';
+import {google, Auth, slides_v1 as SlidesV1} from 'googleapis';
 import uploadLocalImage from './images/upload';
-import {OAuth2Client} from 'google-auth-library';
 import probeImage from './images/probe';
 import maybeGenerateImage from './images/generate';
 import assert from 'assert';
@@ -105,7 +104,7 @@ export default class SlideGenerator {
    * @returns {Promise.<SlideGenerator>}
    */
   public static async newPresentation(
-    oauth2Client: OAuth2Client,
+    oauth2Client: Auth.OAuth2Client,
     title: string
   ): Promise<SlideGenerator> {
     const api = google.slides({version: 'v1', auth: oauth2Client});
@@ -127,7 +126,7 @@ export default class SlideGenerator {
    * @returns {Promise.<SlideGenerator>}
    */
   public static async copyPresentation(
-    oauth2Client: OAuth2Client,
+    oauth2Client: Auth.OAuth2Client,
     title: string,
     presentationId: string
   ): Promise<SlideGenerator> {
@@ -150,7 +149,7 @@ export default class SlideGenerator {
    * @returns {Promise.<SlideGenerator>}
    */
   public static async forPresentation(
-    oauth2Client: OAuth2Client,
+    oauth2Client: Auth.OAuth2Client,
     presentationId: string
   ): Promise<SlideGenerator> {
     const api = google.slides({version: 'v1', auth: oauth2Client});

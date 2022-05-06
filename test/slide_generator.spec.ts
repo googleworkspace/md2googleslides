@@ -17,14 +17,14 @@ import jsonfile from 'jsonfile';
 import nock from 'nock';
 import chai from 'chai';
 import chaiAsPromised from 'chai-as-promised';
-import {OAuth2Client} from 'google-auth-library';
+import {google, Auth} from 'googleapis';
 import SlideGenerator from '../src/slide_generator';
 
 const expect = chai.expect;
 chai.use(chaiAsPromised);
 
-function buildCredentials(): OAuth2Client {
-  const oauth2Client = new OAuth2Client('test', 'test');
+function buildCredentials(): Auth.OAuth2Client {
+  const oauth2Client = new Auth.OAuth2Client('test', 'test');
   oauth2Client.setCredentials({
     access_token: 'abc',
     token_type: ' Bearer',
