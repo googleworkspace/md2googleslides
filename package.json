@@ -38,10 +38,10 @@
   "author": "Steven Bazyl",
   "license": "Apache-2.0",
   "dependencies": {
-    "argparse": "^2.0.0",
+    "argparse": "^2.0.1",
     "await-to-js": "^3.0.0",
-    "babel-polyfill": "^6.26.0",
     "cli-progress": "^3.11.0",
+    "core-js": "^3.22.4",
     "debug": "^4.3.4",
     "extend": "^3.0.0",
     "file-url": "^3.0.0",

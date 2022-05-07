@@ -16,8 +16,6 @@
 
 /* eslint-disable no-console, @typescript-eslint/no-var-requires */
 
-require('babel-polyfill');
-
 const Promise = require('promise');
 const fs = require('fs');
 const path = require('path');
@@ -46,62 +44,65 @@ const STORED_CLIENT_ID_PATH = path.join(
 );
 
 const parser = new ArgumentParser({
-  version: '1.0.0',
-  addHelp: true,
+  add_help: true,
   description: 'Markdown to Slides converter',
 });
 
-parser.addArgument('file', {
+parser.add_argument('-v', '--version', {
+  action: 'version',
+  version: '1.0.1',
+});
+parser.add_argument('file', {
   help: 'Path to markdown file to convert, If omitted, reads from stdin',
   nargs: '?',
 });
-parser.addArgument(['-u', '--user'], {
+parser.add_argument('-u', '--user', {
   help: 'Email address of user',
   required: false,
   dest: 'user',
-  defaultValue: 'default',
+  default: 'default',
 });
-parser.addArgument(['-a', '--append'], {
+parser.add_argument('-a', '--append', {
   dest: 'id',
   help: 'Appends slides to an existing presentation',
   required: false,
 });
-parser.addArgument(['-e', '--erase'], {
+parser.add_argument('-e', '--erase', {
   dest: 'erase',
-  action: 'storeTrue',
+  action: 'store_true',
   help: 'Erase existing slides prior to appending.',
   required: false,
 });
-parser.addArgument(['-n', '--no-browser'], {
-  action: 'storeTrue',
+parser.add_argument('-n', '--no-browser', {
+  action: 'store_true',
   dest: 'headless',
   help: 'Headless mode - do not launch browsers, just shows URLs',
   required: false,
 });
-parser.addArgument(['-s', '--style'], {
+parser.add_argument('-s', '--style', {
   help: 'Name of highlight.js theme for code formatting',
   dest: 'style',
   required: false,
-  defaultValue: 'default',
+  default: 'default',
 });
-parser.addArgument(['-t', '--title'], {
+parser.add_argument('-t', '--title', {
   help: 'Title of the presentation',
   dest: 'title',
   required: false,
 });
-parser.addArgument(['-c', '--copy'], {
+parser.add_argument('-c', '--copy', {
   help: 'Id of the presentation to copy and use as a base',
   dest: 'copy',
   required: false,
 });
-parser.addArgument(['--use-fileio'], {
+parser.add_argument('--use-fileio', {
   help: 'Acknolwedge local and generated images are uploaded to https://file.io',
-  action: 'storeTrue',
+  action: 'store_true',
   dest: 'useFileio',
   required: false,
 });
 
-const args = parser.parseArgs();
+const args = parser.parse_args();
 
 function handleError(err) {
   console.log('Unable to generate slides:', err);
