@@ -16,7 +16,6 @@
 
 /* eslint-disable no-console, @typescript-eslint/no-var-requires */
 
-const Promise = require('promise');
 const fs = require('fs');
 const path = require('path');
 const ArgumentParser = require('argparse').ArgumentParser;
