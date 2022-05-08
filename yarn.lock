@@ -2765,31 +2765,12 @@
     "is-stream" "^2.0.0"
     "node-fetch" "^2.3.0"
 
-"gaxios@^5.0.0":
-  "integrity" "sha512-VD/yc5ln6XU8Ch1hyYY6kRMBE0Yc2np3fPyeJeYHhrPs1i8rgnsApPMWyrugkl7LLoSqpOJVBWlQIa87OAvt8Q=="
-  "resolved" "https://registry.npmjs.org/gaxios/-/gaxios-5.0.0.tgz"
-  "version" "5.0.0"
-  dependencies:
-    "abort-controller" "^3.0.0"
-    "extend" "^3.0.2"
-    "https-proxy-agent" "^5.0.0"
-    "is-stream" "^2.0.0"
-    "node-fetch" "^2.6.7"
-
 "gcp-metadata@^4.2.0":
   "integrity" "sha512-x850LS5N7V1F3UcV7PoupzGsyD6iVwTVvsh3tbXfkctZnBnjW5yu5z1/3k3SehF7TyoTIe78rJs02GMMy+LF+A=="
   "resolved" "https://registry.npmjs.org/gcp-metadata/-/gcp-metadata-4.3.1.tgz"
   "version" "4.3.1"
   dependencies:
     "gaxios" "^4.0.0"
-    "json-bigint" "^1.0.0"
-
-"gcp-metadata@^5.0.0":
-  "integrity" "sha512-gfwuX3yA3nNsHSWUL4KG90UulNiq922Ukj3wLTrcnX33BB7PwB1o0ubR8KVvXu9nJH+P5w1j2SQSNNqto+H0DA=="
-  "resolved" "https://registry.npmjs.org/gcp-metadata/-/gcp-metadata-5.0.0.tgz"
-  "version" "5.0.0"
-  dependencies:
-    "gaxios" "^5.0.0"
     "json-bigint" "^1.0.0"
 
 "gensync@^1.0.0-beta.2":
@@ -2919,21 +2900,6 @@
     "jws" "^4.0.0"
     "lru-cache" "^6.0.0"
 
-"google-auth-library@^8.0.2":
-  "integrity" "sha512-HoG+nWFAThLovKpvcbYzxgn+nBJPTfAwtq0GxPN821nOO+21+8oP7MoEHfd1sbDulUFFGfcjJr2CnJ4YssHcyg=="
-  "resolved" "https://registry.npmjs.org/google-auth-library/-/google-auth-library-8.0.2.tgz"
-  "version" "8.0.2"
-  dependencies:
-    "arrify" "^2.0.0"
-    "base64-js" "^1.3.0"
-    "ecdsa-sig-formatter" "^1.0.11"
-    "fast-text-encoding" "^1.0.0"
-    "gaxios" "^5.0.0"
-    "gcp-metadata" "^5.0.0"
-    "gtoken" "^5.3.2"
-    "jws" "^4.0.0"
-    "lru-cache" "^6.0.0"
-
 "google-p12-pem@^3.1.3":
   "integrity" "sha512-HHuHmkLgwjdmVRngf5+gSmpkyaRI6QmOg77J8tkNBHhNEI62sGHyw4/+UkgyZEI7h84NbWprXDJ+sa3xOYFvTg=="
   "resolved" "https://registry.npmjs.org/google-p12-pem/-/google-p12-pem-3.1.4.tgz"
@@ -2983,7 +2949,7 @@
   "resolved" "https://registry.npmjs.org/graceful-fs/-/graceful-fs-4.2.6.tgz"
   "version" "4.2.6"
 
-"gtoken@^5.0.4", "gtoken@^5.3.2":
+"gtoken@^5.0.4":
   "integrity" "sha512-gkvEKREW7dXWF8NV8pVrKfW7WqReAmjjkMBh6lNCCGOM4ucS0r0YyXXl0r/9Yj8wcW/32ISkfc8h5mPTDbtifQ=="
   "resolved" "https://registry.npmjs.org/gtoken/-/gtoken-5.3.2.tgz"
   "version" "5.3.2"
@@ -4025,13 +3991,6 @@
   "version" "1.0.0"
 
 "node-fetch@^2.3.0":
-  "integrity" "sha512-ZjMPFEfVx5j+y2yF35Kzx5sF7kDzxuDj6ziH4FFbOp87zKDZNx8yExJIb05OGF4Nlt9IHFIMBkRl41VdvcNdbQ=="
-  "resolved" "https://registry.npmjs.org/node-fetch/-/node-fetch-2.6.7.tgz"
-  "version" "2.6.7"
-  dependencies:
-    "whatwg-url" "^5.0.0"
-
-"node-fetch@^2.6.7":
   "integrity" "sha512-ZjMPFEfVx5j+y2yF35Kzx5sF7kDzxuDj6ziH4FFbOp87zKDZNx8yExJIb05OGF4Nlt9IHFIMBkRl41VdvcNdbQ=="
   "resolved" "https://registry.npmjs.org/node-fetch/-/node-fetch-2.6.7.tgz"
   "version" "2.6.7"

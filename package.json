@@ -45,7 +45,6 @@
     "debug": "^4.3.4",
     "extend": "^3.0.0",
     "file-url": "^3.0.0",
-    "google-auth-library": "^8.0.2",
     "googleapis": "^100.0.0",
     "highlight.js": "^11.5.1",
     "inline-styles-parse": "^1.2.0",
