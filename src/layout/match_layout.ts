@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import GenericLayout from './generic_layout';
+import GenericLayout from './generic_layout.js';
 import {slides_v1 as SlidesV1} from 'googleapis';
-import {SlideDefinition, TextDefinition} from '../slides';
+import {SlideDefinition, TextDefinition} from '../slides.js';
 
 type MatchFn = (slide: SlideDefinition) => boolean;
 

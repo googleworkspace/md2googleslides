@@ -13,11 +13,10 @@
 // limitations under the License.
 
 import Debug from 'debug';
-import {uuid} from '../utils';
+import {uuid} from '../utils.js';
 import extend from 'extend';
 // @ts-ignore
 import Layout from 'layout';
-import * as _ from 'lodash';
 import {slides_v1 as SlidesV1} from 'googleapis';
 import {
   ImageDefinition,
@@ -25,12 +24,12 @@ import {
   TableDefinition,
   TextDefinition,
   VideoDefinition,
-} from '../slides';
+} from '../slides.js';
 import {
   findLayoutIdByName,
   findPlaceholder,
   findSpeakerNotesObjectId,
-} from './presentation_helpers';
+} from './presentation_helpers.js';
 import assert from 'assert';
 
 const debug = Debug('md2gslides');
@@ -240,7 +239,7 @@ export default class GenericLayout {
     // In this case, we're assuming that lists are supplied in order of
     // appearance and they're non-overlapping.
     // Processing in the reverse order avoids having to readjust indices.
-    for (const listMarker of _.reverse(text.listMarkers)) {
+    for (const listMarker of text.listMarkers.reverse()) {
       const request = {
         createParagraphBullets: extend(
           {

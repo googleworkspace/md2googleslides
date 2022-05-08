@@ -20,11 +20,12 @@ import {
   ListDefinition,
   ImageDefinition,
   VideoDefinition,
-} from '../slides';
-import {uuid} from '../utils';
+} from '../slides.js';
+import {uuid} from '../utils.js';
 import extend from 'extend';
-import * as _ from 'lodash';
-import {Stylesheet} from './css';
+import pkg from 'lodash';
+const {matches, find} = pkg;
+import {Stylesheet} from './css.js';
 import assert from 'assert';
 import {Element} from 'parse5';
 
@@ -116,10 +117,13 @@ export class Context {
     if (style.start === style.end) {
       return; // Ignore empty ranges
     }
-    if (_.isEmpty(_.keys(_.omit(style, 'start', 'end')))) {
-      return; // Ignore ranges with no style
+    if(Object.keys(style).filter(k=>['start', 'end'].includes(k)).length == 0) {
+      return;
     }
-    if (_.find(this.text.textRuns, _.matches(style))) {
+//    if (_.isEmpty(_.keys(_.omitBy(style, (v,k) => ['start', 'end'].includes(k))))) {
+//      return; // Ignore ranges with no style
+//    }
+    if (find(this.text.textRuns, matches(style))) {
       return; // Ignore duplicate ranges
     }
     this.text.textRuns.push(style);

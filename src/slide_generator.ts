@@ -13,23 +13,23 @@
 // limitations under the License.
 
 import Debug from 'debug';
-import extractSlides from './parser/extract_slides';
-import {SlideDefinition, ImageDefinition} from './slides';
-import matchLayout from './layout/match_layout';
+import extractSlides from './parser/extract_slides.js';
+import {SlideDefinition, ImageDefinition} from './slides.js';
+import matchLayout from './layout/match_layout.js';
 import {URL} from 'url';
 import {google, Auth, slides_v1 as SlidesV1} from 'googleapis';
-import uploadLocalImage from './images/upload';
-import probeImage from './images/probe';
-import maybeGenerateImage from './images/generate';
+import uploadLocalImage from './images/upload.js';
+import probeImage from './images/probe.js';
+import maybeGenerateImage from './images/generate.js';
 import assert from 'assert';
 
 const debug = Debug('md2gslides');
-const fs = require('fs');
-const path = require('path');
-const cliProgress = require('cli-progress');
+import fs from 'fs';
+import path from 'path';
+import cliProgress from 'cli-progress';
 
 const USER_HOME =
-  process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE;
+  process.env.HOME || process.env.HOMEPATH || process.env.USERPROFILE || "";
 
 const STORED_API_KEY_PATH = path.join(
   USER_HOME,
@@ -85,7 +85,7 @@ export default class SlideGenerator {
     // be stored in ~/.md2googleslides_)
     let data; // needs to be scoped outside of try-catch
     try {
-      data = fs.readFileSync(STORED_API_KEY_PATH);
+      data = fs.readFileSync(STORED_API_KEY_PATH, 'utf8');
       this.fileIO_key = JSON.parse(data).api_key;
     } catch (err) {
       console.log('Error loading api key data:', err);

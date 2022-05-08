@@ -17,11 +17,11 @@ import extend from 'extend';
 import Token from 'markdown-it/lib/token';
 import parse5, {Element} from 'parse5';
 import fileUrl from 'file-url';
-import {SlideDefinition, StyleDefinition} from '../slides';
-import parseMarkdown from './parser';
-import {Context} from './env';
-import highlightSyntax from './syntax_highlight';
-import {parseStyleSheet, parseInlineStyle, updateStyleDefinition} from './css';
+import {SlideDefinition, StyleDefinition} from '../slides.js';
+import parseMarkdown from './parser.js';
+import {Context} from './env.js';
+import highlightSyntax from './syntax_highlight.js';
+import {parseStyleSheet, parseInlineStyle, updateStyleDefinition} from './css.js';
 import assert from 'assert';
 
 const debug = Debug('md2gslides');

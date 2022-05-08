@@ -1,6 +1,13 @@
 {
   "extends": "./node_modules/gts/",
   "rules": {
-    "@typescript-eslint/ban-ts-comment": 0
+    "@typescript-eslint/ban-ts-comment": 0,
+    "node/no-unsupported-features/es-syntax": [
+      "error", {"ignores": ["dynamicImport", "modules"]}
+    ],
+  },
+  "parserOptions": {
+    "ecmaVersion": 2020,
+    "sourceType":  "module",
   }
 }

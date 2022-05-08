@@ -4,12 +4,12 @@
     [
       "@babel/preset-env",
       {
-        "targets": {
-          "node": "8"
-        }
+        "targets": { "node": "8" },
+        "modules": false,
       }
     ]
   ],
+  "ignore": ["node_modules"],
   "plugins": [
     "@babel/proposal-class-properties",
     "@babel/proposal-object-rest-spread"

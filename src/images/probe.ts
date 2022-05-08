@@ -14,7 +14,7 @@
 
 import Debug from 'debug';
 import probeImageSize from 'probe-image-size';
-import {ImageDefinition} from '../slides';
+import {ImageDefinition} from '../slides.js';
 import retry from 'promise-retry';
 import fs from 'fs';
 import {URL} from 'url';

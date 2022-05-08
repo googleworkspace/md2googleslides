@@ -13,9 +13,9 @@
 // limitations under the License.
 
 import Debug from 'debug';
-import renderSVG from './svg';
-import renderMathJax from './/mathjax';
-import {ImageDefinition} from '../slides';
+import renderSVG from './svg.js';
+import renderMathJax from './mathjax.js';
+import {ImageDefinition} from '../slides.js';
 import assert from 'assert';
 
 const debug = Debug('md2gslides');

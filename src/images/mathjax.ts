@@ -15,8 +15,8 @@
 import Debug from 'debug';
 // @ts-ignore
 import mathJax from 'mathjax-node';
-import renderSVG from './svg';
-import {ImageDefinition} from '../slides';
+import renderSVG from './svg.js';
+import {ImageDefinition} from '../slides.js';
 import assert from 'assert';
 
 const debug = Debug('md2gslides');

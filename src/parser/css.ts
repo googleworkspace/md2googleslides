@@ -19,7 +19,8 @@ import inlineStylesParse from 'inline-styles-parse';
 // @ts-ignore
 import nativeCSS from 'native-css';
 import {Color, StyleDefinition} from '../slides';
-import * as _ from 'lodash';
+import pkg from 'lodash';
+const {mapKeys, camelCase} = pkg;
 
 const debug = Debug('md2gslides');
 
@@ -47,7 +48,7 @@ function parseColorString(hexString: string): Color | undefined {
 }
 
 function normalizeKeys(css: CssRule): CssRule {
-  return _.mapKeys(css, (value, key) => _.camelCase(key));
+  return mapKeys(css, (value, key) => camelCase(key));
 }
 
 export function parseStyleSheet(stylesheet: string | undefined): Stylesheet {

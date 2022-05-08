@@ -16,14 +16,15 @@
 
 /* eslint-disable no-console, @typescript-eslint/no-var-requires */
 
-const fs = require('fs');
-const path = require('path');
-const ArgumentParser = require('argparse').ArgumentParser;
-const UserAuthorizer = require('../lib/auth').default;
-const SlideGenerator = require('../lib/slide_generator').default;
-const opener = require('opener');
-const readline = require('readline');
-
+import fs   from 'fs';
+import path from 'path';
+import { ArgumentParser } from 'argparse';
+import UserAuthorizer from '../lib/auth.js';
+import SlideGenerator from '../lib/slide_generator.js';
+import opener  from 'opener';
+import readline from 'readline';
+import { createRequire } from 'module';
+const require = createRequire(import.meta.url);
 const SCOPES = [
   'https://www.googleapis.com/auth/presentations',
   'https://www.googleapis.com/auth/drive',

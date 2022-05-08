@@ -13,9 +13,9 @@
 // limitations under the License.
 
 import low from 'lowlight';
-import {Context} from './env';
-import {CssRule, updateStyleDefinition} from './css';
-import {StyleDefinition} from '../slides';
+import {Context} from './env.js';
+import {CssRule, updateStyleDefinition} from './css.js';
+import {StyleDefinition} from '../slides.js';
 
 type RuleFn = (node: lowlight.HastNode, context: Context) => void;
 interface Rules {
