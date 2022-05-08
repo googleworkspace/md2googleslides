@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import low from 'lowlight';
+import {lowlight as low} from 'lowlight/lib/all.js'
 import {Context} from './env.js';
 import {CssRule, updateStyleDefinition} from './css.js';
 import {StyleDefinition} from '../slides.js';
@@ -91,7 +91,7 @@ function highlightSyntax(
   context: Context
 ): void {
   const highlightResult = low.highlight(language, content);
-  for (const node of highlightResult.value) {
+  for (const node of highlightResult.children) {
     processHastNode(node, context);
   }
 }
