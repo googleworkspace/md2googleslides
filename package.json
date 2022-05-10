@@ -46,7 +46,6 @@
     "argparse": "^2.0.1",
     "await-to-js": "^3.0.0",
     "cli-progress": "^3.11.0",
-    "compile": "^0.0.2",
     "core-js": "^3.22.4",
     "debug": "^4.3.4",
     "extend": "^3.0.0",

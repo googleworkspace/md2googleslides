@@ -2242,11 +2242,6 @@
   "resolved" "https://registry.npmjs.org/commondir/-/commondir-1.0.1.tgz"
   "version" "1.0.1"
 
-"compile@^0.0.2":
-  "integrity" "sha1-CSYk3yKFI0/NOegCaTRK/U22+VI="
-  "resolved" "https://registry.npmjs.org/compile/-/compile-0.0.2.tgz"
-  "version" "0.0.2"
-
 "concat-map@0.0.1":
   "integrity" "sha1-2Klr13/Wjfd5OnMDajug1UBdR3s="
   "resolved" "https://registry.npmjs.org/concat-map/-/concat-map-0.0.1.tgz"
