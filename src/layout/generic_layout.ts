@@ -123,7 +123,13 @@ export default class GenericLayout {
         const body = this.slide.bodies[i];
         this.appendFillPlaceholderTextRequest(body.text, placeholder, requests);
         if (body.images && body.images.length) {
-          this.appendCreateImageRequests(body.images, placeholder, requests);
+          const pictureElements = findPlaceholder(
+            this.presentation,
+            this.slide.objectId,
+            'PICTURE'
+          ) || [];
+          // send all the images, and just the first placeholder
+          this.appendCreateImageRequests(body.images, pictureElements, requests);
         }
         if (body.videos && body.videos.length) {
           this.appendCreateVideoRequests(body.videos, placeholder, requests);
@@ -286,75 +292,84 @@ export default class GenericLayout {
   }
 
   protected appendCreateImageRequests(
-    images: ImageDefinition[],
-    placeholder: SlidesV1.Schema$PageElement | undefined,
-    requests: SlidesV1.Schema$Request[]
-  ): void {
-    // TODO - Fix weird cast
-    const layer = (Layout as (s: string) => Layout.PackingSmith)('left-right'); // TODO - Configurable?
-    for (const image of images) {
-      debug('Slide #%d: adding inline image %s', this.slide.index, image.url);
-      layer.addItem({
-        width: image.width + image.padding * 2,
-        height: image.height + image.padding * 2,
-        meta: image,
-      });
-    }
+      images: ImageDefinition[],
+      placeholders: SlidesV1.Schema$PageElement[],
+      requests: SlidesV1.Schema$Request[]
+    ): void {
+      const that = this;
 
-    const box = this.getBodyBoundingBox(placeholder);
-    const computedLayout = layer.export();
+      function transformAndReplacePlaceholder(
+        image: ImageDefinition, 
+        placeholder: SlidesV1.Schema$PageElement
+      ): void {
+        // TODO - Fix weird cast
+        const layer = (Layout as (s: string) => Layout.PackingSmith)('left-right'); // TODO - Configurable?
+        debug('Slide #%d: adding inline image %s', that.slide.index, image.url);
+        layer.addItem({
+          width: image.width + image.padding * 2,
+          height: image.height + image.padding * 2,
+          meta: image,
+        });
+        const box = that.getBodyBoundingBox(placeholder);
+        const computedLayout = layer.export();
 
-    const scaleRatio = Math.min(
-      box.width / computedLayout.width,
-      box.height / computedLayout.height
-    );
+        const scaleRatio = Math.min(
+          box.width / computedLayout.width,
+          box.height / computedLayout.height
+        );
 
-    const scaledWidth = computedLayout.width * scaleRatio;
-    const scaledHeight = computedLayout.height * scaleRatio;
+        const scaledWidth = computedLayout.width * scaleRatio;
+        const scaledHeight = computedLayout.height * scaleRatio;
 
-    const baseTranslateX = box.x + (box.width - scaledWidth) / 2;
-    const baseTranslateY = box.y + (box.height - scaledHeight) / 2;
+        const baseTranslateX = box.x + (box.width - scaledWidth) / 2;
+        const baseTranslateY = box.y + (box.height - scaledHeight) / 2;
 
-    for (const item of computedLayout.items) {
-      const itemOffsetX = item.meta.offsetX ? item.meta.offsetX : 0;
-      const itemOffsetY = item.meta.offsetY ? item.meta.offsetY : 0;
-      const itemPadding = item.meta.padding ? item.meta.padding : 0;
-      const width = item.meta.width * scaleRatio;
-      const height = item.meta.height * scaleRatio;
-      const translateX =
-        baseTranslateX + (item.x + itemPadding + itemOffsetX) * scaleRatio;
-      const translateY =
-        baseTranslateY + (item.y + itemPadding + itemOffsetY) * scaleRatio;
+        if(computedLayout.items.length > 1) {
+          console.error('IMPOSSIBLE - multiple images in transformAndReplacePlaceholder');
+        }
+        const item = computedLayout.items[0];
+        const itemOffsetX = item.meta.offsetX ? item.meta.offsetX : 0;
+        const itemOffsetY = item.meta.offsetY ? item.meta.offsetY : 0;
+        const itemPadding = item.meta.padding ? item.meta.padding : 0;
+        const width  = item.meta.width  * scaleRatio;
+        const height = item.meta.height * scaleRatio;
+        const translateX =
+          baseTranslateX + (item.x + itemPadding + itemOffsetX) * scaleRatio;
+        const translateY =
+          baseTranslateY + (item.y + itemPadding + itemOffsetY) * scaleRatio;
 
-      requests.push({
-        createImage: {
-          elementProperties: {
-            pageObjectId: this.slide.objectId,
-            size: {
-              height: {
-                magnitude: height,
-                unit: 'EMU',
+        // add the image at about the same size/position as the placeholder
+        requests.push({
+          createImage: {
+            elementProperties: {
+              pageObjectId: that.slide.objectId,
+              size: {
+                height: { magnitude: height, unit: 'EMU'},
+                width:  { magnitude: width,  unit: 'EMU'},
               },
-              width: {
-                magnitude: width,
+              transform: {
+                scaleX: 1, scaleY: 1,
+                translateX: translateX, translateY: translateY,
+                shearX: 0, shearY: 0,
                 unit: 'EMU',
               },
             },
-            transform: {
-              scaleX: 1,
-              scaleY: 1,
-              translateX: translateX,
-              translateY: translateY,
-              shearX: 0,
-              shearY: 0,
-              unit: 'EMU',
-            },
+            url: item.meta.url,
           },
-          url: item.meta.url,
-        },
+        });
+
+        // if a placeholder was found, delete it
+        if (placeholder) {
+          requests.push({'deleteObject': {'objectId': placeholder!['objectId']}});
+        }
+      }
+
+      images.forEach((image, i) => {
+        debug('Slide #%d: adding inline image %s', this.slide.index, image.url);
+        const placeholder = placeholders[i] || undefined;
+        transformAndReplacePlaceholder(image, placeholder)
       });
     }
-  }
 
   protected appendCreateVideoRequests(
     videos: VideoDefinition[],
