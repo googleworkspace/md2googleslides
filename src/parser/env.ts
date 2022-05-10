@@ -21,7 +21,7 @@ import {
   ImageDefinition,
   VideoDefinition,
 } from '../slides.js';
-import {uuid} from '../utils.js';
+import {v1 as uuid} from 'uuid';
 import extend from 'extend';
 import pkg from 'lodash';
 const {matches, find} = pkg;

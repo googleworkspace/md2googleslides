@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import Debug from 'debug';
-import {uuid} from '../utils.js';
+import {v1 as uuid} from 'uuid';
 import extend from 'extend';
 // @ts-ignore
 import Layout from 'layout';
@@ -357,11 +357,6 @@ export default class GenericLayout {
             url: item.meta.url,
           },
         });
-
-        // if a placeholder was found, delete it
-        if (placeholder) {
-          requests.push({'deleteObject': {'objectId': placeholder!['objectId']}});
-        }
       }
 
       images.forEach((image, i) => {
@@ -369,6 +364,9 @@ export default class GenericLayout {
         const placeholder = placeholders[i] || undefined;
         transformAndReplacePlaceholder(image, placeholder)
       });
+
+      // remove all placeholders from the slide
+      placeholders.forEach(p => requests.push({'deleteObject': {'objectId': p!['objectId']}}));
     }
 
   protected appendCreateVideoRequests(

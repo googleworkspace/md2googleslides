@@ -94,6 +94,8 @@ export function findPlaceholder(
     return undefined;
   }
 
+  console.log(page.pageElements);
+
   // Check for textboxes (name == element.shape.placeholder.type)
   // But also check for image placeholders (name == 'PICTURE')
   for (const element of page.pageElements) {
@@ -104,7 +106,9 @@ export function findPlaceholder(
     ) {
       placeholders.push(element);
     }
-    if (element.image && name == 'PICTURE') {
+    if (element.image && 
+      element.image.placeholder && 
+      name == 'PICTURE') {
       placeholders.push(element);
     }
   }
