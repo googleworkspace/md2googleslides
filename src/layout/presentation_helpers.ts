@@ -94,12 +94,17 @@ export function findPlaceholder(
     return undefined;
   }
 
+  // Check for textboxes (name == element.shape.placeholder.type)
+  // But also check for image placeholders (name == 'PICTURE')
   for (const element of page.pageElements) {
     if (
       element.shape &&
       element.shape.placeholder &&
       name === element.shape.placeholder.type
     ) {
+      placeholders.push(element);
+    }
+    if (element.image && name == 'PICTURE') {
       placeholders.push(element);
     }
   }
