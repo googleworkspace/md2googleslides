@@ -46,6 +46,7 @@ export default function matchLayout(
     }
     layoutName = layout.name;
   }
+  //console.log('@@found layout', layoutName);
   return new GenericLayout(layoutName, presentation, slide);
 }
 
@@ -88,6 +89,10 @@ defineLayout(
     hasText(slide.title) && !hasText(slide.subtitle) && !hasContent(slide)
 );
 defineLayout(
+  'TITLE_AND_TWO_COLUMNS',
+  slide => hasText(slide.title) && slide.bodies.length === 2
+);
+defineLayout(
   'SECTION_TITLE_AND_DESCRIPTION',
   slide =>
     hasText(slide.title) && hasText(slide.subtitle) && hasTextContent(slide)
@@ -95,10 +100,6 @@ defineLayout(
 defineLayout(
   'BIG_NUMBER',
   slide => hasBigTitle(slide) && hasTextContent(slide)
-);
-defineLayout(
-  'TITLE_AND_TWO_COLUMNS',
-  slide => hasText(slide.title) && slide.bodies.length === 2
 );
 defineLayout(
   'TITLE_AND_BODY',
