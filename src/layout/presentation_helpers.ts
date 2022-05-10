@@ -106,7 +106,7 @@ export function findPlaceholder(
     }
     if (element.image && 
       element.image.placeholder && 
-      name == 'PICTURE') {
+      name == element.image.placeholder.type) {
       placeholders.push(element);
     }
   }

@@ -81,6 +81,7 @@ export default class GenericLayout {
     return requests;
   }
 
+  // called once, for each slide!
   public appendContentRequests(
     requests: SlidesV1.Schema$Request[]
   ): SlidesV1.Schema$Request[] {
@@ -118,23 +119,32 @@ export default class GenericLayout {
         bodyElements?.length ?? 0,
         this.slide.bodies.length
       );
+
+      // grab all the image placeholders for this slide
+      const imagePlaceholders = findPlaceholder(
+        this.presentation,
+        this.slide.objectId,
+        'PICTURE'
+      ) || [];
+
       for (let i = 0; i < bodyCount; ++i) {
         const placeholder = bodyElements![i];
         const body = this.slide.bodies[i];
         this.appendFillPlaceholderTextRequest(body.text, placeholder, requests);
+
         if (body.images && body.images.length) {
-          const pictureElements = findPlaceholder(
-            this.presentation,
-            this.slide.objectId,
-            'PICTURE'
-          ) || [];
           // send all the images, and just the first placeholder
-          this.appendCreateImageRequests(body.images, pictureElements, requests);
+          this.appendCreateImageRequests(body.images, imagePlaceholders, requests);
         }
         if (body.videos && body.videos.length) {
           this.appendCreateVideoRequests(body.videos, placeholder, requests);
         }
       }
+
+      // if there were any, remove all image placeholders from the slide
+      imagePlaceholders.forEach(p => 
+        requests.push({'deleteObject': {'objectId': p!['objectId']}}));
+
     }
 
     if (this.slide.notes) {
@@ -298,7 +308,7 @@ export default class GenericLayout {
     ): void {
       const that = this;
 
-      function transformAndReplacePlaceholder(
+      function transformToMatchPlaceholder(
         image: ImageDefinition, 
         placeholder: SlidesV1.Schema$PageElement
       ): void {
@@ -357,17 +367,12 @@ export default class GenericLayout {
             url: item.meta.url,
           },
         });
-
-        // if a placeholder was found, delete it
-        if (placeholder) {
-          requests.push({'deleteObject': {'objectId': placeholder!['objectId']}});
-        }
       }
 
       images.forEach((image, i) => {
         debug('Slide #%d: adding inline image %s', this.slide.index, image.url);
         const placeholder = placeholders[i] || undefined;
-        transformAndReplacePlaceholder(image, placeholder)
+        transformToMatchPlaceholder(image, placeholder)
       });
     }
 
