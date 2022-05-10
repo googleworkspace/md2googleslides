@@ -1,5 +1,5 @@
 {
-  "name": "md2gslides",
+  "name": "md2googleslides",
   "version": "0.5.1",
   "description": "Convert Markdown to Google Slides",
   "engines": {
