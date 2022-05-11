@@ -452,6 +452,14 @@ export default class GenericLayout {
     const table = tables[0];
     const tableId = uuid();
 
+    // check to see if the first cell of the first row asks us to delete
+    // necessary to handle racket workaround for the markdown limitation
+    // that all tables have headers
+    if(table.cells[0][0].rawText == "DELETE THIS ROW") {
+      table.cells.shift();               // delete the row
+      table.rows = table.rows - 1;       // update row count
+    }
+
     requests.push({
       createTable: {
         objectId: tableId,
