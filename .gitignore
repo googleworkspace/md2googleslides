@@ -45,3 +45,6 @@ jspm_packages
 
 # Exclude the compiled lib directory
 lib
+
+# OSX files
+.DS_Store
