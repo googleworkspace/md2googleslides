@@ -14,6 +14,7 @@
 
 import Debug from 'debug';
 import fs from 'fs';
+import request from 'request-promise-native';
 
 const debug = Debug('md2gslides');
 
@@ -33,25 +34,23 @@ async function uploadLocalImage(filePath: string, key?: string): Promise<string>
       file: stream,
     };
 
+    // all requests should expire in an hour, and be auto-deleted
+    const req : {url: string, formData: any, headers?: any} = {
+      url: 'https://file.io?expires=1h&autoDelete=true', formData: params
+    };
+
     // add the authorization key, if one is defined
-    const headers = new Headers();
     if(key) {
-      headers.append("Authorization", key);
+      req.headers = {"Authorization" : key}
     }
-    
-    return await fetch('https://file.io?expires=1h&autoDelete=true', {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(params),
-    })
-    .then(response => response.json())
-    .then(result => {
-      debug('Temporary link: %s', result.link);
-      return result.link;
-    }).catch(error => {
-      debug('Unable to upload file: %O', error);
-      throw(error);
-    });
+    const res = await request.post(req);
+    const responseData = JSON.parse(res);
+    if (!responseData.success) {
+      debug('Unable to upload file: %O', responseData);
+      throw res;
+    }
+    debug('Temporary link: %s', responseData.link);
+    return responseData.link;
   } finally {
     stream.destroy();
   }
