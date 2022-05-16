@@ -257,6 +257,7 @@ export default class SlideGenerator {
         return Promise.reject('Local images require --use-fileio option');
       }
       image.url = await uploadLocalImage(parsedUrl.pathname, this.fileIO_key);
+      console.log('@@imageurl is:', image.url);
     };
     return this.processImages(uploadImageifLocal, true);
   }

@@ -15,6 +15,7 @@
 import Debug from 'debug';
 import renderSVG from './svg.js';
 import renderMathJax from './mathjax.js';
+import renderDOM from './dom.js';
 import {ImageDefinition} from '../slides.js';
 import assert from 'assert';
 
@@ -23,6 +24,7 @@ const debug = Debug('md2gslides');
 const renderers: {[key: string]: (img: ImageDefinition) => Promise<String>} = {
   svg: renderSVG,
   math: renderMathJax,
+  html: renderDOM
 };
 
 /**
