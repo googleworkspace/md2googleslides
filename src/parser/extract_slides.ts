@@ -176,6 +176,7 @@ inlineTokenRules['text'] = (token, context) => {
 };
 
 inlineTokenRules['paragraph_open'] = (token, context) => {
+  const style = applyTokenStyle(token, {});
   assert(context.currentSlide);
   if (hasClass(token, 'column')) {
     context.markerParagraph = true;
@@ -191,6 +192,7 @@ inlineTokenRules['paragraph_open'] = (token, context) => {
   } else if (!context.text) {
     context.startTextBlock();
   }
+  context.startStyle(style);
 
   const layout = attr(token, 'layout');
   // If we have a layout attribute set this on the slide so we can select the
@@ -207,6 +209,7 @@ inlineTokenRules['paragraph_close'] = (token, context) => {
   } else {
     context.appendText('\n');
   }
+  context.endStyle();
 };
 
 inlineTokenRules['fence'] = (token, context) => {
