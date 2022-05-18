@@ -311,7 +311,8 @@ export default class GenericLayout {
     ): void {
       const that = this;
 
-      function transformToMatchPlaceholder(
+      // Convert pixels to EMUs. If there's a placeholder, resize to fit.
+      function transformImageSize(
         image: ImageDefinition, 
         placeholder: SlidesV1.Schema$PageElement
       ): void {
@@ -323,22 +324,21 @@ export default class GenericLayout {
           height: image.height + image.padding * 2,
           meta: image,
         });
-        const box = that.getBodyBoundingBox(placeholder);
+        let box = that.getBodyBoundingBox(placeholder);
         const computedLayout = layer.export();
-        
+
         // assume we're just converting Pixels->EMU, but scale to fit if we have a placeholder
         let scaleRatio = EMUperPixel;
         if(!!placeholder) {
           scaleRatio = Math.min(
-            box.width / computedLayout.width,
+            box.width  / computedLayout.width,
             box.height / computedLayout.height
           );
         }
-
-        const scaledWidth = computedLayout.width * scaleRatio;
+        const scaledWidth  = computedLayout.width  * scaleRatio;
         const scaledHeight = computedLayout.height * scaleRatio;
 
-        const baseTranslateX = box.x + (box.width - scaledWidth) / 2;
+        const baseTranslateX = box.x + (box.width  - scaledWidth)  / 2;
         const baseTranslateY = box.y + (box.height - scaledHeight) / 2;
 
         if(computedLayout.items.length > 1) {
@@ -380,7 +380,7 @@ export default class GenericLayout {
       images.forEach((image, i) => {
         debug('Slide #%d: adding inline image %s', this.slide.index, image.url);
         const placeholder = placeholders[i] || undefined;
-        transformToMatchPlaceholder(image, placeholder)
+        transformImageSize(image, placeholder)
       });
     }
 

@@ -59,16 +59,24 @@ async function probeImage(image: ImageDefinition): Promise<ImageDefinition> {
   debug('Probing image size: %s', image.url);
   assert(image.url);
   const parsedUrl = new URL(image.url);
-  if (parsedUrl.protocol === 'file:') {
-    const size = await probeFile(parsedUrl.pathname);
-    image.width = size.width;
-    image.height = size.height;
+  let size;
+  if(parsedUrl.protocol === 'file:'){
+    size = await probeFile(parsedUrl.pathname);
   } else {
-    const size = await probeUrl(image.url);
-    image.width = size.width;
-    image.height = size.height;
+    size = await probeUrl(image.url);
   }
 
+  // if there's a custom height/width, we need to scale
+  let scaleRatio = 1;
+  if(image.height || image.width) {
+    scaleRatio = Math.min(
+      size.width  / image.width,
+      size.height / image.height
+    );
+  }
+
+  image.width  = size.width  * scaleRatio;
+  image.height = size.height * scaleRatio;
   return image;
 }
 
