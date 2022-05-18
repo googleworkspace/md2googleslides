@@ -34,6 +34,9 @@ import assert from 'assert';
 
 const debug = Debug('md2gslides');
 
+// from https://stackoverflow.com/a/66543738/12026982
+const EMUperPixel = 9525;
+
 interface BoundingBox {
   height: number;
   width: number;
@@ -322,11 +325,15 @@ export default class GenericLayout {
         });
         const box = that.getBodyBoundingBox(placeholder);
         const computedLayout = layer.export();
-
-        const scaleRatio = Math.min(
-          box.width / computedLayout.width,
-          box.height / computedLayout.height
-        );
+        
+        // assume we're just converting Pixels->EMU, but scale to fit if we have a placeholder
+        let scaleRatio = EMUperPixel;
+        if(!!placeholder) {
+          scaleRatio = Math.min(
+            box.width / computedLayout.width,
+            box.height / computedLayout.height
+          );
+        }
 
         const scaledWidth = computedLayout.width * scaleRatio;
         const scaledHeight = computedLayout.height * scaleRatio;
@@ -349,7 +356,7 @@ export default class GenericLayout {
           baseTranslateY + (item.y + itemPadding + itemOffsetY) * scaleRatio;
 
         // add the image at about the same size/position as the placeholder
-        requests.push({
+        const req = {
           createImage: {
             elementProperties: {
               pageObjectId: that.slide.objectId,
@@ -366,7 +373,8 @@ export default class GenericLayout {
             },
             url: item.meta.url,
           },
-        });
+        };
+        requests.push(req);
       }
 
       images.forEach((image, i) => {
