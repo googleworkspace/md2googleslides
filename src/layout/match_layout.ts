@@ -46,7 +46,6 @@ export default function matchLayout(
     }
     layoutName = layout.name;
   }
-  //console.log('@@found layout', layoutName);
   return new GenericLayout(layoutName, presentation, slide);
 }
 

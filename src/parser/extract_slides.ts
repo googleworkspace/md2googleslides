@@ -404,6 +404,16 @@ fullTokenRules['image'] = (token, context) => {
     offsetY: 0,
   };
 
+  const width = attr(token, 'width');
+  if (width) {
+    image.width = parseInt(width);
+  }
+
+  const height = attr(token, 'height');
+  if (height) {
+    image.height = parseInt(height);
+  }
+
   const padding = attr(token, 'pad');
   if (padding) {
     image.padding = parseInt(padding);
