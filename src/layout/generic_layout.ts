@@ -172,7 +172,7 @@ export default class GenericLayout {
       debug('No text for placeholder %s');
       return;
     }
-
+    
     if (typeof placeholder === 'string') {
       assert(this.slide.objectId);
       const pageElements = findPlaceholder(
