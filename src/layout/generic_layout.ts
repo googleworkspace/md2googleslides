@@ -354,10 +354,12 @@ export default class GenericLayout {
           baseTranslateX + (item.x + itemPadding + itemOffsetX) * scaleRatio;
         const translateY =
           baseTranslateY + (item.y + itemPadding + itemOffsetY) * scaleRatio;
+        const imageId = uuid();
 
         // add the image at about the same size/position as the placeholder
-        const req = {
+        const createImageReq = {
           createImage: {
+            objectId: imageId,
             elementProperties: {
               pageObjectId: that.slide.objectId,
               size: {
@@ -374,7 +376,17 @@ export default class GenericLayout {
             url: item.meta.url,
           },
         };
-        requests.push(req);
+        requests.push(createImageReq);
+
+        // add the altText
+        const altTextReq = {
+          updatePageElementAltText: {
+            "objectId": imageId,
+            "title": "",
+            "description": image.altText,
+          }
+        };
+        requests.push(altTextReq);
       }
 
       images.forEach((image, i) => {

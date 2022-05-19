@@ -48,6 +48,7 @@ export interface ImageDefinition {
   padding: number;
   offsetX: number;
   offsetY: number;
+  altText?: string;
 }
 export interface TableDefinition {
   rows: number;

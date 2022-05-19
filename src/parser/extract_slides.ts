@@ -402,6 +402,7 @@ fullTokenRules['image'] = (token, context) => {
     padding: 0,
     offsetX: 0,
     offsetY: 0,
+    altText: token.content,
   };
 
   const width = attr(token, 'width');
