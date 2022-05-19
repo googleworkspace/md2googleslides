@@ -435,6 +435,7 @@ fullTokenRules['image'] = (token, context) => {
   } else {
     context.images.push(image);
   }
+  //console.log('parser returned image:', JSON.stringify(image));
 };
 
 fullTokenRules['video'] = (token, context) => {

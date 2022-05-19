@@ -66,17 +66,16 @@ async function probeImage(image: ImageDefinition): Promise<ImageDefinition> {
     size = await probeUrl(image.url);
   }
 
-  // if there's a custom height/width, we need to scale
-  let scaleRatio = 1;
-  if(image.height || image.width) {
-    scaleRatio = Math.min(
-      size.width  / image.width,
-      size.height / image.height
-    );
-  }
+  //console.log('declared size:', JSON.stringify(image, null, 4), 'actual size', JSON.stringify(size,null,4));
 
+  // if there's a custom height/width, we need to scale. Otherwise use 1.
+  let scaleRatio;
+  scaleRatio = image.height? (image.height  / size.height) : 1;
+  scaleRatio = image.width?  (image.width   / size.width ) : 1;
+  
   image.width  = size.width  * scaleRatio;
   image.height = size.height * scaleRatio;
+  //console.log('after probe, image:', JSON.stringify(image, null, 4))
   return image;
 }
 
