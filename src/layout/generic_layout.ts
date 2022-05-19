@@ -471,14 +471,19 @@ export default class GenericLayout {
     }
     const table = tables[0];
     const tableId = uuid();
+    let hasHeader = true;
 
     // check to see if the first cell of the first row asks us to delete
     // necessary to handle racket workaround for the markdown limitation
     // that all tables have headers
     if(table.cells[0][0].rawText == "DELETE THIS ROW") {
+      hasHeader = false;
+    }
+    // If it's a table with no header...
+    if(!hasHeader) {
       table.cells.shift();               // delete the row
       table.rows = table.rows - 1;       // update row count
-    }
+    } 
 
     requests.push({
       createTable: {
@@ -508,6 +513,36 @@ export default class GenericLayout {
         );
       }
     }
+
+    // if there's a header, update the formatting
+    // from cell (0,0) through table.columns, give it a half-gray BG
+    requests.push({
+      updateTableCellProperties: {
+        objectId: tableId,
+        tableRange: {
+          location: {
+            rowIndex: 0,
+            columnIndex: 0
+          },
+          rowSpan: 1,
+          columnSpan: table.columns
+        },
+        tableCellProperties: {
+          tableCellBackgroundFill: {
+            solidFill: {
+              color: {
+                rgbColor: {
+                  red: 0.75,
+                  green: 0.75,
+                  blue: 0.75
+                }
+              }
+            }
+          }
+        },
+        fields: "tableCellBackgroundFill.solidFill.color"
+      }
+    });
   }
 
   protected calculateBoundingBox(
