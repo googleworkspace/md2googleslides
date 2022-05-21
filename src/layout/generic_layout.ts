@@ -208,7 +208,7 @@ export default class GenericLayout {
     const request = {
       insertText: extend(
         {
-          text: text.rawText,
+          text: text.rawText.trimLeft(), // trim any starting whitespace
         },
         locationProps
       ),
