@@ -245,18 +245,30 @@ export default class SlideGenerator {
   }
 
   protected async uploadLocalImages(): Promise<void> {
+    const urlCache: { [key: string]: string } = {};
     const uploadImageifLocal = async (
       image: ImageDefinition
     ): Promise<void> => {
       assert(image.url);
+      console.log(JSON.stringify(urlCache,null,4));
       const parsedUrl = new URL(image.url);
-      if (parsedUrl.protocol !== 'file:') {
+      // have we already uploaded it?
+      if(urlCache[parsedUrl.pathname]) { 
+        image.url = urlCache[parsedUrl.pathname];
         return;
       }
-      if (!this.allowUpload) {
+      // if it's not a file, just terminate
+      else if (parsedUrl.protocol !== 'file:') {
+        return;
+      }
+      // reject the promise if we're not allowed to upload
+      else if (!this.allowUpload) {
         return Promise.reject('Local images require --use-fileio option');
       }
-      image.url = await uploadLocalImage(parsedUrl.pathname, this.fileIO_key);
+      else {
+        image.url = await uploadLocalImage(parsedUrl.pathname, this.fileIO_key);
+        urlCache[parsedUrl.pathname] = image.url;
+      }
     };
     return this.processImages(uploadImageifLocal, true);
   }
