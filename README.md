@@ -325,9 +325,9 @@ the font size:
 <pre>
 ### Hello World
 
-```javascript
+```javascript{style="font-size: 36pt"}
 console.log('Hello world');
-```{style="font-size: 36pt"}
+```
 </pre>
 
 ### Tables
