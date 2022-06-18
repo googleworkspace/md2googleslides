@@ -115,7 +115,7 @@
     "mocha": "9.0.1",
     "mock-fs": "5.0.0",
     "nock": "13.1.0",
-    "typescript": "4.3.4"
+    "typescript": "4.7.4"
   },
   "bin": {
     "md2gslides": "bin/md2gslides.js"
