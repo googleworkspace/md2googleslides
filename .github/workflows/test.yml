@@ -6,7 +6,7 @@ name: Test
 on: [push, pull_request, workflow_dispatch]
 
 jobs:
-  test:
+  matrix:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -20,4 +20,8 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - run: npm ci
       - run: npm test
-
+  test:
+    needs: [matrix]
+    runs-on: ubuntu-latest
+    steps:
+    - run: echo "Test matrix finished"
