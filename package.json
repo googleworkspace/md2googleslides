@@ -97,7 +97,7 @@
     "@types/lowlight": "^0.0.2",
     "@types/markdown-it": "12.0.2",
     "@types/mkdirp": "^1.0.1",
-    "@types/mocha": "^8.2.2",
+    "@types/mocha": "9.1.1",
     "@types/mock-fs": "^4.13.0",
     "@types/node": "15.12.4",
     "@types/parse-color": "^1.0.0",
@@ -112,7 +112,7 @@
     "chai-as-promised": "7.1.1",
     "chai-subset": "1.6.0",
     "gts": "3.1.0",
-    "mocha": "9.0.1",
+    "mocha": "9.2.2",
     "mock-fs": "5.0.0",
     "nock": "13.1.0",
     "typescript": "4.3.4"
