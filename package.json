@@ -93,7 +93,7 @@
     "@types/debug": "^4.1.5",
     "@types/extend": "^3.0.1",
     "@types/jsonfile": "^6.0.0",
-    "@types/lowdb": "1.0.10",
+    "@types/lowdb": "1.0.11",
     "@types/lowlight": "^0.0.2",
     "@types/markdown-it": "12.0.2",
     "@types/mkdirp": "^1.0.1",
