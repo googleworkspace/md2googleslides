@@ -92,7 +92,7 @@
     "@types/chai-subset": "^1.3.3",
     "@types/debug": "^4.1.5",
     "@types/extend": "^3.0.1",
-    "@types/jsonfile": "^6.0.0",
+    "@types/jsonfile": "6.1.0",
     "@types/lowdb": "1.0.10",
     "@types/lowlight": "^0.0.2",
     "@types/markdown-it": "12.0.2",
