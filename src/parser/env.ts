@@ -26,7 +26,7 @@ import extend from 'extend';
 import * as _ from 'lodash';
 import {Stylesheet} from './css';
 import assert from 'assert';
-import {Element} from 'parse5';
+import {Element} from 'parse5/dist/tree-adapters/default';
 
 export class Context {
   public slides: SlideDefinition[] = [];
