@@ -15,7 +15,8 @@
 import Debug from 'debug';
 import extend from 'extend';
 import Token from 'markdown-it/lib/token';
-import parse5, {Element} from 'parse5';
+import parse5 from 'parse5';
+import {Element} from 'parse5/dist/tree-adapters/default';
 import fileUrl from 'file-url';
 import {SlideDefinition, StyleDefinition} from '../slides';
 import parseMarkdown from './parser';
@@ -118,9 +119,10 @@ inlineTokenRules['inline'] = (token, context) => {
 };
 
 inlineTokenRules['html_inline'] = (token, context) => {
-  const fragment = context.inlineHtmlContext
-    ? parse5.parseFragment(context.inlineHtmlContext, token.content)
-    : parse5.parseFragment(token.content);
+  // const fragment = context.inlineHtmlContext
+  //   ? parse5.parseFragment(token.content, context.inlineHtmlContext)
+  //   : parse5.parseFragment(token.content);
+  const fragment = parse5.parseFragment(token.content);
   if (fragment.childNodes && fragment.childNodes.length) {
     const node = fragment.childNodes[0] as Element;
     const style: StyleDefinition = {};
