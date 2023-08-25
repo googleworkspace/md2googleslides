@@ -1,20 +1,14 @@
-Generate Google Slides from markdown & HTML. Run from the command line or embed in another
-application.
+Generate Google Slides from markdown & HTML. Run from the command line or embed in another application. This project was developed as an example of how to use the [Google Slides (REST) API](https://developers.google.com/slides). While it does not yet produce stunningly beautiful decks, you are encouraged to use this tool for quickly prototyping presentations. Contributions are welcome.
 
-This project was developed as an example of how to use the
-[Slides API](https://developers.google.com/slides).
+**NOTE**: This is a fork of the original repo at <https://github.com/googleworkspace/md2googleslides>. The project is still "actively" maintained, but some users can't wait for the PRs from the original maintainer. Upstream changes will be merged as necessary.
 
-While it does not yet produce stunningly beautiful decks, you are encouraged to use
-this tool for quickly prototyping presentations.
-
-Contributions are welcome.
 
 ## Installation and usage
 
-For command line use, install md2gslides globally:
+For command line use, install `md2gslides` globally:
 
 ```sh
-npm install -g md2gslides
+npm install -g @wescpy/md2gslides
 ```
 
 Then get your OAuth client ID credentials:
@@ -33,7 +27,7 @@ After installing, import your slides by running:
 md2gslides slides.md --title "Talk Title"
 ```
 
-This will generate new Google Slides in your account with title `Talk Title`. 
+This will generate new Google Slides in your account with title `Talk Title`.
 
 NOTE: The first time the command is run you will be prompted for authorization. OAuth token
 credentials are stored locally in a file named `~/.md2googleslides/credentials.json`.
@@ -440,5 +434,4 @@ See [CONTRIBUTING](CONTRIBUTING.md) for additional terms.
 
 ## License
 
-This library is licensed under Apache 2.0. Full license text is
-available in [LICENSE](LICENSE).
+This library is licensed under Apache 2.0. Full license text is available in [LICENSE](LICENSE).
