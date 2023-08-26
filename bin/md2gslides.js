@@ -20,12 +20,14 @@ require('babel-polyfill');
 
 const Promise = require('promise');
 const fs = require('fs');
+const fsp = require('fs').promises;
 const path = require('path');
+const process = require('process');
 const ArgumentParser = require('argparse').ArgumentParser;
-const UserAuthorizer = require('../lib/auth').default;
+const {authenticate} = require('@google-cloud/local-auth');
+const {google} = require('googleapis');
 const SlideGenerator = require('../lib/slide_generator').default;
 const opener = require('opener');
-const readline = require('readline');
 
 const SCOPES = [
   'https://www.googleapis.com/auth/presentations',
@@ -107,62 +109,57 @@ function handleError(err) {
   console.log('Unable to generate slides:', err);
 }
 
-function prompt(url) {
-  if (args.headless) {
-    console.log('Authorize this app by visiting this url: ');
-    console.log(url);
-  } else {
-    console.log('Authorize this app in your browser.');
-    opener(url);
+/**
+ * Reads previously authorized credentials from the save file.
+ *
+ * @return {Promise<OAuth2Client|null>}
+ */
+async function loadSavedCredentialsIfExist() {
+  try {
+    const content = await fsp.readFile(STORED_CREDENTIALS_PATH);
+    const credentials = JSON.parse(content);
+    return google.auth.fromJSON(credentials);
+  } catch (err) {
+    return null;
   }
-  return new Promise((resolve, reject) => {
-    const rl = readline.createInterface({
-      input: process.stdin,
-      output: process.stdout,
-    });
-    rl.question('Enter the code here: ', code => {
-      rl.close();
-      code = code.trim();
-      if (code.length > 0) {
-        resolve(code);
-      } else {
-        reject(new Error('No code provided'));
-      }
-    });
-  });
 }
 
-function authorizeUser() {
-  // Google OAuth2 clients always have a secret, even if the client is an installed
-  // application/utility such as this.  Of course, in such cases the "secret" is
-  // actually publicly known; security depends entirely on the secrecy of refresh
-  // tokens, which effectively become bearer tokens.
+/**
+ * Serializes credentials to a file comptible with GoogleAUth.fromJSON.
+ *
+ * @param {OAuth2Client} client
+ * @return {Promise<void>}
+ */
+async function saveCredentials(client) {
+  const content = await fsp.readFile(STORED_CLIENT_ID_PATH);
+  const keys = JSON.parse(content);
+  const key = keys.installed || keys.web;
+  const payload = JSON.stringify({
+    type: 'authorized_user',
+    client_id: key.client_id,
+    client_secret: key.client_secret,
+    refresh_token: client.credentials.refresh_token,
+  });
+  await fsp.writeFile(STORED_CREDENTIALS_PATH, payload);
+}
 
-  // Load and parse client ID and secret from client_id.json file. (Create
-  // OAuth client ID from Credentials tab at console.developers.google.com
-  // and download the credentials as client_id.json to ~/.md2googleslides
-  let data; // needs to be scoped outside of try-catch
-  try {
-    data = fs.readFileSync(STORED_CLIENT_ID_PATH);
-  } catch (err) {
-    console.log('Error loading client secret file:', err);
-    throw err;
+/**
+ * Load or request or authorization to call APIs.
+ *
+ */
+async function authorize() {
+  let client = await loadSavedCredentialsIfExist();
+  if (client) {
+    return client;
   }
-  if (data === undefined) {
-    console.log('Error loading client secret data');
-    throw 'No client secret found.';
+  client = await authenticate({
+    scopes: SCOPES,
+    keyfilePath: STORED_CLIENT_ID_PATH,
+  });
+  if (client.credentials) {
+    await saveCredentials(client);
   }
-  const creds = JSON.parse(data).installed;
-
-  // Authorize user and get (& store) a valid access token.
-  const options = {
-    clientId: creds.client_id,
-    clientSecret: creds.client_secret,
-    filePath: STORED_CREDENTIALS_PATH,
-    prompt: prompt,
-  };
-  const auth = new UserAuthorizer(options);
-  return auth.getUserCredentials(args.user, SCOPES);
+  return client;
 }
 
 function buildSlideGenerator(oauth2Client) {
@@ -228,7 +225,7 @@ function displayResults(id) {
     opener(url);
   }
 }
-authorizeUser()
+authorize()
   .then(buildSlideGenerator)
   .then(eraseIfNeeded)
   .then(generateSlides)

@@ -1,20 +1,14 @@
-Generate Google Slides from markdown & HTML. Run from the command line or embed in another
-application.
+Generate Google Slides from markdown & HTML. Run from the command line or embed in another application. This project was developed as an example of how to use the [Google Slides (REST) API](https://developers.google.com/slides). While it does not yet produce stunningly beautiful decks, you are encouraged to use this tool for quickly prototyping presentations. Contributions are welcome.
 
-This project was developed as an example of how to use the
-[Slides API](https://developers.google.com/slides).
+**NOTE**: This is a fork of the original repo at <https://github.com/googleworkspace/md2googleslides>. The project is still "actively" maintained, but some users can't wait for the PRs from the original maintainer. Upstream changes will be merged as necessary.
 
-While it does not yet produce stunningly beautiful decks, you are encouraged to use
-this tool for quickly prototyping presentations.
-
-Contributions are welcome.
 
 ## Installation and usage
 
-For command line use, install md2gslides globally:
+For command line use, install `md2gslides` globally:
 
 ```sh
-npm install -g md2gslides
+npm install -g @wescpy/md2gslides
 ```
 
 Then get your OAuth client ID credentials:
@@ -22,29 +16,59 @@ Then get your OAuth client ID credentials:
 * Create (or reuse) a developer project at <https://console.developers.google.com>
 * Enable Google Slides API at [API library page](https://console.developers.google.com/apis/library)
 * Go to [Credentials page](https://console.developers.google.com/apis/credentials) and click "+ Create credentials" at the top
-* Select "OAuth client ID" authorization credentials
+* Create "OAuth client ID" type of credentials.
 * Choose type "Computer Application" and give it some name.
-* Download client credentials file.
-* Copy it to `client_id.json` (name has to match) and save to `~/.md2googleslides`.
+* Download client ID/secret file and shorten the name to: `client_id.json`.
+* Move `client_id.json` (name has to be exact) to `~/.md2googleslides`.
 
 After installing, import your slides by running:
+
+```sh
+md2gslides slides.md
+```
+
+You'll get a slide deck named "slides.md".
+
+> NOTE: The first time you run the `md2gslides` command, you will be prompted for authorization. OAuth token credentials are stored in `~/.md2googleslides/credentials.json`. You may get a "scary-looking" screen that says, "Google hasn't verified this app." Click "Advanced" then "Go to _APP-NAME_ (unsafe)" if you trust yourself as the author of the app that's requesting to access your Slides files in Drive.
+
+
+If you want to give the presentation a different name, use the `--title` option:
 
 ```sh
 md2gslides slides.md --title "Talk Title"
 ```
 
-This will generate new Google Slides in your account with title `Talk Title`. 
+This will generate new Google Slides in your account with title `Talk Title`.
 
-NOTE: The first time the command is run you will be prompted for authorization. OAuth token
-credentials are stored locally in a file named `~/.md2googleslides/credentials.json`.
+Each time you run `md2gslides`, a new slide deck will be generated. If you want to append to or replace an existing slide deck, get the Drive file ID of that deck. The file ID is the 44-character string in a presentation's URL. For example, for this slide deck URL: `https://docs.google.com/presentation/d/1EAYk18WDjIG-zp_0vLm3CsfQh_i8eXc67Jo2O9C6Vuc/edit`, its file ID is `1EAYk18WDjIG-zp_0vLm3CsfQh_i8eXc67Jo2O9C6Vuc`.
 
-Each time you will run the above comment, new slide deck will be generated. In order to work on exactly the same
-deck, just get the ID of the already generated slides. For example, you can use following command:
+Let's say you made some additional slides in `slides2.md`. To generate those slides and append to your existing deck, run:
 
+```sh
+md2gslides slides2.md --append FILE_ID
 ```
-# To reuse deck available at: https://docs.google.com/presentation/d/<some id>/edit#
-md2gslides slides.md --title "Talk Title" --append <some id> --erase
+
+To regenerate and replace a deck you've created with file ID `FILE_ID`, run:
+
+```sh
+md2gslides slides.md --erase --append FILE_ID
 ```
+
+Each time you run the `md2gslides` command, the newly-created or edited slide deck will open in a new browser tab. If you want to suppress that from happening because you already have it open in an existing tab, issue the `--no-browser` option. This command replaces an existing deck but doesn't open up a new browser tab:
+
+```sh
+md2gslides slides.md --no-browser --erase --append FILE_ID
+```
+
+If you're an advanced user, you can use the shorter alternative 1-character options:
+
+```sh
+md2gslides slides.md -nea FILE_ID -t "Talk Title"
+```
+
+
+Images (see syntax below) are expected to be online (have URLs), but if you have local files you wish you use the `--use-fileio` option. More info on this option down below in the [Local images](#local-images) section.
+
 
 ## Supported markdown rules
 
@@ -163,11 +187,7 @@ Even if you will use `--append` option for deck reuse, theme will be not changed
 
 #### Inline images
 
-Images can be placed on slides using image tags. Multiple images
-can be included. Mulitple images in a single paragraph are arranged in columns,
-mutiple paragraphs arranged as rows.
-
-Note: Images are currently scaled and centered to fit the
+Images can be placed on slides using image tags. Multiple images can be included. Mulitple images in a single paragraph are arranged in columns, multiple paragraphs arranged as rows. **NOTE:** Images are currently scaled and centered to fit the
 slide template.
 
 <pre>
@@ -328,6 +348,7 @@ console.log('Hello world');
 ```{style="font-size: 36pt"}
 </pre>
 
+
 ### Tables
 
 Tables are supported via
@@ -349,22 +370,18 @@ Dogs   | 75 million
 Birds  | 16 million
 </pre>
 
+
 ### Local images
 
-Images referencing local paths temporarily uploaded and hosted to [file.io](https://file.io). File.io
-is an emphemeral file serving service that generates short-lived random URLs to the upload file and deletes
-content shortly after use.
+Images referencing local paths temporarily uploaded and hosted to [file.io](https://file.io). File.io is an ephemeral file serving service that generates short-lived random URLs to the upload file and deletes content shortly after use.
 
-Since local images are uploaded to a thrid party, explicit opt-in is required to use this feature.
-Include the `--use-fileio` option to opt-in to uploading images. This applies to file-based images as well
+Since local images are uploaded to a third party, explicit opt-in is required to use this feature. Include the `--use-fileio` option to opt-in to uploading images. This applies to file-based images as well
 as automatically rasterized content like math expressions and SVGs.
+
 
 ### Image rasterization
 
-Slides can also include generated images, using `$$$` fenced blocks
-for the data. Currently supported generated images are math expression (TeX
-and MathML) as well as SVG. Rasterized images are treated like local images are require
-opt-in to uploading images to a 3rd party service via the `--use-fileio` option.
+Slides can also include generated images, using `$$$` fenced blocks for the data. Currently supported generated images are math expression (TeX and MathML) as well as SVG. Rasterized images are treated like local images are require opt-in to uploading images to a 3rd party service via the `--use-fileio` option.
 
 Using TeX:
 
@@ -440,5 +457,4 @@ See [CONTRIBUTING](CONTRIBUTING.md) for additional terms.
 
 ## License
 
-This library is licensed under Apache 2.0. Full license text is
-available in [LICENSE](LICENSE).
+This library is licensed under Apache 2.0. Full license text is available in [LICENSE](LICENSE).
