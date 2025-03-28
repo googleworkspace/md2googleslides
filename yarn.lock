@@ -4737,8 +4737,8 @@ table@^6.0.9:
     strip-ansi "^6.0.0"
 
 tar-fs@^2.0.0, tar-fs@^2.1.1:
-  version "2.1.1"
-  resolved "https://registry.npmjs.org/tar-fs/-/tar-fs-2.1.1.tgz"
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/tar-fs/-/tar-fs-2.1.2.tgz#425f154f3404cb16cb8ff6e671d45ab2ed9596c5"
   dependencies:
     chownr "^1.1.1"
     mkdirp-classic "^0.5.2"
