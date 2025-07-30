@@ -1450,8 +1450,8 @@ boxen@^5.0.0:
     wrap-ansi "^7.0.0"
 
 brace-expansion@^1.1.7:
-  version "1.1.11"
-  resolved "https://registry.npmjs.org/brace-expansion/-/brace-expansion-1.1.11.tgz"
+  version "1.1.12"
+  resolved "https://registry.yarnpkg.com/brace-expansion/-/brace-expansion-1.1.12.tgz#ab9b454466e5a8cc3a187beaad580412a9c5b843"
   dependencies:
     balanced-match "^1.0.0"
     concat-map "0.0.1"
